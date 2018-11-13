@@ -14,16 +14,36 @@ namespace MobileClient.Views
     public partial class OrderPage : ContentPage
     {
         private MainPage RootPage { get => Application.Current.MainPage as MainPage; }
+
         public OrderPage()
         {
             InitializeComponent();
             StatePicker.ItemsSource = States.Select(x => x.Text).ToList();
-            SubmitButton.Clicked += async (s, e) =>
-            {
-                await RootPage.NavigateFromMenu(MenuItemType.MyOrders);
-            };
+            SubmitButton.Clicked += async (s, e) => await HandleSubmitClick(s, e);
         }
 
+        private async Task HandleSubmitClick(object sender, EventArgs e)
+        {
+            ErrorMessage.Text = "";
+            if (string.IsNullOrWhiteSpace(AddressLine1.Text)
+                || string.IsNullOrWhiteSpace(AddressLine2.Text)
+                || string.IsNullOrWhiteSpace(City.Text)
+                || StatePicker.SelectedIndex < 0
+                || string.IsNullOrWhiteSpace(Zip.Text))
+            {
+                ErrorMessage.Text = "Please fill out all fields before submitting.";
+                return;
+            }
+            // Submit here
+            await Task.Delay(200);
+            // Clear all fields
+            AddressLine1.Text = "";
+            AddressLine2.Text = "";
+            City.Text = "";
+            StatePicker.SelectedIndex = -1;
+            Zip.Text = "";
+            await RootPage.NavigateFromMenu(MenuItemType.MyOrders);
+        }
         private readonly List<StateViewModel> States = new List<StateViewModel>()
         {
             new StateViewModel() {Code = "AL", Text = "Alabama"},

@@ -26,6 +26,9 @@
                 WidthRequest="200"
                 Keyboard="Numeric"
                 HorizontalOptions="CenterAndExpand" />
+            <Label x:Name="ErrorMessage"
+                   WidthRequest="300"
+                   HorizontalOptions="CenterAndExpand" />
             <Button Text="Submit"
                     x:Name="SubmitButton"
                     WidthRequest="300"

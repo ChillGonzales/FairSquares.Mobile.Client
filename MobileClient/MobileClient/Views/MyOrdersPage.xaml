@@ -4,8 +4,8 @@
              x:Class="MobileClient.Views.MyOrdersPage">
     <ContentPage.Content>
         <StackLayout>
-            <Label Text="Welcome to your orders!"
-                VerticalOptions="CenterAndExpand" 
+            <ListView x:Name="OrderListView"
+                VerticalOptions="CenterAndExpand"
                 HorizontalOptions="CenterAndExpand" />
         </StackLayout>
     </ContentPage.Content>
