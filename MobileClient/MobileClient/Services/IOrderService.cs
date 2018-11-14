@@ -8,7 +8,7 @@ namespace MobileClient.Services
 {
     public interface IOrderService
     {
-        Task<string> AddOrder(Order order);
-        Task<IEnumerable<Order>> GetMemberOrders(string memberId);
+        string AddOrder(Order order);
+        IEnumerable<Order> GetMemberOrders(string memberId);
     }
 }

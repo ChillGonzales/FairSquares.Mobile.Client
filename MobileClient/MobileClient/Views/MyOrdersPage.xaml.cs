@@ -20,8 +20,8 @@ namespace MobileClient.Views
         public MyOrdersPage()
         {
             InitializeComponent();
-            _orderService = DependencyService.Get<IOrderService>();
-            _currentOrders = _orderService.GetMemberOrders("1234").Result.ToList();
+            _orderService = App.Container.GetInstance<IOrderService>();
+            _currentOrders = _orderService.GetMemberOrders("1234").ToList();
             OrderListView.ItemsSource = _currentOrders.Select(x => x.StreetAddress);
         }
     }

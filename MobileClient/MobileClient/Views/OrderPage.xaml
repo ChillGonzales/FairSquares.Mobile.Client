@@ -4,35 +4,54 @@
              Title="Order"
              x:Class="MobileClient.Views.OrderPage">
     <ContentPage.Content>
-        <StackLayout>
-            <Entry Placeholder="Address Line 1"
-                x:Name="AddressLine1"
+        <ScrollView>
+            <StackLayout Spacing="1">
+                <Entry x:Name="AddressLine1"
+                VerticalOptions="Start"
                 WidthRequest="200"
                 HorizontalOptions="CenterAndExpand" />
-            <Entry Placeholder="Address Line 2"
-                x:Name="AddressLine2"
+                <Label Text="Address Line 1" 
+               VerticalOptions="FillAndExpand"
+               HeightRequest="50"
+               HorizontalOptions="Center"/>
+                <Entry x:Name="AddressLine2"
                 WidthRequest="200"
                 HorizontalOptions="CenterAndExpand" />
-            <Entry Placeholder="City"
-                x:Name="City"
+                <Label Text="Address Line 2" 
+               VerticalOptions="FillAndExpand"
+               HorizontalOptions="Center"/>
+                <Entry x:Name="City"
+                VerticalOptions="FillAndExpand"
                 WidthRequest="200"
                 HorizontalOptions="CenterAndExpand" />
-            <Picker Title="State"
-                x:Name="StatePicker"
+                <Label Text="City" 
+                   VerticalOptions="FillAndExpand"
+                   HorizontalOptions="Center"/>
+                <Picker x:Name="StatePicker"
+                VerticalOptions="FillAndExpand"
                 WidthRequest="200"
                 HorizontalOptions="CenterAndExpand" />
-            <Entry Placeholder="Zip Code"
-                x:Name="Zip"
-                WidthRequest="200"
+                <Label Text="State" 
+                   VerticalOptions="FillAndExpand"
+                   HorizontalOptions="Center"/>
+                <Entry x:Name="Zip"
+                VerticalOptions="FillAndExpand"
+                WidthRequest="100"
                 Keyboard="Numeric"
                 HorizontalOptions="CenterAndExpand" />
-            <Label x:Name="ErrorMessage"
+                <Label Text="Zip Code" 
+                   VerticalOptions="FillAndExpand"
+                   HorizontalOptions="Center"/>
+                <Label x:Name="ErrorMessage"
+                   VerticalOptions="FillAndExpand"
                    WidthRequest="300"
                    HorizontalOptions="CenterAndExpand" />
-            <Button Text="Submit"
+                <Button Text="Submit"
+                    VerticalOptions="End"
                     x:Name="SubmitButton"
                     WidthRequest="300"
                     HorizontalOptions="CenterAndExpand"/>
-        </StackLayout>
+            </StackLayout>
+        </ScrollView>
     </ContentPage.Content>
 </ContentPage>

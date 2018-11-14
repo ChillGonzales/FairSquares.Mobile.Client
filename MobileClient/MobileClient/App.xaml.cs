@@ -1,4 +1,6 @@
-﻿using MobileClient.Views;
+﻿using MobileClient.Services;
+using MobileClient.Views;
+using SimpleInjector;
 using System;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
@@ -8,10 +10,17 @@ namespace MobileClient
 {
     public partial class App : Application
     {
+        public readonly static Container Container;
+
+        static App()
+        {
+            Container = new Container();
+            Container.Register<IOrderService, MockOrderService>();
+        }
+
         public App()
         {
             InitializeComponent();
-
             MainPage = new MainPage();
         }
 
