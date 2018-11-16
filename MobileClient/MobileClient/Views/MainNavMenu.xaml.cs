@@ -22,9 +22,9 @@ namespace MobileClient.Views
             // Fill out nav bar menu
             _menuItems = new List<MainNavMenuItem>()
             {
-                new MainNavMenuItem() { MenuItemType = MenuItemType.Order, Title = "New Order" },
-                new MainNavMenuItem() { MenuItemType = MenuItemType.MyOrders, Title = "My Orders" },
-                new MainNavMenuItem() { MenuItemType = MenuItemType.Account, Title = "Account" }
+                new MainNavMenuItem() { PageType = PageType.Order, Title = "New Order" },
+                new MainNavMenuItem() { PageType = PageType.MyOrders, Title = "My Orders" },
+                new MainNavMenuItem() { PageType = PageType.Account, Title = "Account" }
             };
 
             ListViewMenu.ItemsSource = _menuItems;
@@ -35,7 +35,7 @@ namespace MobileClient.Views
             {
                 if (e.SelectedItem == null)
                     return;
-                var selectedType = ((MainNavMenuItem)e.SelectedItem).MenuItemType;
+                var selectedType = ((MainNavMenuItem)e.SelectedItem).PageType;
                 await RootPage.NavigateFromMenu(selectedType);
             };
         }

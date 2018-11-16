@@ -6,13 +6,14 @@ namespace MobileClient.ViewModels
 {
     public class MainNavMenuItem
     {
-        public MenuItemType MenuItemType { get; set; }
+        public PageType PageType { get; set; }
         public string Title { get; set; }
     }
-    public enum MenuItemType
+    public enum PageType
     {
         Order = 0,
         MyOrders = 1,
-        Account = 2
+        Account = 2,
+        OrderDetail = 3
     }
 }

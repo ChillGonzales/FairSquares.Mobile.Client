@@ -56,7 +56,7 @@ namespace MobileClient.Views
                 City.Text = "";
                 StatePicker.SelectedIndex = -1;
                 Zip.Text = "";
-                await RootPage.NavigateFromMenu(MenuItemType.MyOrders);
+                await RootPage.NavigateFromMenu(PageType.MyOrders);
             }
             catch (Exception ex)
             {

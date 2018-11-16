@@ -17,6 +17,7 @@ namespace MobileClient.Views
     {
         private readonly IOrderService _orderService;
         private List<Order> _currentOrders;
+        private MainPage RootPage { get => Application.Current.MainPage as MainPage; }
         public static IList<OrderGroup> All { private set; get; }
 
         public MyOrdersPage()
@@ -42,6 +43,12 @@ namespace MobileClient.Views
                         Debug.WriteLine(ex.ToString());
                     }
                 });
+
+                OrderListView.ItemSelected += async (s, e) =>
+                {
+                    var id = ((OrderViewCell)e.SelectedItem).OrderId;
+                    await RootPage.NavigateToPage(new NavigationPage(new OrderDetailPage(_currentOrders.FirstOrDefault(x => x.OrderId == id))));
+                };
             }
             catch (Exception ex)
             {
@@ -51,19 +58,21 @@ namespace MobileClient.Views
 
         private void SetListViewSource(List<Order> orders)
         {
-            var fulGroup = new OrderGroup("Completed");
+            var fulGroup = new OrderGroup() { Title = "Completed" };
             fulGroup.AddRange(_currentOrders.Where(x => x.Fulfilled).Select(x => new OrderViewCell()
             {
                 Text = x.StreetAddress.Split('\n')[0],
-                TextColor = Color.Black
+                TextColor = Color.Black,
+                OrderId = x.OrderId
                 //Detail = x.Fulfilled ? "Complete" : "Pending",
                 //DetailColor = x.Fulfilled ? Color.DarkGreen : Color.DarkBlue
             }));
-            var penGroup = new OrderGroup("Pending");
+            var penGroup = new OrderGroup() { Title = "Pending" };
             penGroup.AddRange(_currentOrders.Where(x => !x.Fulfilled).Select(x => new OrderViewCell()
             {
                 Text = x.StreetAddress.Split('\n')[0],
-                TextColor = Color.Black
+                TextColor = Color.Black,
+                OrderId = x.OrderId
                 //Detail = x.Fulfilled ? "Complete" : "Pending",
                 //DetailColor = x.Fulfilled ? Color.DarkGreen : Color.DarkBlue
             }));
@@ -79,13 +88,10 @@ namespace MobileClient.Views
         public Color TextColor { get; set; }
         public string Detail { get; set; }
         public Color DetailColor { get; set; }
+        public string OrderId { get; set; }
     }
     public class OrderGroup : List<OrderViewCell>
     {
-        public OrderGroup(string title)
-        {
-            Title = title;
-        }
         public string Title { get; set; }
     }
 }

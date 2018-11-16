@@ -2,6 +2,7 @@
 using MobileClient.Views;
 using SimpleInjector;
 using System;
+using System.Threading.Tasks;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -19,6 +20,9 @@ namespace MobileClient
         static App()
         {
             Container = new Container();
+            var orderService = new AzureOrderService(_orderEndpoint, _apiKey);
+            // Build the cache of the orders so it doesn't take so long
+            Task.Run(() => orderService.GetMemberOrders(MemberId));
             Container.Register<IOrderService>(() => new AzureOrderService(_orderEndpoint, _apiKey), Lifestyle.Singleton);
         }
 

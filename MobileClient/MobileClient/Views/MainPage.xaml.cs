@@ -10,7 +10,7 @@ namespace MobileClient.Views
 {
     public partial class MainPage : MasterDetailPage
     {
-        private readonly Dictionary<MenuItemType, NavigationPage> MenuPages = new Dictionary<MenuItemType, NavigationPage>();
+        private readonly Dictionary<PageType, NavigationPage> MenuPages = new Dictionary<PageType, NavigationPage>();
 
         public MainPage()
         {
@@ -18,22 +18,22 @@ namespace MobileClient.Views
             MasterBehavior = MasterBehavior.Popover;
 
             // Adds default detail page (new order) to dictionary
-            MenuPages.Add(MenuItemType.Order, (NavigationPage) Detail);
+            MenuPages.Add(PageType.Order, (NavigationPage) Detail);
         }
-        public async Task NavigateFromMenu(MenuItemType pageType)
+        public async Task NavigateFromMenu(PageType pageType)
         {
             if (!MenuPages.Keys.Contains(pageType))
             {
                 switch (pageType)
                 {
-                    case (MenuItemType.Order):
-                        MenuPages.Add(MenuItemType.Order, new NavigationPage(new OrderPage()));
+                    case (PageType.Order):
+                        MenuPages.Add(PageType.Order, new NavigationPage(new OrderPage()));
                         break;
-                    case (MenuItemType.MyOrders):
-                        MenuPages.Add(MenuItemType.MyOrders, new NavigationPage(new MyOrdersPage()));
+                    case (PageType.MyOrders):
+                        MenuPages.Add(PageType.MyOrders, new NavigationPage(new MyOrdersPage()));
                         break;
-                    case (MenuItemType.Account):
-                        MenuPages.Add(MenuItemType.Account, new NavigationPage(new AccountPage()));
+                    case (PageType.Account):
+                        MenuPages.Add(PageType.Account, new NavigationPage(new AccountPage()));
                         break;
                 }
             }
@@ -48,6 +48,14 @@ namespace MobileClient.Views
 
                 IsPresented = false;
             }
+        }
+        public async Task NavigateToPage(NavigationPage page)
+        {
+            Detail = page;
+            if (Device.RuntimePlatform == Device.Android)
+                await Task.Delay(100);
+
+            IsPresented = false;
         }
     }
 }
