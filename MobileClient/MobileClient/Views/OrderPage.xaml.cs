@@ -1,6 +1,8 @@
-﻿using MobileClient.ViewModels;
+﻿using MobileClient.Services;
+using MobileClient.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,35 +16,52 @@ namespace MobileClient.Views
     public partial class OrderPage : ContentPage
     {
         private MainPage RootPage { get => Application.Current.MainPage as MainPage; }
+        private readonly IOrderService _orderService;
 
         public OrderPage()
         {
             InitializeComponent();
+            _orderService = App.Container.GetInstance<IOrderService>();
             StatePicker.ItemsSource = States.Select(x => x.Text).ToList();
             SubmitButton.Clicked += async (s, e) => await HandleSubmitClick(s, e);
         }
 
         private async Task HandleSubmitClick(object sender, EventArgs e)
         {
-            ErrorMessage.Text = "";
-            if (string.IsNullOrWhiteSpace(AddressLine1.Text)
-                || string.IsNullOrWhiteSpace(AddressLine2.Text)
-                || string.IsNullOrWhiteSpace(City.Text)
-                || StatePicker.SelectedIndex < 0
-                || string.IsNullOrWhiteSpace(Zip.Text))
+            try
             {
-                ErrorMessage.Text = "Please fill out all fields before submitting.";
-                return;
+                ErrorMessage.Text = "";
+                if (string.IsNullOrWhiteSpace(AddressLine1.Text)
+                    || string.IsNullOrWhiteSpace(City.Text)
+                    || StatePicker.SelectedIndex < 0
+                    || string.IsNullOrWhiteSpace(Zip.Text))
+                {
+                    ErrorMessage.Text = "Please fill out all fields before submitting.";
+                    return;
+                }
+
+                // Submit order
+                await Task.Run(() => _orderService.AddOrder(new Models.Order()
+                {
+                    StreetAddress = $"{AddressLine1.Text}\n{(string.IsNullOrWhiteSpace(AddressLine2.Text) ? "" : AddressLine2.Text + "\n")}\n" +
+                                    $"{City.Text}, {States[StatePicker.SelectedIndex].Code} {Zip.Text}",
+                    ReportType = Models.ReportType.Basic,
+                    MemberId = App.MemberId,
+                    MemberEmail = "cmmonroe2010@gmail.com"
+                }));
+
+                // Clear all fields
+                AddressLine1.Text = "";
+                AddressLine2.Text = "";
+                City.Text = "";
+                StatePicker.SelectedIndex = -1;
+                Zip.Text = "";
+                await RootPage.NavigateFromMenu(MenuItemType.MyOrders);
             }
-            // Submit here
-            await Task.Delay(200);
-            // Clear all fields
-            AddressLine1.Text = "";
-            AddressLine2.Text = "";
-            City.Text = "";
-            StatePicker.SelectedIndex = -1;
-            Zip.Text = "";
-            await RootPage.NavigateFromMenu(MenuItemType.MyOrders);
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Failed to submit order with error '" + ex.ToString() + "'");
+            }
         }
         private readonly List<StateViewModel> States = new List<StateViewModel>()
         {

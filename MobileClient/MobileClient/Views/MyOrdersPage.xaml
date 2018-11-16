@@ -6,8 +6,20 @@
     <ContentPage.Content>
         <StackLayout>
             <ListView x:Name="OrderListView"
+                IsPullToRefreshEnabled="True"
+                IsGroupingEnabled="True"
+                GroupDisplayBinding="{Binding Title}"
                 VerticalOptions="CenterAndExpand"
-                HorizontalOptions="CenterAndExpand" />
+                HorizontalOptions="CenterAndExpand">
+            <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <TextCell Text="{Binding Text}"
+                                  Detail="{Binding Detail}"
+                                  TextColor="{Binding TextColor}"
+                                  DetailColor="{Binding DetailColor}"/>
+                    </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>
