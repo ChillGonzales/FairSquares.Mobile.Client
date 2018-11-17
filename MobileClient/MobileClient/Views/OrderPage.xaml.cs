@@ -1,4 +1,5 @@
-﻿using MobileClient.Services;
+﻿using FairSquares.Measurement.Core.Models;
+using MobileClient.Services;
 using MobileClient.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -45,7 +46,7 @@ namespace MobileClient.Views
                 {
                     StreetAddress = $"{AddressLine1.Text}\n{(string.IsNullOrWhiteSpace(AddressLine2.Text) ? "" : AddressLine2.Text + "\n")}\n" +
                                     $"{City.Text}, {States[StatePicker.SelectedIndex].Code} {Zip.Text}",
-                    ReportType = Models.ReportType.Basic,
+                    ReportType = ReportType.Basic,
                     MemberId = App.MemberId,
                     MemberEmail = "cmmonroe2010@gmail.com"
                 }));

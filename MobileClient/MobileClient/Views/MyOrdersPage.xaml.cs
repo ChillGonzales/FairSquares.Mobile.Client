@@ -1,5 +1,6 @@
 ﻿using MobileClient.Models;
 using MobileClient.Services;
+using MobileClient.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -16,7 +17,7 @@ namespace MobileClient.Views
     public partial class MyOrdersPage : ContentPage
     {
         private readonly IOrderService _orderService;
-        private List<Order> _currentOrders;
+        private readonly ICache<Order> _orderCache;
         private MainPage RootPage { get => Application.Current.MainPage as MainPage; }
         public static IList<OrderGroup> All { private set; get; }
 
@@ -26,16 +27,16 @@ namespace MobileClient.Views
             try
             {
                 _orderService = App.Container.GetInstance<IOrderService>();
-                _currentOrders = _orderService.GetMemberOrders(App.MemberId).ToList();
-                SetListViewSource(_currentOrders);
+                _orderCache = App.Container.GetInstance<ICache<Order>>();
+                SetListViewSource(_orderCache.GetAll().Select(x => x.Value).ToList());
 
                 OrderListView.RefreshCommand = new Command(async () =>
                 {
                     try
                     {
                         OrderListView.IsRefreshing = true;
-                        _currentOrders = await Task.Run(() => _orderService.GetMemberOrders(App.MemberId).ToList());
-                        SetListViewSource(_currentOrders);
+                        _orderCache.Put(await Task.Run(() => _orderService.GetMemberOrders(App.MemberId).ToDictionary(x => x.OrderId, x => x)));
+                        SetListViewSource(_orderCache.GetAll().Select(x => x.Value).ToList());
                         OrderListView.IsRefreshing = false;
                     }
                     catch (Exception ex)
@@ -47,7 +48,7 @@ namespace MobileClient.Views
                 OrderListView.ItemSelected += async (s, e) =>
                 {
                     var id = ((OrderViewCell)e.SelectedItem).OrderId;
-                    await RootPage.NavigateToPage(new NavigationPage(new OrderDetailPage(_currentOrders.FirstOrDefault(x => x.OrderId == id))));
+                    await RootPage.NavigateToPage(new NavigationPage(new OrderDetailPage(_orderCache.Get(id))));
                 };
             }
             catch (Exception ex)
@@ -59,7 +60,7 @@ namespace MobileClient.Views
         private void SetListViewSource(List<Order> orders)
         {
             var fulGroup = new OrderGroup() { Title = "Completed" };
-            fulGroup.AddRange(_currentOrders.Where(x => x.Fulfilled).Select(x => new OrderViewCell()
+            fulGroup.AddRange(_orderCache.GetAll().Select(x => x.Value).Where(x => x.Fulfilled).Select(x => new OrderViewCell()
             {
                 Text = x.StreetAddress.Split('\n')[0],
                 TextColor = Color.Black,
@@ -68,7 +69,7 @@ namespace MobileClient.Views
                 //DetailColor = x.Fulfilled ? Color.DarkGreen : Color.DarkBlue
             }));
             var penGroup = new OrderGroup() { Title = "Pending" };
-            penGroup.AddRange(_currentOrders.Where(x => !x.Fulfilled).Select(x => new OrderViewCell()
+            penGroup.AddRange(_orderCache.GetAll().Select(x => x.Value).Where(x => !x.Fulfilled).Select(x => new OrderViewCell()
             {
                 Text = x.StreetAddress.Split('\n')[0],
                 TextColor = Color.Black,

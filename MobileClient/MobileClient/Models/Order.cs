@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FairSquares.Measurement.Core.Models;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -19,11 +20,6 @@ namespace MobileClient.Models
         public int? Price { get; set; }
         public string ChargeId { get; set; }
         public string CouponCodeId { get; set; }
-    }
-    public enum ReportType
-    {
-        Basic = 0,
-        Premium = 1
     }
     public enum RoofOption
     {
