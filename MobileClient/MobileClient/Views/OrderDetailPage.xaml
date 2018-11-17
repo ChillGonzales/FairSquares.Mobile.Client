@@ -4,18 +4,21 @@
              x:Class="MobileClient.Views.OrderDetailPage">
     <ContentPage.Content>
         <StackLayout>
+            <Image x:Name="TopImage"
+                VerticalOptions="Center"
+                HorizontalOptions="CenterAndExpand" />
             <Label x:Name="OrderId"
-                VerticalOptions="CenterAndExpand" 
-                HorizontalOptions="CenterAndExpand" />
+                VerticalOptions="Center" 
+                HorizontalOptions="Start" />
             <Label x:Name="Address"
-                VerticalOptions="CenterAndExpand" 
-                HorizontalOptions="CenterAndExpand" />
+                VerticalOptions="Center" 
+                HorizontalOptions="Start" />
             <Label x:Name="Area"
-                VerticalOptions="CenterAndExpand" 
-                HorizontalOptions="CenterAndExpand" />
+                VerticalOptions="Center" 
+                HorizontalOptions="Start" />
             <Label x:Name="Squares"
-                VerticalOptions="CenterAndExpand" 
-                HorizontalOptions="CenterAndExpand" />
+                VerticalOptions="Center" 
+                HorizontalOptions="Start" />
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

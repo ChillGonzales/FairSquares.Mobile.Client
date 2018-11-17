@@ -48,7 +48,7 @@ namespace MobileClient.Views
                 OrderListView.ItemSelected += async (s, e) =>
                 {
                     var id = ((OrderViewCell)e.SelectedItem).OrderId;
-                    await RootPage.NavigateToPage(new NavigationPage(new OrderDetailPage(_orderCache.Get(id))));
+                    await Navigation.PushAsync(new OrderDetailPage(_orderCache.Get(id)));
                 };
             }
             catch (Exception ex)

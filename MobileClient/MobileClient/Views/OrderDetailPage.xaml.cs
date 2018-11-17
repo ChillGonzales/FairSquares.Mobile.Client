@@ -28,15 +28,16 @@ namespace MobileClient.Views
             InitializeComponent();
             _propertyCache = App.Container.GetInstance<ICache<PropertyModel>>();
             _order = order;
-            OrderId.Text = order.OrderId;
+            OrderId.Text = $"Order #{order.OrderId}";
             var prop = _propertyCache.GetAll().FirstOrDefault(x => x.Value.OrderId == order.OrderId).Value;
             if (prop == null)
             {
                 // TODO: Handle error of no property found
             }
             _property = prop;
-            Address.Text = _property.Address;
-            Squares.Text = _property.Roofs.First().TotalSquares.ToString();
+            Address.Text = $"Address: {_property.Address}";
+            Area.Text = $"Total Area: {_property.Roofs.First().TotalArea.ToString()} sq. ft.";
+            Squares.Text = $"Total Squares: {_property.Roofs.First().TotalSquares.ToString()} squares";
         }
     }
 }
