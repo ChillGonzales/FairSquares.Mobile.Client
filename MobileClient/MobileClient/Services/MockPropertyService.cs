@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using FairSquares.Measurement.Core.Models;
 
 namespace MobileClient.Services
 {
     public class MockPropertyService : IPropertyService
     {
-        public Dictionary<string, PropertyModel> GetProperties(List<string> orderIds)
+        public async Task<Dictionary<string, PropertyModel>> GetProperties(List<string> orderIds)
         {
+            await Task.Delay(5);
             var dict = new Dictionary<string, PropertyModel>();
             foreach (var id in orderIds)
             {

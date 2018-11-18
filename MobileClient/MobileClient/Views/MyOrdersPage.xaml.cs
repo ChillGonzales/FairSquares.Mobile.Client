@@ -35,7 +35,7 @@ namespace MobileClient.Views
                     try
                     {
                         OrderListView.IsRefreshing = true;
-                        _orderCache.Put(await Task.Run(() => _orderService.GetMemberOrders(App.MemberId).ToDictionary(x => x.OrderId, x => x)));
+                        _orderCache.Put((await _orderService.GetMemberOrders(App.MemberId)).ToDictionary(x => x.OrderId, x => x));
                         SetListViewSource(_orderCache.GetAll().Select(x => x.Value).ToList());
                         OrderListView.IsRefreshing = false;
                     }

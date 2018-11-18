@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 using MobileClient.Models;
 using Newtonsoft.Json;
 
@@ -20,10 +21,10 @@ namespace MobileClient.Services
             _http = new HttpClient();
         }
 
-        public string AddOrder(Order order)
+        public async Task<string> AddOrder(Order order)
         {
-            var result = _http.PostAsync($"{_baseEndpoint}?accessKey={_apiKey}", 
-                new StringContent(JsonConvert.SerializeObject(order), Encoding.UTF8, "application/json")).Result;
+            var result = await _http.PostAsync($"{_baseEndpoint}?accessKey={_apiKey}",
+                new StringContent(JsonConvert.SerializeObject(order), Encoding.UTF8, "application/json"));
             if (!result.IsSuccessStatusCode)
             {
                 throw new Exception("HTTP request to add order failed with error code: " + result.StatusCode);
@@ -34,9 +35,9 @@ namespace MobileClient.Services
             }
         }
 
-        public IEnumerable<Order> GetMemberOrders(string memberId)
+        public async Task<IEnumerable<Order>> GetMemberOrders(string memberId)
         {
-            var result = _http.GetAsync($"{_baseEndpoint}/member?memberId={memberId}&accessKey={_apiKey}").Result;
+            var result = await _http.GetAsync($"{_baseEndpoint}/member?memberId={memberId}&accessKey={_apiKey}");
             if (!result.IsSuccessStatusCode)
             {
                 throw new Exception("HTTP request to get member's orders failed with error code: " + result.StatusCode);

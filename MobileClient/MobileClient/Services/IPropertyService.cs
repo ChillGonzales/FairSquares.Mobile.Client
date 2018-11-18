@@ -2,11 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace MobileClient.Services
 {
     public interface IPropertyService
     {
-        Dictionary<string, PropertyModel> GetProperties(List<string> orderIds);
+        Task<Dictionary<string, PropertyModel>> GetProperties(List<string> orderIds);
     }
 }
