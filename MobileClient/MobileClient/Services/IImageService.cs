@@ -7,6 +7,6 @@ namespace MobileClient.Services
 {
     public interface IImageService
     {
-        Task<Dictionary<string, byte[]>> GetImages(List<string> orderIds);
+        Dictionary<string, byte[]> GetImages(List<string> orderIds);
     }
 }

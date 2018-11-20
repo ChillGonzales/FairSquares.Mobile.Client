@@ -20,12 +20,12 @@ namespace MobileClient.Services
             _logger = logger;
             _http = new HttpClient();
         }
-        public async Task<Dictionary<string, byte[]>> GetImages(List<string> orderIds)
+        public Dictionary<string, byte[]> GetImages(List<string> orderIds)
         {
             if (orderIds == null || !orderIds.Any())
                 throw new ArgumentNullException(nameof(orderIds));
             var tasks = orderIds.Select(x => new { Order = x, Response = _http.GetAsync($"{_baseUrl}/{x}/top.png") });
-            await Task.WhenAll(tasks.Select(x => x.Response));
+            Task.WaitAll(tasks.Select(x => x.Response).ToArray());
             return tasks.ToDictionary(x => x.Order, x =>
             {
                 if (!x.Response.Result.IsSuccessStatusCode)

@@ -3,6 +3,7 @@ using FairSquares.Measurement.Core.Utilities;
 using MobileClient.Models;
 using MobileClient.Services;
 using MobileClient.Utilities;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -50,16 +51,65 @@ namespace MobileClient.Views
                 roof.TotalSquares = Math.Round(response.TotalSquaresCount, 0);
                 roof.PredominantPitchRise = rise;
             }
+            var overallPitch = RoofUtilities.GetPredominantPitchFromSections(_property.Roofs.SelectMany(x => x.Sections).ToList());
+            PitchSlider.Value = overallPitch;
+            PitchSlider.ValueChanged += OnPitchSliderValueChanged;
             var serv = App.Container.GetInstance<IImageService>();
-            var img = serv.GetImages(new List<string>() { prop.OrderId }).Result;
+            var img = serv.GetImages(new List<string>() { prop.OrderId });
             var stream = new StreamImageSource();
             stream.Stream = (x) =>
             {
                 return Task.FromResult<Stream>(new MemoryStream(img.First().Value));
             };
+            TopImage.Source = stream;
             Address.Text = $"Address: {_property.Address}";
-            Area.Text = $"Total Area: {_property.Roofs.First().TotalArea.ToString()} sq. ft.";
-            Squares.Text = $"Total Squares: {_property.Roofs.First().TotalSquares.ToString()} squares";
+            Area.Text = $"Total Area: {_property.Roofs.Sum(x => x.TotalArea).ToString()} sq. ft.";
+            Squares.Text = $"Total Squares: {_property.Roofs.Sum(x => x.TotalSquares).ToString()} squares";
+        }
+        private async void OnPitchSliderValueChanged(object sender, ValueChangedEventArgs e)
+        {
+            try
+            {
+                var copy = JsonConvert.DeserializeObject<PropertyModel>(JsonConvert.SerializeObject(_property));
+                var sections = copy.Roofs.GroupJoin(copy.Roofs.SelectMany(x => x.Sections),
+                    x => x.PredominantPitchRise,
+                    y => (int)y.PitchRise,
+                    (x, y) => new
+                    {
+                        Pitch = x.PredominantPitchRise,
+                        Sections = y
+                    }).Where(x => x.Pitch == e.OldValue).SelectMany(x => x.Sections);
+                foreach (var section in sections)
+                {
+                    section.PitchRise = e.NewValue;
+                    var totals = SectionUtilities.CalculateAreaAndSquares(new CalculateSectionModelRequest()
+                    {
+                        Length = section.Length,
+                        NumberOfSections = section.NumberOfSections,
+                        PitchRise = section.PitchRise,
+                        PitchRun = section.PitchRun,
+                        SecondLength = section.SecondLength,
+                        ShapeType = section.ShapeType,
+                        Width = section.Width
+                    });
+                    section.CalculatedX = totals.CalculatedX;
+                    section.Area = totals.Area;
+                    section.SquaresCount = totals.SquaresCount;
+                }
+                foreach (var roof in copy.Roofs)
+                {
+                    var totals = RoofUtilities.CalculateTotals(roof);
+                    roof.TotalArea = totals.TotalArea;
+                    roof.TotalSquares = totals.TotalSquaresCount;
+                }
+                Area.Text = $"Total Area: {copy.Roofs.Sum(x => x.TotalArea).ToString()} sq. ft.";
+                Area.Text = $"Total Squares: {copy.Roofs.Sum(x => x.TotalSquares).ToString()} sq. ft.";
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
     }
 }
