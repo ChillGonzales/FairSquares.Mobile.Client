@@ -9,8 +9,13 @@
                 VerticalOptions="Center" 
                 HorizontalOptions="Center" />
                 <Image x:Name="TopImage"
-                VerticalOptions="Center"
-                HorizontalOptions="CenterAndExpand" />
+                    VerticalOptions="Center"
+                    HorizontalOptions="CenterAndExpand" >
+                    <Image.GestureRecognizers>
+                        <TapGestureRecognizer x:Name="ImageGR"
+                            NumberOfTapsRequired="1" />
+                    </Image.GestureRecognizers>
+                </Image>
                 <Label x:Name="Address"
                 VerticalOptions="Center" 
                 HorizontalOptions="Start" />
@@ -31,6 +36,10 @@
                     VerticalOptions="Center" 
                     HorizontalOptions="Start" />
             </StackLayout>
+            <Image x:Name="FullscreenImage"
+                VerticalOptions="CenterAndExpand"
+                HorizontalOptions="CenterAndExpand"
+                IsVisible="False" />
         </ScrollView>
     </ContentPage.Content>
 </ContentPage>

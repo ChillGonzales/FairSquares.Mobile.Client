@@ -1,15 +1,12 @@
 ﻿using FairSquares.Measurement.Core.Models;
 using FairSquares.Measurement.Core.Utilities;
 using MobileClient.Models;
-using MobileClient.Services;
 using MobileClient.Utilities;
 using MobileClient.ViewModels;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -24,6 +21,7 @@ namespace MobileClient.Views
         private Order _order;
         private PropertyModel _property;
         private ICache<PropertyModel> _propertyCache;
+        private ICache<ImageModel> _imageCache;
         private RecalculatedPropertyModel _recalculated;
         private readonly ILogger<OrderDetailPage> _logger;
 
@@ -34,10 +32,13 @@ namespace MobileClient.Views
         public OrderDetailPage(Order order)
         {
             InitializeComponent();
+
+            // Get dependencies
             _logger = App.Container.GetInstance<ILogger<OrderDetailPage>>();
             _propertyCache = App.Container.GetInstance<ICache<PropertyModel>>();
+            _imageCache = App.Container.GetInstance<ICache<ImageModel>>();
+
             _order = order;
-            OrderId.Text = $"Order #{order.OrderId}";
             var prop = _propertyCache.GetAll().FirstOrDefault(x => x.Value.OrderId == order.OrderId).Value;
             if (prop == null)
             {
@@ -53,19 +54,21 @@ namespace MobileClient.Views
             // Materialize view
             _recalculated = GetViewModelFromProperty(_property);
 
+            // Set GUI and event handlers
+            OrderId.Text = $"Order #{order.OrderId}";
             Pitch.Text = $"Pitch: {_recalculated.CurrentPitch}:12";
             PitchStepper.Value = _recalculated.CurrentPitch;
             PitchStepper.ValueChanged += OnPitchStepperValueChanged;
+            ImageGR.Tapped += OnImageTapped;
 
-            // TODO: refactor this and cache images
-            var serv = App.Container.GetInstance<IImageService>();
-            var img = serv.GetImages(new List<string>() { prop.OrderId });
+            var img = _imageCache.Get(prop.OrderId);
             var stream = new StreamImageSource();
             stream.Stream = (x) =>
             {
-                return Task.FromResult<Stream>(new MemoryStream(img.First().Value));
+                return Task.FromResult<Stream>(new MemoryStream(img.Image));
             };
             TopImage.Source = stream;
+            FullscreenImage.Source = stream;
             Address.Text = $"{Regex.Replace(_property.Address, @"\n\n", @"\n")}";
             Area.Text = $"Total Area: {_property.Roofs.Sum(x => x.TotalArea).ToString()} sq. ft.";
             Squares.Text = $"Total Squares: {_property.Roofs.Sum(x => x.TotalSquares).ToString()} squares";
@@ -130,6 +133,10 @@ namespace MobileClient.Views
             {
                 _logger.LogError("Failed to calculate pitch. " + ex.ToString());
             }
+        }
+        private void OnImageTapped(object sender, EventArgs e)
+        {
+            FullscreenImage.IsVisible = !FullscreenImage.IsVisible;
         }
     }
 }

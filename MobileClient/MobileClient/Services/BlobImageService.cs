@@ -1,4 +1,5 @@
-﻿using MobileClient.Utilities;
+﻿using MobileClient.Models;
+using MobileClient.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,20 +21,33 @@ namespace MobileClient.Services
             _logger = logger;
             _http = new HttpClient();
         }
-        public Dictionary<string, byte[]> GetImages(List<string> orderIds)
+        public Dictionary<string, ImageModel> GetImages(List<string> orderIds)
         {
             if (orderIds == null || !orderIds.Any())
                 throw new ArgumentNullException(nameof(orderIds));
-            var tasks = orderIds.Select(x => new { Order = x, Response = _http.GetAsync($"{_baseUrl}/{x}/top.png") });
+            var tasks = orderIds.Select(x => new
+            {
+                Order = x,
+                Response = _http.GetAsync($"{_baseUrl}/{x}/top.png"),
+                Uri = $"{_baseUrl}/{x}/top.png"
+            });
             Task.WaitAll(tasks.Select(x => x.Response).ToArray());
             return tasks.ToDictionary(x => x.Order, x =>
             {
                 if (!x.Response.Result.IsSuccessStatusCode)
                 {
                     _logger.LogError($"Image request failed for order id '{x.Order}' with code '{x.Response.Result.StatusCode}");
-                    return new byte[0];
+                    return new ImageModel()
+                    {
+                        Image = new byte[0],
+                        Uri = x.Uri
+                    };
                 }
-                return x.Response.Result.Content.ReadAsByteArrayAsync().Result;
+                return new ImageModel()
+                {
+                    Image = x.Response.Result.Content.ReadAsByteArrayAsync().Result,
+                    Uri = x.Uri
+                };
             });
         }
     }
