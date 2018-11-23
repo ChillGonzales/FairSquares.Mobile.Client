@@ -3,12 +3,14 @@ using FairSquares.Measurement.Core.Utilities;
 using MobileClient.Models;
 using MobileClient.Services;
 using MobileClient.Utilities;
+using MobileClient.ViewModels;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 using Xamarin.Forms;
@@ -22,6 +24,7 @@ namespace MobileClient.Views
         private Order _order;
         private PropertyModel _property;
         private ICache<PropertyModel> _propertyCache;
+        private RecalculatedPropertyModel _recalculated;
         private readonly ILogger<OrderDetailPage> _logger;
 
         public OrderDetailPage()
@@ -43,17 +46,18 @@ namespace MobileClient.Views
                 return;
             }
             _property = prop;
-            foreach (var roof in _property.Roofs)
-            {
-                var response = RoofUtilities.CalculateTotals(roof);
-                var rise = RoofUtilities.GetPredominantPitchFromSections(roof.Sections);
-                roof.TotalArea = Math.Round(response.TotalArea, 0);
-                roof.TotalSquares = Math.Round(response.TotalSquaresCount, 0);
-                roof.PredominantPitchRise = rise;
-            }
-            var overallPitch = RoofUtilities.GetPredominantPitchFromSections(_property.Roofs.SelectMany(x => x.Sections).ToList());
-            PitchSlider.Value = overallPitch;
-            PitchSlider.ValueChanged += OnPitchSliderValueChanged;
+
+            // Recalculate roof totals for current property
+            CalculateCurrentTotals(_property);
+
+            // Materialize view
+            _recalculated = GetViewModelFromProperty(_property);
+
+            Pitch.Text = $"Pitch: {_recalculated.CurrentPitch}:12";
+            PitchStepper.Value = _recalculated.CurrentPitch;
+            PitchStepper.ValueChanged += OnPitchStepperValueChanged;
+
+            // TODO: refactor this and cache images
             var serv = App.Container.GetInstance<IImageService>();
             var img = serv.GetImages(new List<string>() { prop.OrderId });
             var stream = new StreamImageSource();
@@ -62,26 +66,42 @@ namespace MobileClient.Views
                 return Task.FromResult<Stream>(new MemoryStream(img.First().Value));
             };
             TopImage.Source = stream;
-            Address.Text = $"Address: {_property.Address}";
+            Address.Text = $"{Regex.Replace(_property.Address, @"\n\n", @"\n")}";
             Area.Text = $"Total Area: {_property.Roofs.Sum(x => x.TotalArea).ToString()} sq. ft.";
             Squares.Text = $"Total Squares: {_property.Roofs.Sum(x => x.TotalSquares).ToString()} squares";
         }
-        private async void OnPitchSliderValueChanged(object sender, ValueChangedEventArgs e)
+
+        private void CalculateCurrentTotals(PropertyModel property)
+        {
+            foreach (var roof in property.Roofs)
+            {
+                var response = RoofUtilities.CalculateTotals(roof);
+                var rise = RoofUtilities.GetPredominantPitchFromSections(roof.Sections);
+                roof.TotalArea = Math.Round(response.TotalArea, 0);
+                roof.TotalSquares = Math.Round(response.TotalSquaresCount, 0);
+                roof.PredominantPitchRise = rise;
+            }
+        }
+        private RecalculatedPropertyModel GetViewModelFromProperty(PropertyModel property)
+        {
+            var overallPitch = RoofUtilities.GetPredominantPitchFromSections(_property.Roofs.SelectMany(x => x.Sections).ToList());
+            return new RecalculatedPropertyModel(property)
+            {
+                RecalculatedSections = property.Roofs.SelectMany(x => x.Sections).Where(x => x.PitchRise == overallPitch).ToList(),
+                CurrentPitch = overallPitch,
+                OriginalPitch = overallPitch
+            };
+        }
+        private void OnPitchStepperValueChanged(object sender, ValueChangedEventArgs e)
         {
             try
             {
-                var copy = JsonConvert.DeserializeObject<PropertyModel>(JsonConvert.SerializeObject(_property));
-                var sections = copy.Roofs.GroupJoin(copy.Roofs.SelectMany(x => x.Sections),
-                    x => x.PredominantPitchRise,
-                    y => (int)y.PitchRise,
-                    (x, y) => new
-                    {
-                        Pitch = x.PredominantPitchRise,
-                        Sections = y
-                    }).Where(x => x.Pitch == e.OldValue).SelectMany(x => x.Sections);
-                foreach (var section in sections)
+                var newVal = Math.Round(e.NewValue, 0);
+                Pitch.Text = $"Pitch: {newVal}:12";
+                _recalculated.CurrentPitch = (int)newVal;
+                foreach (var section in _recalculated.RecalculatedSections)
                 {
-                    section.PitchRise = e.NewValue;
+                    section.PitchRise = newVal;
                     var totals = SectionUtilities.CalculateAreaAndSquares(new CalculateSectionModelRequest()
                     {
                         Length = section.Length,
@@ -96,19 +116,19 @@ namespace MobileClient.Views
                     section.Area = totals.Area;
                     section.SquaresCount = totals.SquaresCount;
                 }
-                foreach (var roof in copy.Roofs)
+                foreach (var roof in _recalculated.Roofs)
                 {
                     var totals = RoofUtilities.CalculateTotals(roof);
                     roof.TotalArea = totals.TotalArea;
                     roof.TotalSquares = totals.TotalSquaresCount;
+                    roof.PredominantPitchRise = RoofUtilities.GetPredominantPitchFromSections(roof.Sections);
                 }
-                Area.Text = $"Total Area: {copy.Roofs.Sum(x => x.TotalArea).ToString()} sq. ft.";
-                Area.Text = $"Total Squares: {copy.Roofs.Sum(x => x.TotalSquares).ToString()} sq. ft.";
+                Area.Text = $"Total Area: {Math.Round(_recalculated.Roofs.Sum(x => x.TotalArea), 2).ToString()} sq. ft.";
+                Squares.Text = $"Total Squares: {Math.Ceiling(_recalculated.Roofs.Sum(x => x.TotalSquares)).ToString()} squares";
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                throw;
+                _logger.LogError("Failed to calculate pitch. " + ex.ToString());
             }
         }
     }

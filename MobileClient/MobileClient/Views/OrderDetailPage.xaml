@@ -3,25 +3,34 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MobileClient.Views.OrderDetailPage">
     <ContentPage.Content>
-        <StackLayout>
-            <Image x:Name="TopImage"
+        <ScrollView>
+            <StackLayout>
+                <Label x:Name="OrderId"
+                VerticalOptions="Center" 
+                HorizontalOptions="Center" />
+                <Image x:Name="TopImage"
                 VerticalOptions="Center"
                 HorizontalOptions="CenterAndExpand" />
-            <Label x:Name="OrderId"
+                <Label x:Name="Address"
                 VerticalOptions="Center" 
                 HorizontalOptions="Start" />
-            <Label x:Name="Address"
-                VerticalOptions="Center" 
-                HorizontalOptions="Start" />
-            <Label x:Name="Area"
-                VerticalOptions="Center" 
-                HorizontalOptions="Start" />
-            <Label x:Name="Squares"
-                VerticalOptions="Center" 
-                HorizontalOptions="Start" />
-            <Slider x:Name="PitchSlider"
-                Minimum="0"
-                Maximum="25"/>
-        </StackLayout>
+                <StackLayout
+                    Orientation="Horizontal">
+                    <Label x:Name="Pitch"
+                       Text="Predominant Pitch: "
+                       VerticalOptions="Center"
+                       HorizontalOptions="Start" />
+                    <Stepper x:Name="PitchStepper"
+                        Minimum="0"
+                        Maximum="25"/>
+                </StackLayout>
+                <Label x:Name="Area"
+                    VerticalOptions="Center" 
+                    HorizontalOptions="Start" />
+                <Label x:Name="Squares"
+                    VerticalOptions="Center" 
+                    HorizontalOptions="Start" />
+            </StackLayout>
+        </ScrollView>
     </ContentPage.Content>
 </ContentPage>
