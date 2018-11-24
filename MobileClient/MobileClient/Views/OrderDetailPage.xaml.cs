@@ -68,7 +68,6 @@ namespace MobileClient.Views
                 return Task.FromResult<Stream>(new MemoryStream(img.Image));
             };
             TopImage.Source = stream;
-            FullscreenImage.Source = stream;
             Address.Text = $"{Regex.Replace(_property.Address, @"\n\n", @"\n")}";
             Area.Text = $"Total Area: {_property.Roofs.Sum(x => x.TotalArea).ToString()} sq. ft.";
             Squares.Text = $"Total Squares: {_property.Roofs.Sum(x => x.TotalSquares).ToString()} squares";
@@ -134,9 +133,9 @@ namespace MobileClient.Views
                 _logger.LogError("Failed to calculate pitch. " + ex.ToString());
             }
         }
-        private void OnImageTapped(object sender, EventArgs e)
+        private async void OnImageTapped(object sender, EventArgs e)
         {
-            FullscreenImage.IsVisible = !FullscreenImage.IsVisible;
+            await Navigation.PushModalAsync(new ImagePopup((StreamImageSource)TopImage.Source));
         }
     }
 }

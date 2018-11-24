@@ -36,10 +36,6 @@
                     VerticalOptions="Center" 
                     HorizontalOptions="Start" />
             </StackLayout>
-            <Image x:Name="FullscreenImage"
-                VerticalOptions="CenterAndExpand"
-                HorizontalOptions="CenterAndExpand"
-                IsVisible="False" />
         </ScrollView>
     </ContentPage.Content>
 </ContentPage>

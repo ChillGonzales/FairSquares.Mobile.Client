@@ -8,6 +8,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Xamarin.Auth;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -19,9 +20,14 @@ namespace MobileClient
         public readonly static Container Container;
         public static string MemberId = "fc20a942-5dce-4a2b-a916-4b916a6d41d9";
         private static string _apiKey = "30865dc7-8e15-4fab-a777-0b795370a9d7";
+        private const string _clientID = "81761642488-ovc2vh5394h1ebd1d6jusqv7q2jefbs2.apps.googleusercontent.com";
         private static string _orderEndpoint = @"https://fairsquares-order-management-api.azurewebsites.net/api/orders";
         private static string _propertyEndpoint = @"https://property-measurements.azurewebsites.net/api/properties";
         private static string _blobEndpoint = @"https://fairsquaresapplogging.blob.core.windows.net/roof-images";
+        private const string _scope = "plus.login";
+        private static string _googleAuthroizeUrl = @"";
+        private static string _googleRedirectUrl = @"";
+        private static string _googleAccessTokenUrl = @"";
 
         static App()
         {
@@ -31,6 +37,8 @@ namespace MobileClient
                 var orderService = new AzureOrderService(_orderEndpoint, _apiKey);
                 var propertyService = new PropertyService(_propertyEndpoint, new DebugLogger<PropertyService>());
                 var imageService = new BlobImageService(_blobEndpoint, new DebugLogger<BlobImageService>());
+                var authenticator = new OAuth2Authenticator(_clientID, null, _scope, new Uri(_googleAuthroizeUrl), 
+                                                            new Uri(_googleRedirectUrl), new Uri(_googleAccessTokenUrl), null, true);
 
                 // Register services
                 Container.Register<IOrderService>(() => orderService, Lifestyle.Singleton);
@@ -71,6 +79,10 @@ namespace MobileClient
                 Container.Register<ICache<Order>>(() => orderCache, Lifestyle.Singleton);
                 Container.Register<ICache<ImageModel>>(() => imageCache, Lifestyle.Singleton);
                 Container.RegisterConditional(typeof(ICache<>), typeof(MemoryCache<>), c => !c.Handled);
+
+                // Login user
+                var presenter = new Xamarin.Auth.Presenters.OAuthLoginPresenter();
+                presenter.Login(authenticator);
             }
             catch (Exception ex)
             {
