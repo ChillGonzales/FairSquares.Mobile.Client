@@ -3,10 +3,13 @@ using MobileClient.Models;
 using MobileClient.Services;
 using MobileClient.Utilities;
 using MobileClient.Views;
+using Newtonsoft.Json;
 using SimpleInjector;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Xamarin.Auth;
 using Xamarin.Forms;
@@ -25,20 +28,26 @@ namespace MobileClient
         private static string _propertyEndpoint = @"https://property-measurements.azurewebsites.net/api/properties";
         private static string _blobEndpoint = @"https://fairsquaresapplogging.blob.core.windows.net/roof-images";
         private const string _scope = "plus.login";
-        private static string _googleAuthroizeUrl = @"";
-        private static string _googleRedirectUrl = @"";
-        private static string _googleAccessTokenUrl = @"";
+        private const string _googleDiscoveryDoc = @"https://accounts.google.com/.well-known/openid-configuration";
+        private static string _googleRedirectUrl = @"81761642488-ovc2vh5394h1ebd1d6jusqv7q2jefbs2.apps.googleusercontent.com";
+        private static string _googleAuthUrl = @"";
+        private static string _googleTokenUrl = @"";
 
         static App()
         {
             try
             {
+                var http = new HttpClient();
+                var response = http.GetAsync(_googleDiscoveryDoc).Result;
+                var content = JsonConvert.DeserializeObject<Dictionary<string, object>>(response.Content.ReadAsStringAsync().Result);
+                _googleAuthUrl = content["authorization_endpoint"].ToString();
+                _googleTokenUrl = content["token_endpoint"].ToString();
                 Container = new Container();
                 var orderService = new AzureOrderService(_orderEndpoint, _apiKey);
                 var propertyService = new PropertyService(_propertyEndpoint, new DebugLogger<PropertyService>());
                 var imageService = new BlobImageService(_blobEndpoint, new DebugLogger<BlobImageService>());
-                var authenticator = new OAuth2Authenticator(_clientID, null, _scope, new Uri(_googleAuthroizeUrl), 
-                                                            new Uri(_googleRedirectUrl), new Uri(_googleAccessTokenUrl), null, true);
+                var authenticator = new OAuth2Authenticator(_clientID, null, _scope, new Uri(_googleAuthUrl), 
+                                                            new Uri(_googleRedirectUrl), new Uri(_googleTokenUrl), null, true);
 
                 // Register services
                 Container.Register<IOrderService>(() => orderService, Lifestyle.Singleton);
