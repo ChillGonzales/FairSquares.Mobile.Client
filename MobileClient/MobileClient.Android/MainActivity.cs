@@ -6,6 +6,7 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using Android.OS;
+using MobileClient.Authentication;
 
 namespace MobileClient.Droid
 {
@@ -18,6 +19,7 @@ namespace MobileClient.Droid
             ToolbarResource = Resource.Layout.Toolbar;
 
             base.OnCreate(savedInstanceState);
+
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
             global::Xamarin.Auth.Presenters.XamarinAndroid.AuthenticationConfiguration.Init(this, savedInstanceState);
             LoadApplication(new App());

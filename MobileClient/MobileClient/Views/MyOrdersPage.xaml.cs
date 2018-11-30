@@ -1,4 +1,5 @@
-﻿using MobileClient.Models;
+﻿using MobileClient.Authentication;
+using MobileClient.Models;
 using MobileClient.Services;
 using MobileClient.Utilities;
 using System;
@@ -19,6 +20,7 @@ namespace MobileClient.Views
         private readonly IOrderService _orderService;
         private readonly ICache<Order> _orderCache;
         private readonly ILogger<MyOrdersPage> _logger;
+        private readonly ICurrentUserService _userService;
         private MainPage RootPage { get => Application.Current.MainPage as MainPage; }
         public static IList<OrderGroup> All { private set; get; }
 
@@ -27,6 +29,9 @@ namespace MobileClient.Views
             InitializeComponent();
             try
             {
+                _userService = App.Container.GetInstance<ICurrentUserService>();
+                if (_userService.GetLoggedInAccount() == null)
+                    Navigation.PushModalAsync(new LandingPage(), true);
                 _orderService = App.Container.GetInstance<IOrderService>();
                 _orderCache = App.Container.GetInstance<ICache<Order>>();
                 _logger = App.Container.GetInstance<ILogger<MyOrdersPage>>();

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
+using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
@@ -10,16 +10,17 @@ using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
+using Xamarin.Auth;
 
 namespace MobileClient.Droid
 {
-    [Activity(Label = "CustomUrlSchemeInterceptorActivity", NoHistory = true, LaunchMode = LaunchMode.SingleTop)]
+    [Activity(Label = "GoogleAuthInterceptor", NoHistory = true, LaunchMode = LaunchMode.SingleTop)]
     [IntentFilter(
     new[] { Intent.ActionView },
     Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable },
-    DataSchemes = new[] { "" },
-    DataPath = "/oauth2redirect")]
-    public class CustomUrlSchemeInterceptorActivity : Activity
+    DataSchemes = new[] { Configuration.RedirectNoPath },
+    DataPaths = new[] { Configuration.RedirectPath })]
+    public class GoogleAuthInterceptor : Activity
     {
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -29,10 +30,17 @@ namespace MobileClient.Droid
             var uri = new Uri(Intent.Data.ToString());
 
             // Load redirectUrl page
-            // TODO: Fix this error
-            //AuthenticationState.Authenticator.OnPageLoading(uri);
+            App.Container.GetInstance<OAuth2Authenticator>().OnPageLoading(uri);
 
-            Finish();
+            Task.Run(() =>
+            {
+                var intent = new Intent(this, typeof(MainActivity));
+                intent.SetFlags(ActivityFlags.ClearTop | ActivityFlags.SingleTop);
+                StartActivity(intent);
+            });
+
+            this.Finish();
+            return;
         }
     }
 }

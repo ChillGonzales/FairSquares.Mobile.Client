@@ -1,4 +1,5 @@
-﻿using MobileClient.ViewModels;
+﻿using MobileClient.Authentication;
+using MobileClient.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,7 @@ namespace MobileClient.Views
     public partial class MainPage : MasterDetailPage
     {
         private readonly Dictionary<PageType, NavigationPage> MenuPages = new Dictionary<PageType, NavigationPage>();
+        private readonly ICurrentUserService _userService;
 
         public MainPage()
         {

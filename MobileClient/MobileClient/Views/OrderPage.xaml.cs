@@ -1,4 +1,5 @@
 ﻿using FairSquares.Measurement.Core.Models;
+using MobileClient.Authentication;
 using MobileClient.Services;
 using MobileClient.ViewModels;
 using System;
@@ -17,11 +18,15 @@ namespace MobileClient.Views
     public partial class OrderPage : ContentPage
     {
         private MainPage RootPage { get => Application.Current.MainPage as MainPage; }
+        private readonly ICurrentUserService _userService;
         private readonly IOrderService _orderService;
 
         public OrderPage()
         {
             InitializeComponent();
+            _userService = App.Container.GetInstance<ICurrentUserService>();
+            if (_userService.GetLoggedInAccount() == null)
+                Navigation.PushModalAsync(new LandingPage(), true);
             _orderService = App.Container.GetInstance<IOrderService>();
             StatePicker.ItemsSource = States.Select(x => x.Text).ToList();
             SubmitButton.Clicked += async (s, e) => await HandleSubmitClick(s, e);
