@@ -42,6 +42,9 @@ namespace MobileClient.Views
             var prop = _propertyCache.GetAll().FirstOrDefault(x => x.Value.OrderId == order.OrderId).Value;
             if (prop == null)
             {
+
+                PitchStepper.IsVisible = false;
+                Pitch.Text = $"Your property is in the process of being measured!";
                 // TODO: Handle error of no property found
                 _logger.LogError($"Property with order id '{order.OrderId}' was not found in cache.");
                 return;
@@ -57,6 +60,7 @@ namespace MobileClient.Views
             // Set GUI and event handlers
             OrderId.Text = $"Order #{order.OrderId}";
             Pitch.Text = $"Pitch: {_recalculated.CurrentPitch}:12";
+            PitchStepper.IsVisible = true;
             PitchStepper.Value = _recalculated.CurrentPitch;
             PitchStepper.ValueChanged += OnPitchStepperValueChanged;
             ImageGR.Tapped += OnImageTapped;

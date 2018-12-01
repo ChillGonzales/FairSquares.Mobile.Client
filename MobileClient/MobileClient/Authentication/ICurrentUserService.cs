@@ -7,8 +7,9 @@ namespace MobileClient.Authentication
 {
     public interface ICurrentUserService
     {
+        event EventHandler<LoggedInEventArgs> OnLoggedIn;
         void LogIn(Account user);
-        Account GetLoggedInAccount();
+        AccountModel GetLoggedInAccount();
         void LogOut();
     }
 }

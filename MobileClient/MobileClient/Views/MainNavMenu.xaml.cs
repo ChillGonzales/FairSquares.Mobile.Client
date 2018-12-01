@@ -1,4 +1,5 @@
-﻿using MobileClient.ViewModels;
+﻿using MobileClient.Authentication;
+using MobileClient.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,7 @@ namespace MobileClient.Views
     {
         private MainPage RootPage { get => Application.Current.MainPage as MainPage; }
         private readonly List<MainNavMenuItem> _menuItems;
+        private readonly ICurrentUserService _userService;
 
         public MainNavMenu()
         {
@@ -29,6 +31,7 @@ namespace MobileClient.Views
 
             ListViewMenu.ItemsSource = _menuItems;
             ListViewMenu.SelectedItem = _menuItems[0];
+            _userService = App.Container.GetInstance<ICurrentUserService>();
 
             // Hook up event for when menu item gets selected
             ListViewMenu.ItemSelected += async (s, e) =>
@@ -36,7 +39,14 @@ namespace MobileClient.Views
                 if (e.SelectedItem == null)
                     return;
                 var selectedType = ((MainNavMenuItem)e.SelectedItem).PageType;
-                await RootPage.NavigateFromMenu(selectedType);
+                if (_userService.GetLoggedInAccount() == null)
+                {
+                    await RootPage.NavigateFromMenu(PageType.Account);
+                }
+                else
+                {
+                    await RootPage.NavigateFromMenu(selectedType);
+                }
             };
         }
     }

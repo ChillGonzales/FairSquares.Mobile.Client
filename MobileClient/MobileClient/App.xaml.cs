@@ -22,7 +22,6 @@ namespace MobileClient
     public partial class App : Application
     {
         public readonly static Container Container;
-        public static string MemberId = "fc20a942-5dce-4a2b-a916-4b916a6d41d9";
         private static string _apiKey = "30865dc7-8e15-4fab-a777-0b795370a9d7";
         //private const string _clientID = "81761642488-ovc2vh5394h1ebd1d6jusqv7q2jefbs2.apps.googleusercontent.com";
         private static string _orderEndpoint = @"https://fairsquares-order-management-api.azurewebsites.net/api/orders";
@@ -53,27 +52,21 @@ namespace MobileClient
                 authenticator.Completed += (s, e) =>
                 {
                     if (e.IsAuthenticated)
+                    {
                         userService.LogIn(e.Account);
+                    }
                 };
-
-                // Register services
-                Container.Register<IOrderService>(() => orderService, Lifestyle.Singleton);
-                Container.Register<IPropertyService>(() => propertyService, Lifestyle.Singleton);
-                Container.Register<IImageService>(() => imageService, Lifestyle.Singleton);
-                Container.Register(typeof(ILogger<>), typeof(DebugLogger<>), Lifestyle.Transient);
-                Container.Register<OAuth2Authenticator>(() => authenticator, Lifestyle.Singleton);
-                Container.Register<AccountStore>(() => AccountStore.Create(), Lifestyle.Singleton);
-                Container.Register<ICurrentUserService>(() => userService, Lifestyle.Singleton);
 
                 // Setup caches and begin process of filling them.
                 var propertyCache = new MemoryCache<PropertyModel>(new DebugLogger<MemoryCache<PropertyModel>>());
                 var orderCache = new MemoryCache<Order>(new DebugLogger<MemoryCache<Order>>());
                 var imageCache = new MemoryCache<ImageModel>(new DebugLogger<MemoryCache<ImageModel>>());
-                Task.Run(async () =>
+
+                Func<string, Task> RefreshCaches = userId => Task.Run(async () =>
                 {
                     try
                     {
-                        var orders = await orderService.GetMemberOrders(MemberId);
+                        var orders = await orderService.GetMemberOrders(userId);
                         orderCache.Put(orders.ToDictionary(x => x.OrderId, x => x));
                         var propTask = Task.Run(async () =>
                         {
@@ -92,6 +85,24 @@ namespace MobileClient
                         Debug.WriteLine($"Failed to fill caches.\n{ex.ToString()}");
                     }
                 });
+                var user = userService.GetLoggedInAccount();
+                if (user != null)
+                    RefreshCaches(user.UserId);
+
+                userService.OnLoggedIn += (s, e) =>
+                {
+                    RefreshCaches(e.Account.UserId);
+                };
+
+                // Register services
+                Container.Register<IOrderService>(() => orderService, Lifestyle.Singleton);
+                Container.Register<IPropertyService>(() => propertyService, Lifestyle.Singleton);
+                Container.Register<IImageService>(() => imageService, Lifestyle.Singleton);
+                Container.Register(typeof(ILogger<>), typeof(DebugLogger<>), Lifestyle.Transient);
+                Container.Register<OAuth2Authenticator>(() => authenticator, Lifestyle.Singleton);
+                Container.Register<AccountStore>(() => AccountStore.Create(), Lifestyle.Singleton);
+                Container.Register<ICurrentUserService>(() => userService, Lifestyle.Singleton);
+                Container.Register<ICacheRefresher>(() => new CacheRefresher(new DebugLogger<CacheRefresher>(), RefreshCaches), Lifestyle.Singleton);
 
                 // Finish registering created caches
                 Container.Register<ICache<PropertyModel>>(() => propertyCache, Lifestyle.Singleton);

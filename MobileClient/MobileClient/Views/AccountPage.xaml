@@ -4,9 +4,14 @@
              x:Class="MobileClient.Views.AccountPage">
     <ContentPage.Content>
         <StackLayout>
-            <Label Text="Welcome to your account!"
+            <Label x:Name="EmailLabel"
+                Text=""
                 VerticalOptions="CenterAndExpand" 
                 HorizontalOptions="CenterAndExpand" />
+            <Button x:Name="LogoutButton"
+                    Text="Log Out"
+                    VerticalOptions="CenterAndExpand"
+                    HorizontalOptions="CenterAndExpand" />
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

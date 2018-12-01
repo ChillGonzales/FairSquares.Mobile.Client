@@ -45,6 +45,12 @@ namespace MobileClient.Views
                     ErrorMessage.Text = "Please fill out all fields before submitting.";
                     return;
                 }
+                var user = _userService.GetLoggedInAccount();
+                if (user == null)
+                {
+                    ErrorMessage.Text = "You must be logged in to submit an order.";
+                    return;
+                }
 
                 // Submit order
                 await Task.Run(() => _orderService.AddOrder(new Models.Order()
@@ -52,8 +58,8 @@ namespace MobileClient.Views
                     StreetAddress = $"{AddressLine1.Text}\n{(string.IsNullOrWhiteSpace(AddressLine2.Text) ? "" : AddressLine2.Text + "\n")}\n" +
                                     $"{City.Text}, {States[StatePicker.SelectedIndex].Code} {Zip.Text}",
                     ReportType = ReportType.Basic,
-                    MemberId = App.MemberId,
-                    MemberEmail = "cmmonroe2010@gmail.com"
+                    MemberId = user.UserId,
+                    MemberEmail = user.Email
                 }));
 
                 // Clear all fields

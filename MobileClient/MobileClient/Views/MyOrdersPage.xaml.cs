@@ -20,6 +20,7 @@ namespace MobileClient.Views
         private readonly IOrderService _orderService;
         private readonly ICache<Order> _orderCache;
         private readonly ILogger<MyOrdersPage> _logger;
+        private readonly ICacheRefresher _cacheRefresher;
         private readonly ICurrentUserService _userService;
         private MainPage RootPage { get => Application.Current.MainPage as MainPage; }
         public static IList<OrderGroup> All { private set; get; }
@@ -35,6 +36,7 @@ namespace MobileClient.Views
                 _orderService = App.Container.GetInstance<IOrderService>();
                 _orderCache = App.Container.GetInstance<ICache<Order>>();
                 _logger = App.Container.GetInstance<ILogger<MyOrdersPage>>();
+                _cacheRefresher = App.Container.GetInstance<ICacheRefresher>();
                 SetListViewSource(_orderCache.GetAll().Select(x => x.Value).ToList());
 
                 OrderListView.RefreshCommand = new Command(async () =>
@@ -42,7 +44,10 @@ namespace MobileClient.Views
                     try
                     {
                         OrderListView.IsRefreshing = true;
-                        _orderCache.Put((await _orderService.GetMemberOrders(App.MemberId)).ToDictionary(x => x.OrderId, x => x));
+                        var user = _userService.GetLoggedInAccount();
+                        if (user == null)
+                            return;
+                        _cacheRefresher.RefreshCaches(user.UserId);
                         SetListViewSource(_orderCache.GetAll().Select(x => x.Value).ToList());
                         OrderListView.IsRefreshing = false;
                     }
