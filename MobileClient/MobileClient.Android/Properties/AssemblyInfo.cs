@@ -6,18 +6,17 @@ using Android.App;
 #if DEBUG
 [assembly: Application(Debuggable = true)]
 #else
-[assembly: Application(Debuggable=false)]
+[assembly: Application(Debuggable = false)]
 #endif
-
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("MobileClient.Android")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Fair Sqaures LLC")]
 [assembly: AssemblyProduct("MobileClient.Android")]
-[assembly: AssemblyCopyright("Copyright ©  2014")]
+[assembly: AssemblyCopyright("Copyright ©  2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]

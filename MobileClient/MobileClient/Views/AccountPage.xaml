@@ -12,6 +12,10 @@
                     Text="Log Out"
                     VerticalOptions="CenterAndExpand"
                     HorizontalOptions="CenterAndExpand" />
+            <Button x:Name="PayButton"
+                    Text="Subscribe"
+                    VerticalOptions="CenterAndExpand"
+                    HorizontalOptions="CenterAndExpand" />
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>
