@@ -8,6 +8,9 @@
                 <Label x:Name="OrderId"
                 VerticalOptions="Center" 
                 HorizontalOptions="Center" />
+                <Label x:Name="Address"
+                VerticalOptions="Center" 
+                HorizontalOptions="CenterAndExpand" />
                 <Image x:Name="TopImage"
                     VerticalOptions="Center"
                     HorizontalOptions="CenterAndExpand" >
@@ -16,9 +19,6 @@
                             NumberOfTapsRequired="1" />
                     </Image.GestureRecognizers>
                 </Image>
-                <Label x:Name="Address"
-                VerticalOptions="Center" 
-                HorizontalOptions="Start" />
                 <StackLayout
                     Orientation="Horizontal">
                     <Label x:Name="Pitch"
@@ -33,6 +33,7 @@
                     VerticalOptions="Center" 
                     HorizontalOptions="Start" />
                 <Label x:Name="Squares"
+                    FontAttributes="Bold"
                     VerticalOptions="Center" 
                     HorizontalOptions="Start" />
             </StackLayout>
