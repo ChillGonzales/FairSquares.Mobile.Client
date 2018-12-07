@@ -1,4 +1,5 @@
 ﻿using MobileClient.Authentication;
+using MobileClient.Services;
 using Plugin.InAppBilling;
 using Plugin.InAppBilling.Abstractions;
 using System;
@@ -16,72 +17,37 @@ namespace MobileClient.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class AccountPage : ContentPage
     {
-        private readonly ICurrentUserService _userService;
+        private readonly ICurrentUserService _userCache;
+        private readonly IUserService _userService;
         private readonly AccountModel _user;
 
         public AccountPage()
         {
             InitializeComponent();
-            _userService = App.Container.GetInstance<ICurrentUserService>();
-            _user = _userService.GetLoggedInAccount();
-            _userService.OnLoggedIn += (s, e) => SetUIToAccount(e.Account);
+            _userCache = App.Container.GetInstance<ICurrentUserService>();
+            _user = _userCache.GetLoggedInAccount();
+            _userCache.OnLoggedIn += (s, e) => SetUIToAccount(e.Account);
             SetUIToAccount(_user);
             LogoutButton.Clicked += LogoutButton_Clicked;
-            PayButton.Clicked += PayButton_Clicked;
+            SaveButton.Clicked += SaveButton_Clicked;
         }
 
-        private async void PayButton_Clicked(object sender, EventArgs e)
+        private void SaveButton_Clicked(object sender, EventArgs e)
         {
-            var billing = CrossInAppBilling.Current;
-            try
-            {
-                var connected = await billing.ConnectAsync(ItemType.Subscription);
-                if (!connected)
-                {
-                    //we are offline or can't connect, don't try to purchase
-                    return;
-                }
-
-                //check purchases
-                var purchase = await billing.PurchaseAsync("premium_subscription_monthly", ItemType.Subscription, "payload");
-
-                //possibility that a null came through.
-                if (purchase == null)
-                {
-                    //did not purchase
-                    Debug.WriteLine("Did not purchase");
-                }
-                else
-                {
-                    //purchased!
-                    Debug.WriteLine("Purchased!");
-                }
-            }
-            catch (InAppBillingPurchaseException purchaseEx)
-            {
-                //Billing Exception handle this based on the type
-                Debug.WriteLine("Error: " + purchaseEx);
-            }
-            catch (Exception ex)
-            {
-                //Something else has gone wrong, log it
-                Debug.WriteLine("Issue connecting: " + ex);
-            }
-            finally
-            {
-                await billing.DisconnectAsync();
-            }
+            if (string.IsNullOrWhiteSpace(FirstName.Text) || string.IsNullOrWhiteSpace(LastName.Text))
+                return;
+            // TODO: Implement user update
         }
 
         private async void LogoutButton_Clicked(object sender, EventArgs e)
         {
-            if (_userService.GetLoggedInAccount() == null)
+            if (_userCache.GetLoggedInAccount() == null)
             {
                 await Navigation.PushModalAsync(new LandingPage());
                 await Navigation.PopAsync();
                 return;
             }
-            _userService.LogOut();
+            _userCache.LogOut();
             SetUIToAccount(null);
             await Navigation.PushModalAsync(new LandingPage());
         }

@@ -11,9 +11,11 @@ namespace MobileClient.Services
         public DebugLogger()
         { }
 
-        public void LogError(string message)
+        public void LogError(string message, params object[] args)
         {
             Debug.WriteLine($"Error logged from class: {typeof(T).Name}. Message: {message}");
+            foreach (var ob in args)
+                Debug.WriteLine(ob.ToString());
         }
     }
 }

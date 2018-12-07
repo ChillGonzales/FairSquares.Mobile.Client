@@ -6,6 +6,6 @@ namespace MobileClient.Utilities
 {
     public interface ILogger<T>
     {
-        void LogError(string message);
+        void LogError(string message, params object[] args);
     }
 }

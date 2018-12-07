@@ -1,6 +1,7 @@
 ﻿using FairSquares.Measurement.Core.Models;
 using MobileClient.Authentication;
 using MobileClient.Services;
+using MobileClient.Utilities;
 using MobileClient.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,7 @@ namespace MobileClient.Views
         private MainPage RootPage { get => Application.Current.MainPage as MainPage; }
         private readonly ICurrentUserService _userService;
         private readonly IOrderService _orderService;
+        private readonly ISubscriptionStatus _subStatus;
 
         public OrderPage()
         {
@@ -28,6 +30,7 @@ namespace MobileClient.Views
             if (_userService.GetLoggedInAccount() == null)
                 Navigation.PushModalAsync(new LandingPage(), true);
             _orderService = App.Container.GetInstance<IOrderService>();
+            _subStatus = App.Container.GetInstance<ISubscriptionStatus>();
             StatePicker.ItemsSource = States.Select(x => x.Text).ToList();
             SubmitButton.Clicked += async (s, e) => await HandleSubmitClick(s, e);
         }
@@ -50,6 +53,18 @@ namespace MobileClient.Views
                 {
                     ErrorMessage.Text = "You must be logged in to submit an order.";
                     return;
+                }
+
+                // TODO: Make some reminder for how much time is left or something
+                //if (_subStatus.FreeTrialActive)
+                if (!_subStatus.SubscriptionActive)
+                {
+                    await Navigation.PushModalAsync(new PurchasePage(_subStatus));
+                    if (!_subStatus.SubscriptionActive)
+                    {
+                        ErrorMessage.Text = "Please select a subscription plan to continue.";
+                        return;
+                    }
                 }
 
                 // Submit order
