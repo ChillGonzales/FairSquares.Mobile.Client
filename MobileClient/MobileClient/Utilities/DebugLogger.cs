@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
-namespace MobileClient.Services
+namespace MobileClient.Utilities
 {
     public class DebugLogger<T> : ILogger<T>
     {

@@ -23,13 +23,12 @@ namespace MobileClient
     {
         public readonly static Container Container;
         private static string _apiKey = "30865dc7-8e15-4fab-a777-0b795370a9d7";
-        //private const string _clientID = "81761642488-ovc2vh5394h1ebd1d6jusqv7q2jefbs2.apps.googleusercontent.com";
         private static string _orderEndpoint = @"https://fairsquares-order-management-api.azurewebsites.net/api/orders";
-        private static string _subEndpoint = @"https://fairsquares-order-management-api.azurewebsites.net/api/subscriptions/";
-        private static string _userEndpoint = @"https://fairsquares-order-management-api.azurewebsites.net/api/users/";
+        private static string _notifyEndpoint = @"https://fairsquares-order-management-api.azurewebsites.net/api/notification";
+        private static string _subEndpoint = @"https://fairsquares-order-management-api.azurewebsites.net/api/subscriptions";
+        private static string _userEndpoint = @"https://fairsquares-order-management-api.azurewebsites.net/api/users";
         private static string _propertyEndpoint = @"https://property-measurements.azurewebsites.net/api/properties";
         private static string _blobEndpoint = @"https://fairsquaresapplogging.blob.core.windows.net/roof-images";
-        //private const string _googleDiscoveryDoc = @"https://accounts.google.com/.well-known/openid-configuration";
         private const string GoogleAuthorizeUrl = "https://accounts.google.com/o/oauth2/v2/auth";
         private const string GoogleAccessTokenUrl = "https://www.googleapis.com/oauth2/v4/token";
 
@@ -95,16 +94,20 @@ namespace MobileClient
                 {
                     RefreshCaches(e.Account.UserId);
                 };
+                var notifyService = new NotificationService(new HttpClient(), _notifyEndpoint, _apiKey);
+                var emailLogger = new EmailLogger<PurchasingService>(notifyService, userService);
+                var purchaseService = new PurchasingService(emailLogger);
 
                 // Register services
                 Container.Register<IOrderService>(() => orderService, Lifestyle.Singleton);
                 Container.Register<IPropertyService>(() => propertyService, Lifestyle.Singleton);
                 Container.Register<IImageService>(() => imageService, Lifestyle.Singleton);
+                Container.Register<INotificationService>(() => notifyService, Lifestyle.Singleton);
                 Container.Register(typeof(ILogger<>), typeof(DebugLogger<>), Lifestyle.Transient);
                 Container.Register<OAuth2Authenticator>(() => authenticator, Lifestyle.Singleton);
                 Container.Register<AccountStore>(() => AccountStore.Create(), Lifestyle.Singleton);
                 Container.Register<ICurrentUserService>(() => userService, Lifestyle.Singleton);
-                Container.Register<IPurchasingService, PurchasingService>();
+                Container.Register<IPurchasingService>(() => purchaseService);
                 Container.Register<ISubscriptionStatus>(() => new SubscriptionStatus(null), Lifestyle.Singleton);
                 Container.Register<ICacheRefresher>(() => new CacheRefresher(new DebugLogger<CacheRefresher>(), RefreshCaches), Lifestyle.Singleton);
                 Container.Register<ISubscriptionService>(() => new SubscriptionService(new HttpClient()

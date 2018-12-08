@@ -20,20 +20,51 @@ namespace MobileClient.Services
 
         public async Task<InAppBillingPurchase> PurchaseSubscription(string name, string payload)
         {
-            var billing = CrossInAppBilling.Current;
-            try
+            using (var billing = CrossInAppBilling.Current)
             {
-                var connected = await billing.ConnectAsync(ItemType.Subscription);
+                bool connected = false;
+                try
+                {
+                    connected = await billing.ConnectAsync(ItemType.Subscription);
+                }
+                catch (Exception ex)
+                {
+                    var message = $"Error occurred while try to connect to billing service.";
+                    _logger.LogError(message, ex, name, payload);
+                    throw new InvalidOperationException(message);
+                }
                 if (!connected)
                 {
-                    //we are offline or can't connect, don't try to purchase
+                    // we are offline or can't connect, don't try to purchase
                     _logger.LogError($"Can't connect to billing service.", name, payload);
                     throw new InvalidOperationException($"Can't connect to billing service. Check connection to internet.");
                 }
 
-                //check purchases
-                var purchase = await billing.PurchaseAsync(name, ItemType.Subscription, payload);
-
+                InAppBillingPurchase purchase = null;
+                try
+                {
+                    //check purchases
+                    purchase = await billing.PurchaseAsync(name, ItemType.Subscription, payload);
+                }
+                catch (InAppBillingPurchaseException purchaseEx)
+                {
+                    // Billing Exception handle this based on the type
+                    _logger.LogError("Billing error occurred.", purchaseEx, name, payload);
+                    switch (purchaseEx.PurchaseError)
+                    {
+                    }
+                    throw new InvalidOperationException($"Failed to complete purchase with code '{purchaseEx.PurchaseError}'.");
+                }
+                catch (Exception ex)
+                {
+                    // Something else has gone wrong, log it
+                    _logger.LogError("Failed to purchase subscription.", name, ex);
+                    throw new InvalidOperationException("Failed to complete purchase. Please contact support.");
+                }
+                finally
+                {
+                    await billing.DisconnectAsync();
+                }
                 if (purchase == null)
                 {
                     // did not purchase
@@ -41,25 +72,6 @@ namespace MobileClient.Services
                     throw new InvalidOperationException("Failed to complete purchase. Please contact support.");
                 }
                 return purchase;
-            }
-            catch (InAppBillingPurchaseException purchaseEx)
-            {
-                //Billing Exception handle this based on the type
-                _logger.LogError("Billing error occurred.", purchaseEx, name, payload);
-                switch (purchaseEx.PurchaseError)
-                {
-                }
-                throw new InvalidOperationException("Failed to complete purchase. Please contact support.");
-            }
-            catch (Exception ex)
-            {
-                // Something else has gone wrong, log it
-                _logger.LogError("Failed to purchase subscription.", name, ex);
-                throw new InvalidOperationException("Failed to complete purchase. Please contact support.");
-            }
-            finally
-            {
-                await billing.DisconnectAsync();
             }
         }
     }

@@ -62,8 +62,7 @@ namespace MobileClient.Views
             }
             catch (Exception ex)
             {
-                ErrorLabel.Text = $"An error occurred while purchasing your subscription.";
-                // TODO: Send in email about error.
+                ErrorLabel.Text = ex.Message;
             }
         }
     }

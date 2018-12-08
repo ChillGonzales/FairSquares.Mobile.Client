@@ -6,59 +6,64 @@
     <ContentPage.Content>
         <ScrollView>
             <StackLayout>
-                <StackLayout>
-                        <Entry x:Name="AddressLine1"
-                            VerticalOptions="FillAndExpand"
-                            WidthRequest="200"
-                            HorizontalOptions="CenterAndExpand" />
-                        <Label Text="Address Line 1" 
-                           VerticalOptions="FillAndExpand"
+                <StackLayout Orientation="Horizontal">
+                    <Label Text="Address" 
+                           FontSize="Small"
+                           VerticalOptions="Center"
                            HorizontalOptions="Center"/>
+                    <Entry x:Name="AddressLine1"
+                            FontSize="Medium"
+                            VerticalOptions="Center"
+                            HorizontalOptions="FillAndExpand" />
                 </StackLayout>
-                <StackLayout>
+                <StackLayout Orientation="Horizontal">
+                    <Label Text="Address 2" 
+                       FontSize="Small"
+                       VerticalOptions="Center"
+                       HorizontalOptions="Center"/>
                     <Entry x:Name="AddressLine2"
-                        VerticalOptions="FillAndExpand"
-                        WidthRequest="200"
-                        HorizontalOptions="CenterAndExpand" />
-                    <Label Text="Address Line 2" 
-                       VerticalOptions="FillAndExpand"
-                       HorizontalOptions="Center"/>
+                        FontSize="Medium"
+                        VerticalOptions="Center"
+                        HorizontalOptions="FillAndExpand" />
                 </StackLayout>
-                <StackLayout>
-                    <Entry x:Name="City"
-                        VerticalOptions="FillAndExpand"
-                        WidthRequest="200"
-                        HorizontalOptions="CenterAndExpand" />
+                <StackLayout Orientation="Horizontal">
                     <Label Text="City" 
-                           VerticalOptions="FillAndExpand"
+                           FontSize="Small"
+                           VerticalOptions="Center"
                            HorizontalOptions="Center"/>
+                    <Entry x:Name="City"
+                        FontSize="Medium"
+                        VerticalOptions="Center"
+                        HorizontalOptions="FillAndExpand" />
                 </StackLayout>
-                <StackLayout>
-                    <Picker x:Name="StatePicker"
-                        VerticalOptions="FillAndExpand"
-                        WidthRequest="200"
-                        HorizontalOptions="CenterAndExpand" />
+                <StackLayout Orientation="Horizontal">
                     <Label Text="State" 
-                       VerticalOptions="FillAndExpand"
+                       FontSize="Small"
+                       VerticalOptions="Center"
                        HorizontalOptions="Center"/>
+                    <Picker x:Name="StatePicker"
+                        FontSize="Medium"
+                        VerticalOptions="Center"
+                        HorizontalOptions="FillAndExpand" />
                 </StackLayout>
-                <StackLayout>
-                    <Entry x:Name="Zip"
-                        VerticalOptions="FillAndExpand"
-                        WidthRequest="100"
-                        Keyboard="Numeric"
-                        HorizontalOptions="CenterAndExpand" />
-                    <Label Text="Zip Code" 
-                       VerticalOptions="FillAndExpand"
+                <StackLayout Orientation="Horizontal">
+                    <Label Text="Zip" 
+                       FontSize="Small"
+                       VerticalOptions="Center"
                        HorizontalOptions="Center"/>
+                    <Entry x:Name="Zip"
+                        VerticalOptions="Center"
+                        FontSize="Medium"
+                        Keyboard="Numeric"
+                        HorizontalOptions="FillAndExpand" />
                 </StackLayout>
                 <Label x:Name="ErrorMessage"
-                   VerticalOptions="FillAndExpand"
-                   WidthRequest="300"
+                   TextColor="Red"
+                   VerticalOptions="Center"
+                   FontSize="Small"
                    HorizontalOptions="CenterAndExpand" />
                 <Button Text="Submit"
                     x:Name="SubmitButton"
-                    WidthRequest="300"
                     HorizontalOptions="CenterAndExpand"/>
             </StackLayout>
         </ScrollView>

@@ -53,7 +53,7 @@ namespace MobileClient.Services
         {
             try
             {
-                var result = _http.GetAsync("types").Result;
+                var result = _http.GetAsync("/types").Result;
                 result.EnsureSuccessStatusCode();
                 return JsonConvert.DeserializeObject<List<SubscriptionTypeModel>>(result.Content.ReadAsStringAsync().Result);
             }

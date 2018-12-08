@@ -8,14 +8,18 @@
                 TextDecorations="Underline"
                 VerticalOptions="CenterAndExpand" 
                 HorizontalOptions="CenterAndExpand" />
-            <Label Text="Unlimited Roof Measurements for only $89.99/month."
+            <Label Text="Start your free 30-day trial now!"
+                VerticalOptions="CenterAndExpand"
+                HorizontalOptions="CenterAndExpand" />
+            <Label Text="Monthly subscription is $89.99 after free trial ends."
                 VerticalOptions="CenterAndExpand"
                 HorizontalOptions="CenterAndExpand" />
             <Label x:Name="ErrorLabel"
+                   TextColor="Red"
                    VerticalOptions="CenterAndExpand"
                    HorizontalOptions="CenterAndExpand" />
             <Button x:Name="PurchaseButton"
-                Text="Purchase Premium"
+                Text="Start Free Trial"
                 VerticalOptions="CenterAndExpand"
                 HorizontalOptions="CenterAndExpand" />
         </StackLayout>
