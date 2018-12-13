@@ -24,8 +24,8 @@ namespace MobileClient.Views
             // Fill out nav bar menu
             _menuItems = new List<MainNavMenuItem>()
             {
-                new MainNavMenuItem() { PageType = PageType.Order, Title = "New Order" },
-                new MainNavMenuItem() { PageType = PageType.MyOrders, Title = "My Orders" },
+                new MainNavMenuItem() { PageType = PageType.Order, Title = "Enter Address" },
+                new MainNavMenuItem() { PageType = PageType.MyOrders, Title = "My Roofs" },
                 new MainNavMenuItem() { PageType = PageType.Account, Title = "Account" }
             };
 

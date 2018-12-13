@@ -18,7 +18,6 @@ namespace MobileClient.Views
     public partial class AccountPage : ContentPage
     {
         private readonly ICurrentUserService _userCache;
-        private readonly IUserService _userService;
         private readonly AccountModel _user;
 
         public AccountPage()
@@ -29,15 +28,21 @@ namespace MobileClient.Views
             _userCache.OnLoggedIn += (s, e) => SetUIToAccount(e.Account);
             SetUIToAccount(_user);
             LogoutButton.Clicked += LogoutButton_Clicked;
-            SaveButton.Clicked += SaveButton_Clicked;
+            FeedbackButton.Clicked += FeedbackButton_Clicked;
+            //SaveButton.Clicked += SaveButton_Clicked;
         }
 
-        private void SaveButton_Clicked(object sender, EventArgs e)
+        private async void FeedbackButton_Clicked(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(FirstName.Text) || string.IsNullOrWhiteSpace(LastName.Text))
-                return;
-            // TODO: Implement user update
+            await Navigation.PushModalAsync(new FeedbackPage());
         }
+
+        //private void SaveButton_Clicked(object sender, EventArgs e)
+        //{
+        //    if (string.IsNullOrWhiteSpace(FirstName.Text) || string.IsNullOrWhiteSpace(LastName.Text))
+        //        return;
+        //    // TODO: Implement user update
+        //}
 
         private async void LogoutButton_Clicked(object sender, EventArgs e)
         {

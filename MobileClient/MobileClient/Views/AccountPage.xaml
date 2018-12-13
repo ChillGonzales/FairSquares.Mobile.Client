@@ -8,26 +8,8 @@
                 Text=""
                 VerticalOptions="CenterAndExpand" 
                 HorizontalOptions="CenterAndExpand" />
-            <StackLayout Orientation="Horizontal">
-                <Label 
-                    Text="First Name:"
-                    VerticalOptions="Center"
-                    HorizontalOptions="Center" />
-                <Entry x:Name="FirstName"
-                       VerticalOptions="Center"
-                       HorizontalOptions="Center" />
-            </StackLayout>
-            <StackLayout Orientation="Horizontal">
-                <Label 
-                    Text="Last Name:"
-                    VerticalOptions="Center"
-                    HorizontalOptions="Center" />
-                <Entry x:Name="LastName"
-                       VerticalOptions="Center"
-                       HorizontalOptions="Center" />
-            </StackLayout>
-            <Button x:Name="SaveButton"
-                    Text="Save"
+            <Button x:Name="FeedbackButton"
+                    Text="Send Feedback"
                     HorizontalOptions="CenterAndExpand"
                     VerticalOptions="CenterAndExpand" />
             <Button x:Name="LogoutButton"

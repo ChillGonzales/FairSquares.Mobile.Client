@@ -21,6 +21,7 @@ namespace MobileClient.Views
         private MainPage RootPage { get => Application.Current.MainPage as MainPage; }
         private readonly ICurrentUserService _userService;
         private readonly IOrderService _orderService;
+        private readonly IMessage _toast;
         private readonly ISubscriptionStatus _subStatus;
 
         public OrderPage()
@@ -31,6 +32,7 @@ namespace MobileClient.Views
                 Navigation.PushModalAsync(new LandingPage(), true);
             _orderService = App.Container.GetInstance<IOrderService>();
             _subStatus = App.Container.GetInstance<ISubscriptionStatus>();
+            _toast = DependencyService.Get<IMessage>();
             StatePicker.ItemsSource = States.Select(x => x.Text).ToList();
             SubmitButton.Clicked += async (s, e) => await HandleSubmitClick(s, e);
         }
@@ -56,16 +58,17 @@ namespace MobileClient.Views
                 }
 
                 // TODO: Make some reminder for how much time is left or something
+                // TODO: Re-enable this checking
                 //if (_subStatus.FreeTrialActive)
-                if (!_subStatus.SubscriptionActive)
-                {
-                    await Navigation.PushModalAsync(new PurchasePage(_subStatus));
-                    if (!_subStatus.SubscriptionActive)
-                    {
-                        ErrorMessage.Text = "Please select a subscription plan to continue.";
-                        return;
-                    }
-                }
+                //if (!_subStatus.SubscriptionActive)
+                //{
+                //    await Navigation.PushModalAsync(new PurchasePage(_subStatus));
+                //    if (!_subStatus.SubscriptionActive)
+                //    {
+                //        ErrorMessage.Text = "Please select a subscription plan to continue.";
+                //        return;
+                //    }
+                //}
 
                 // Submit order
                 await Task.Run(() => _orderService.AddOrder(new Models.Order()
@@ -76,7 +79,7 @@ namespace MobileClient.Views
                     MemberId = user.UserId,
                     MemberEmail = user.Email
                 }));
-
+                _toast.ShortAlert($"Your address has been submitted!");
                 // Clear all fields
                 AddressLine1.Text = "";
                 AddressLine2.Text = "";
