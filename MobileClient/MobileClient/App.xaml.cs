@@ -69,6 +69,14 @@ namespace MobileClient
                     {
                         var orders = await orderService.GetMemberOrders(userId);
                         orderCache.Put(orders.ToDictionary(x => x.OrderId, x => x));
+                        var subTask = Task.Run(() =>
+                        {
+                            try
+                            {
+                                DependencyService.Get<IMessagingSubscriber>().Subscribe(orders.Select(x => x.OrderId).ToList());
+                            }
+                            catch { }
+                        });
                         var propTask = Task.Run(async () =>
                         {
                             var properties = await propertyService.GetProperties(orders.Select(x => x.OrderId).ToList());
@@ -79,7 +87,7 @@ namespace MobileClient
                             var images = imageService.GetImages(orders.Select(x => x.OrderId).ToList());
                             imageCache.Put(images);
                         });
-                        await Task.WhenAll(new[] { propTask, imgTask });
+                        await Task.WhenAll(new[] { propTask, imgTask, subTask });
                     }
                     catch (Exception ex)
                     {

@@ -24,12 +24,18 @@ namespace MobileClient.Droid.PushNotifications
 
         public override void OnMessageReceived(RemoteMessage message)
         {
-            Log.Debug(TAG, "From: " + message.From);
-
             // Pull message body out of the template
-            var messageBody = message.Data["message"];
-            if (string.IsNullOrWhiteSpace(messageBody))
+            string messageBody = "";
+            try
+            {
+                messageBody = message.Data["message"];
+                if (string.IsNullOrWhiteSpace(messageBody))
+                    return;
+            }
+            catch (Exception)
+            {
                 return;
+            }
 
             Log.Debug(TAG, "Notification message body: " + messageBody);
             SendNotification(messageBody);

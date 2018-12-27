@@ -13,6 +13,7 @@ using Plugin.CurrentActivity;
 using Android.Gms.Common;
 using Android.Util;
 using Firebase.Iid;
+using Firebase.Messaging;
 
 namespace MobileClient.Droid
 {
@@ -24,6 +25,14 @@ namespace MobileClient.Droid
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
+            if (Intent.Extras != null)
+            {
+                foreach (var key in Intent.Extras.KeySet())
+                {
+                    var value = Intent.Extras.GetString(key);
+                    Log.Debug("DEBUG", $"Key: '{key}' Value: '{value}'");
+                }
+            }
             TabLayoutResource = Resource.Layout.Tabbar;
             ToolbarResource = Resource.Layout.Toolbar;
 
