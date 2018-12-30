@@ -54,7 +54,7 @@ namespace MobileClient.Views
             }
             finally
             {
-                Navigation.PopModalAsync();
+                Navigation.PopAsync();
             }
         }
     }

@@ -7,7 +7,7 @@
             <Button x:Name="GoogleLogin"
                     Text="Login with Google"
                     HorizontalOptions="CenterAndExpand"
-                    VerticalOptions="Center" />
+                    VerticalOptions="CenterAndExpand" />
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

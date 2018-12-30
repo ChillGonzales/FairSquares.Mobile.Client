@@ -32,14 +32,14 @@ namespace MobileClient.Views
             {
                 _userService = App.Container.GetInstance<ICurrentUserService>();
                 if (_userService.GetLoggedInAccount() == null)
-                    Navigation.PushModalAsync(new LandingPage(), true);
+                    Navigation.PushAsync(new LandingPage(), true);
                 _orderService = App.Container.GetInstance<IOrderService>();
                 _orderCache = App.Container.GetInstance<ICache<Order>>();
                 _logger = App.Container.GetInstance<ILogger<MyOrdersPage>>();
                 _cacheRefresher = App.Container.GetInstance<ICacheRefresher>();
                 SetListViewSource(_orderCache.GetAll().Select(x => x.Value).ToList());
 
-                OrderListView.RefreshCommand = new Command(async () =>
+                OrderListView.RefreshCommand = new Command(() =>
                 {
                     try
                     {
@@ -59,8 +59,11 @@ namespace MobileClient.Views
 
                 OrderListView.ItemSelected += async (s, e) =>
                 {
+                    if (e.SelectedItem == null)
+                        return;
                     var id = ((OrderViewCell)e.SelectedItem).OrderId;
                     await Navigation.PushAsync(new OrderDetailPage(_orderCache.Get(id)));
+                    OrderListView.SelectedItem = null;
                 };
             }
             catch (Exception ex)

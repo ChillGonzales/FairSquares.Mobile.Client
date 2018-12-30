@@ -139,7 +139,7 @@ namespace MobileClient.Views
         }
         private async void OnImageTapped(object sender, EventArgs e)
         {
-            await Navigation.PushModalAsync(new ImagePopup((StreamImageSource)TopImage.Source));
+            await Navigation.PushAsync(new ImagePopup((StreamImageSource)TopImage.Source));
         }
     }
 }

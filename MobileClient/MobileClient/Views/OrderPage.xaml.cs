@@ -29,7 +29,7 @@ namespace MobileClient.Views
             InitializeComponent();
             _userService = App.Container.GetInstance<ICurrentUserService>();
             if (_userService.GetLoggedInAccount() == null)
-                Navigation.PushModalAsync(new LandingPage(), true);
+                Navigation.PushAsync(new LandingPage(), true);
             _orderService = App.Container.GetInstance<IOrderService>();
             _subStatus = App.Container.GetInstance<ISubscriptionStatus>();
             _toast = DependencyService.Get<IMessage>();
@@ -62,7 +62,7 @@ namespace MobileClient.Views
                 //if (_subStatus.FreeTrialActive)
                 //if (!_subStatus.SubscriptionActive)
                 //{
-                //    await Navigation.PushModalAsync(new PurchasePage(_subStatus));
+                //    await Navigation.PushAsync(new PurchasePage(_subStatus));
                 //    if (!_subStatus.SubscriptionActive)
                 //    {
                 //        ErrorMessage.Text = "Please select a subscription plan to continue.";

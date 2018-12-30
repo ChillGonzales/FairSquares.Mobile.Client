@@ -25,7 +25,7 @@ namespace MobileClient.Views
         {
             var presenter = new Xamarin.Auth.Presenters.OAuthLoginPresenter();
             presenter.Login(_auth);
-            Navigation.PopModalAsync();
+            Navigation.PopAsync();
         }
     }
 }

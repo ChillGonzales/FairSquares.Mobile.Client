@@ -34,7 +34,7 @@ namespace MobileClient.Views
 
         private async void FeedbackButton_Clicked(object sender, EventArgs e)
         {
-            await Navigation.PushModalAsync(new FeedbackPage());
+            await Navigation.PushAsync(new FeedbackPage());
         }
 
         //private void SaveButton_Clicked(object sender, EventArgs e)
@@ -48,13 +48,12 @@ namespace MobileClient.Views
         {
             if (_userCache.GetLoggedInAccount() == null)
             {
-                await Navigation.PushModalAsync(new LandingPage());
-                await Navigation.PopAsync();
+                await Navigation.PushAsync(new LandingPage());
                 return;
             }
             _userCache.LogOut();
             SetUIToAccount(null);
-            await Navigation.PushModalAsync(new LandingPage());
+            await Navigation.PushAsync(new LandingPage());
         }
 
         private void SetUIToAccount(AccountModel account)

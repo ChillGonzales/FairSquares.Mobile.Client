@@ -31,7 +31,7 @@ namespace MobileClient.Views
 
         private async void OnImageTapped(object sender, EventArgs e)
         {
-            await Navigation.PopModalAsync();
+            await Navigation.PopAsync();
         }
         private void OnImagePinched(object sender, PinchGestureUpdatedEventArgs e)
         {
