@@ -24,8 +24,6 @@
 	<string>8.0</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.FairSquares.MobileClient</string>
-	<key>CFBundleVersion</key>
-	<string>1.0</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>CFBundleName</key>
@@ -49,5 +47,7 @@
 	<string>Assets.xcassets/AppIcon.appiconset</string>
 	<key>XSLaunchImageAssets</key>
 	<string>Assets.xcassets/LaunchImages.launchimage</string>
+	<key>CFBundleVersion</key>
+	<string>1.1</string>
 </dict>
 </plist>

@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:mobileclient="clr-namespace:MobileClient"
              Title="Address"
              x:Class="MobileClient.Views.OrderPage">
     <ContentPage.Content>
@@ -10,52 +11,57 @@
                     <Label Text="Address" 
                            FontSize="Small"
                            VerticalOptions="Center"
-                           HorizontalOptions="Center"/>
-                    <Entry x:Name="AddressLine1"
+                           HorizontalOptions="StartAndExpand"/>
+                    <mobileclient:BorderlessEntry x:Name="AddressLine1"
                             FontSize="Medium"
+                            WidthRequest="250"
                             VerticalOptions="Center"
-                            HorizontalOptions="FillAndExpand" />
+                            HorizontalOptions="End" />
                 </StackLayout>
                 <StackLayout Orientation="Horizontal">
                     <Label Text="Address 2" 
                        FontSize="Small"
                        VerticalOptions="Center"
-                       HorizontalOptions="Center"/>
-                    <Entry x:Name="AddressLine2"
+                       HorizontalOptions="StartAndExpand"/>
+                    <mobileclient:BorderlessEntry x:Name="AddressLine2"
                         FontSize="Medium"
+                        WidthRequest="250"
                         VerticalOptions="Center"
-                        HorizontalOptions="FillAndExpand" />
+                        HorizontalOptions="End" />
                 </StackLayout>
                 <StackLayout Orientation="Horizontal">
                     <Label Text="City" 
                            FontSize="Small"
                            VerticalOptions="Center"
-                           HorizontalOptions="Center"/>
-                    <Entry x:Name="City"
+                           HorizontalOptions="StartAndExpand"/>
+                    <mobileclient:BorderlessEntry x:Name="City"
                         FontSize="Medium"
+                        WidthRequest="250"
                         VerticalOptions="Center"
-                        HorizontalOptions="FillAndExpand" />
+                        HorizontalOptions="End" />
                 </StackLayout>
                 <StackLayout Orientation="Horizontal">
                     <Label Text="State" 
                        FontSize="Small"
                        VerticalOptions="Center"
-                       HorizontalOptions="Center"/>
+                       HorizontalOptions="StartAndExpand"/>
                     <Picker x:Name="StatePicker"
                         FontSize="Medium"
+                        WidthRequest="250"
                         VerticalOptions="Center"
-                        HorizontalOptions="FillAndExpand" />
+                        HorizontalOptions="End" />
                 </StackLayout>
                 <StackLayout Orientation="Horizontal">
                     <Label Text="Zip" 
                        FontSize="Small"
                        VerticalOptions="Center"
-                       HorizontalOptions="Center"/>
-                    <Entry x:Name="Zip"
+                       HorizontalOptions="StartAndExpand"/>
+                    <mobileclient:BorderlessEntry x:Name="Zip"
                         VerticalOptions="Center"
                         FontSize="Medium"
+                        WidthRequest="250"
                         Keyboard="Numeric"
-                        HorizontalOptions="FillAndExpand" />
+                        HorizontalOptions="End" />
                 </StackLayout>
                 <Label x:Name="ErrorMessage"
                    TextColor="Red"
@@ -64,6 +70,7 @@
                    HorizontalOptions="CenterAndExpand" />
                 <Button Text="Submit"
                     x:Name="SubmitButton"
+                    WidthRequest="200"
                     HorizontalOptions="CenterAndExpand"/>
             </StackLayout>
         </ScrollView>

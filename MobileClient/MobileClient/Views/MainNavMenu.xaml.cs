@@ -47,6 +47,7 @@ namespace MobileClient.Views
                 {
                     await RootPage.NavigateFromMenu(selectedType);
                 }
+                ListViewMenu.SelectedItem = null;
             };
         }
     }

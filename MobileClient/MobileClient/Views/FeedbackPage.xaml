@@ -13,6 +13,7 @@
             <Editor x:Name="FeedbackEditor"
                 AutoSize="TextChanges"
                 Placeholder="Enter feedback"
+                WidthRequest="250"
                 FontSize="Small"
                 VerticalOptions="CenterAndExpand"
                 HorizontalOptions="CenterAndExpand" />

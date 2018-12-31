@@ -4,10 +4,16 @@
              x:Class="MobileClient.Views.AccountPage">
     <ContentPage.Content>
         <StackLayout>
-            <Label x:Name="EmailLabel"
-                Text=""
+            <StackLayout Orientation="Horizontal">
+                <Label Text="Member Email: "
                 VerticalOptions="CenterAndExpand" 
-                HorizontalOptions="CenterAndExpand" />
+                HorizontalOptions="StartAndExpand" />
+                <Label x:Name="EmailLabel"
+                Text=""
+                WidthRequest="300"
+                VerticalOptions="CenterAndExpand" 
+                HorizontalOptions="EndAndExpand" />
+            </StackLayout>
             <Button x:Name="FeedbackButton"
                     Text="Send Feedback"
                     HorizontalOptions="CenterAndExpand"

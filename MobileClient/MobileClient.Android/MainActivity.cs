@@ -25,33 +25,40 @@ namespace MobileClient.Droid
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
-            if (Intent.Extras != null)
+            try
             {
-                foreach (var key in Intent.Extras.KeySet())
+                if (Intent.Extras != null)
                 {
-                    var value = Intent.Extras.GetString(key);
-                    Log.Debug("DEBUG", $"Key: '{key}' Value: '{value}'");
+                    foreach (var key in Intent.Extras.KeySet())
+                    {
+                        var value = Intent.Extras.GetString(key);
+                        Log.Debug("DEBUG", $"Key: '{key}' Value: '{value}'");
+                    }
                 }
+                TabLayoutResource = Resource.Layout.Tabbar;
+                ToolbarResource = Resource.Layout.Toolbar;
+
+                base.OnCreate(savedInstanceState);
+
+                CreateNotificationChannel();
+                IsPlayServicesAvailable();
+                Log.Info("FairSquares", $"Token: '{FirebaseInstanceId.Instance.Token.ToString()}'");
+                global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
+                global::Xamarin.Auth.Presenters.XamarinAndroid.AuthenticationConfiguration.Init(this, savedInstanceState);
+                CrossCurrentActivity.Current.Init(this, savedInstanceState);
+                Plugin.CurrentActivity.CrossCurrentActivity.Current.Activity = this;
+                LoadApplication(new App());
             }
-            TabLayoutResource = Resource.Layout.Tabbar;
-            ToolbarResource = Resource.Layout.Toolbar;
-
-            base.OnCreate(savedInstanceState);
-
-            CreateNotificationChannel();
-            IsPlayServicesAvailable();
-            Log.Error("CustomApp", $"Token: '{FirebaseInstanceId.Instance.Token.ToString()}'");
-            global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
-            global::Xamarin.Auth.Presenters.XamarinAndroid.AuthenticationConfiguration.Init(this, savedInstanceState);
-            CrossCurrentActivity.Current.Init(this, savedInstanceState);
-            Plugin.CurrentActivity.CrossCurrentActivity.Current.Activity = this;
-            LoadApplication(new App());
+            catch (Exception ex)
+            {
+                Log.Error("Error", "Error occurred in OnCreate." + ex.ToString());
+            }
         }
 
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
         {
             base.OnActivityResult(requestCode, resultCode, data);
-            InAppBillingImplementation.HandleActivityResult(requestCode, resultCode, data);
+            //InAppBillingImplementation.HandleActivityResult(requestCode, resultCode, data);
         }
 
         private void CreateNotificationChannel()
