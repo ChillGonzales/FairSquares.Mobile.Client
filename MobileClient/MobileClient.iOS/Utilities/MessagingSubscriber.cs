@@ -17,6 +17,7 @@ namespace MobileClient.iOS.Utilities
         {
             if (topics == null || !topics.Any())
                 return;
+            Console.WriteLine("FCM Token: " + Messaging.SharedInstance.FcmToken);
             foreach (var topic in topics)
                 Messaging.SharedInstance.Subscribe($"/topics/{topic}");
         }
