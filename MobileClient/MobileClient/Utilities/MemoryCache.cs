@@ -83,5 +83,21 @@ namespace MobileClient.Utilities
                 throw;
             }
         }
+
+        public void Update(Dictionary<string, T> keyValuePairs)
+        {
+            try
+            {
+                foreach (var kvp in keyValuePairs)
+                {
+                    _cached[kvp.Key] = kvp.Value;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error updating cache.", ex.ToString());
+                throw;
+            }
+        }
     }
 }

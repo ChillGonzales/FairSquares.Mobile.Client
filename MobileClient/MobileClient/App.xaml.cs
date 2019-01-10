@@ -9,6 +9,7 @@ using SimpleInjector;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -59,16 +60,17 @@ namespace MobileClient
                 };
 
                 // Setup caches and begin process of filling them.
-                var propertyCache = new MemoryCache<PropertyModel>(new DebugLogger<MemoryCache<PropertyModel>>());
-                var orderCache = new MemoryCache<Order>(new DebugLogger<MemoryCache<Order>>());
-                var imageCache = new MemoryCache<ImageModel>(new DebugLogger<MemoryCache<ImageModel>>());
+                var dbBasePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                var propertyCache = new LocalSqlCache<PropertyModel>(Path.Combine(dbBasePath, "property.db3"), new DebugLogger<LocalSqlCache<PropertyModel>>());
+                var orderCache = new LocalSqlCache<Order>(Path.Combine(dbBasePath, "order.db3"), new DebugLogger<LocalSqlCache<Order>>());
+                var imageCache = new LocalSqlCache<ImageModel>(Path.Combine(dbBasePath, "images.db3"), new DebugLogger<LocalSqlCache<ImageModel>>());
 
                 Func<string, Task> RefreshCaches = userId => Task.Run(async () =>
                 {
                     try
                     {
                         var orders = await orderService.GetMemberOrders(userId);
-                        orderCache.Put(orders.ToDictionary(x => x.OrderId, x => x));
+                        orderCache.Update(orders.ToDictionary(x => x.OrderId, x => x));
                         var subTask = Task.Run(() =>
                         {
                             try
@@ -80,12 +82,12 @@ namespace MobileClient
                         var propTask = Task.Run(async () =>
                         {
                             var properties = await propertyService.GetProperties(orders.Select(x => x.OrderId).ToList());
-                            propertyCache.Put(properties);
+                            propertyCache.Update(properties);
                         });
                         var imgTask = Task.Run(() =>
                         {
                             var images = imageService.GetImages(orders.Select(x => x.OrderId).ToList());
-                            imageCache.Put(images);
+                            imageCache.Update(images);
                         });
                         await Task.WhenAll(new[] { propTask, imgTask, subTask });
                     }

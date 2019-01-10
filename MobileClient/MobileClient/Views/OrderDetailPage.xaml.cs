@@ -39,7 +39,7 @@ namespace MobileClient.Views
             _imageCache = App.Container.GetInstance<ICache<ImageModel>>();
 
             _order = order;
-            var prop = _propertyCache.GetAll().FirstOrDefault(x => x.Value.OrderId == order.OrderId).Value;
+            var prop = _propertyCache.Get(order.OrderId);
             if (prop == null)
             {
 

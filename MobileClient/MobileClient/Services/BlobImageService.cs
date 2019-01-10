@@ -40,7 +40,8 @@ namespace MobileClient.Services
                     return new ImageModel()
                     {
                         Image = new byte[0],
-                        Uri = x.Uri
+                        Uri = x.Uri,
+                        OrderId = x.Order
                     };
                 }
                 return new ImageModel()
