@@ -77,7 +77,8 @@ namespace MobileClient.Views
                                     $"{City.Text}, {States[StatePicker.SelectedIndex].Code} {Zip.Text}",
                     ReportType = ReportType.Basic,
                     MemberId = user.UserId,
-                    MemberEmail = user.Email
+                    MemberEmail = user.Email,
+                    Comments = Comments.Text
                 }));
                 _toast.ShortAlert($"Your address has been submitted!");
                 // Clear all fields
@@ -86,6 +87,7 @@ namespace MobileClient.Views
                 City.Text = "";
                 StatePicker.SelectedIndex = -1;
                 Zip.Text = "";
+                Comments.Text = "";
                 await RootPage.NavigateFromMenu(PageType.MyOrders);
             }
             catch (Exception ex)

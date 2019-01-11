@@ -20,6 +20,7 @@ namespace MobileClient.Views
 
             // Adds default detail page (new order) to dictionary
             MenuPages.Add(PageType.Order, (NavigationPage) Detail);
+            Detail = new NavigationPage(new InstructionPage());
         }
         public async Task NavigateFromMenu(PageType pageType)
         {

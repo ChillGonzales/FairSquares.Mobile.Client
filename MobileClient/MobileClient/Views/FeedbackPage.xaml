@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:mobileclient="clr-namespace:MobileClient"
              x:Class="MobileClient.Views.FeedbackPage">
     <ContentPage.Content>
         <StackLayout>
@@ -8,18 +9,17 @@
                 FontAttributes="Bold"
                 FontSize="Large"
                 TextDecorations="Underline"
-                VerticalOptions="CenterAndExpand" 
+                VerticalOptions="Center" 
                 HorizontalOptions="CenterAndExpand" />
-            <Editor x:Name="FeedbackEditor"
-                AutoSize="TextChanges"
-                Placeholder="Enter feedback"
-                WidthRequest="250"
+        <mobileclient:BorderlessEntry x:Name="FeedbackEditor"
                 FontSize="Small"
-                VerticalOptions="CenterAndExpand"
+                Margin="10"
+                WidthRequest="300"
+                VerticalOptions="Center"
                 HorizontalOptions="CenterAndExpand" />
-            <Button x:Name="SubmitButton"
+            <Button x:Name="SubmitButton" Margin="10"
                 Text="Submit Feedback"
-                VerticalOptions="CenterAndExpand"
+                VerticalOptions="Center"
                 HorizontalOptions="CenterAndExpand" />
         </StackLayout>
     </ContentPage.Content>

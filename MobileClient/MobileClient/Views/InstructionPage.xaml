@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             Title="Fair Squares"
+             x:Class="MobileClient.Views.InstructionPage">
+    <ContentPage.Content>
+        <StackLayout Margin="10">
+            <Label Text="Tips"
+                FontSize="Large"
+                Margin="5"
+                TextDecorations="Underline"
+                FontAttributes="Bold"
+                VerticalOptions="Center" 
+                HorizontalOptions="CenterAndExpand" />
+            <Label FontSize="Small"
+                Margin="5"
+                VerticalOptions="Center" 
+                HorizontalOptions="CenterAndExpand">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text= "- Go to the " />
+                        <Span Text = "Get It Measured" FontAttributes="Bold" /> 
+                        <Span Text = " page to submit an address for measuring." />
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
+            <Label FontSize="Small"
+                Margin="5"
+                VerticalOptions="Center" 
+                HorizontalOptions="CenterAndExpand">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text= "- View your completed and pending orders on the " />
+                        <Span Text = "My Roofs" FontAttributes="Bold" /> 
+                        <Span Text = " page." />
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
+            <Label Text="- Submitted orders will be completed in ONE business day."
+                FontSize="Small"
+                Margin="5"
+                FontAttributes="Bold"
+                VerticalOptions="Center" 
+                HorizontalOptions="CenterAndExpand" />
+            <Label FontSize="Small"
+                Margin="5"
+                VerticalOptions="Center" 
+                HorizontalOptions="CenterAndExpand">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text= "-This app is still in beta and is subject to change. Please use the " />
+                        <Span Text = "Send Feedback" FontAttributes="Bold" /> 
+                        <Span Text = " feature on the " />
+                        <Span Text = "My Account" FontAttributes="Bold" /> 
+                        <Span Text = " page to send your questions/comments to the developers." />
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
+            <Label Text="Thank you for using Fair Squares!"
+                FontSize="Medium"
+                Margin="5"
+                FontAttributes="Bold"
+                VerticalOptions="Center" 
+                HorizontalOptions="CenterAndExpand" />
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

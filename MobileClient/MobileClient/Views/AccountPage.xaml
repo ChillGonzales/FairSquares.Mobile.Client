@@ -1,27 +1,37 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             Title="My Account"
              x:Class="MobileClient.Views.AccountPage">
     <ContentPage.Content>
-        <StackLayout>
-            <StackLayout Orientation="Horizontal">
-                <Label Text="Member Email: "
-                VerticalOptions="CenterAndExpand" 
-                HorizontalOptions="StartAndExpand" />
-                <Label x:Name="EmailLabel"
-                Text=""
-                WidthRequest="300"
-                VerticalOptions="CenterAndExpand" 
-                HorizontalOptions="EndAndExpand" />
+        <StackLayout Margin="10">
+            <StackLayout Orientation="Vertical"
+                     VerticalOptions="CenterAndExpand">
+                <StackLayout Orientation="Horizontal"
+                         VerticalOptions="Center">
+                    <Label Text="Member Email: "
+                        VerticalOptions="Center" 
+                        HorizontalOptions="StartAndExpand" />
+                    <Label x:Name="EmailLabel"
+                        Text=""
+                        WidthRequest="250"
+                        VerticalOptions="Center" 
+                        HorizontalOptions="End" />
+                </StackLayout>
+                <Button x:Name="LogoutButton"
+                    Text="Log Out"
+                    VerticalOptions="Center"
+                    HorizontalOptions="CenterAndExpand" />
             </StackLayout>
-            <Button x:Name="FeedbackButton"
+            <StackLayout Margin="10" 
+                         Orientation="Vertical"
+                         VerticalOptions="CenterAndExpand">
+                <Label Margin="5" Text="Fair Squares is an application that leverages cutting edge technology to make roof measuring fast, easy, and 100% online. Get accurate roof measurements, with adjustable pitch calculations, completely on the go." />
+                <Button x:Name="FeedbackButton"
                     Text="Send Feedback"
                     HorizontalOptions="CenterAndExpand"
-                    VerticalOptions="CenterAndExpand" />
-            <Button x:Name="LogoutButton"
-                    Text="Log Out"
-                    VerticalOptions="CenterAndExpand"
-                    HorizontalOptions="CenterAndExpand" />
+                    VerticalOptions="Center" />
+            </StackLayout>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

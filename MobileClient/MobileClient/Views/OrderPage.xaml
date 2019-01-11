@@ -2,7 +2,7 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:mobileclient="clr-namespace:MobileClient"
-             Title="Address"
+             Title="Enter Address For Measuring"
              x:Class="MobileClient.Views.OrderPage">
     <ContentPage.Content>
         <ScrollView>
@@ -57,6 +57,18 @@
                        VerticalOptions="Center"
                        HorizontalOptions="StartAndExpand"/>
                     <mobileclient:BorderlessEntry x:Name="Zip"
+                        VerticalOptions="Center"
+                        FontSize="Medium"
+                        WidthRequest="250"
+                        Keyboard="Numeric"
+                        HorizontalOptions="End" />
+                </StackLayout>
+                <StackLayout Orientation="Horizontal">
+                    <Label Text="Comments" 
+                       FontSize="Small"
+                       VerticalOptions="Center"
+                       HorizontalOptions="StartAndExpand"/>
+                    <mobileclient:BorderlessEntry x:Name="Comments"
                         VerticalOptions="Center"
                         FontSize="Medium"
                         WidthRequest="250"
