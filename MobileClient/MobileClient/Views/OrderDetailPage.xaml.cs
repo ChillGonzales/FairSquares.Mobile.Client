@@ -75,6 +75,7 @@ namespace MobileClient.Views
             Address.Text = $"{Regex.Replace(_property.Address, @"\r\n", @" ")}";
             Area.Text = $"Total Area: {_property.Roofs.Sum(x => x.TotalArea).ToString()} sq. ft.";
             Squares.Text = $"Total Squares: {_property.Roofs.Sum(x => x.TotalSquares).ToString()} squares";
+            RefreshTableView(_property.Roofs.Sum(x => x.TotalArea));
         }
 
         private void CalculateCurrentTotals(PropertyModel property)
@@ -131,6 +132,7 @@ namespace MobileClient.Views
                 }
                 Area.Text = $"Total Area: {Math.Round(_recalculated.Roofs.Sum(x => x.TotalArea), 2).ToString()} sq. ft.";
                 Squares.Text = $"Total Squares: {Math.Ceiling(_recalculated.Roofs.Sum(x => x.TotalSquares)).ToString()} squares";
+                RefreshTableView(_recalculated.Roofs.Sum(x => x.TotalArea));
             }
             catch (Exception ex)
             {
@@ -140,6 +142,22 @@ namespace MobileClient.Views
         private async void OnImageTapped(object sender, EventArgs e)
         {
             await Navigation.PushAsync(new ImagePopup((StreamImageSource)TopImage.Source));
+        }
+        private void RefreshTableView(double totalArea)
+        {
+            SafetyStockTable.Root.Clear();
+            var mainSection = new TableSection();
+            var pcts = new[] { .05, .10, .15, .20 };
+            foreach (var pct in pcts)
+            {
+                mainSection.Add(new TextCell()
+                {
+                    Text = pct.ToString("P0") + " Waste",
+                    TextColor = Color.Blue,
+                    Detail = Math.Ceiling((totalArea * (1 + pct)) / 100).ToString() + " Squares"
+                });
+            }
+            SafetyStockTable.Root.Add(mainSection);
         }
     }
 }

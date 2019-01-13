@@ -36,6 +36,16 @@
                     FontAttributes="Bold"
                     VerticalOptions="Center" 
                     HorizontalOptions="Start" />
+
+                <Label Text="Safety Stock Calculations"
+                    FontAttributes="Bold"
+                    VerticalOptions="Center" 
+                    Margin="10"
+                    HorizontalOptions="CenterAndExpand" />
+                <TableView Intent="Data" x:Name="SafetyStockTable">
+                    <TableRoot Title="Safety Stock Calculations">
+                    </TableRoot>
+                </TableView>
             </StackLayout>
         </ScrollView>
     </ContentPage.Content>

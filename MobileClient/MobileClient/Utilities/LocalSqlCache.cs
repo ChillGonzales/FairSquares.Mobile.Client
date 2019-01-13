@@ -29,8 +29,8 @@ namespace MobileClient.Utilities
         }
         public T Get(string key)
         {
-            var stored = _connection.Get<Storable>(key);
-            return JsonConvert.DeserializeObject<T>(stored.SerializedValue);
+            var stored = _connection.Find<Storable>(key);
+            return stored == null ? default(T) : JsonConvert.DeserializeObject<T>(stored.SerializedValue);
         }
         public Dictionary<string, T> GetAll()
         {

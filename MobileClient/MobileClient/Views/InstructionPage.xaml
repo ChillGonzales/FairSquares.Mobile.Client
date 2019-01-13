@@ -12,52 +12,54 @@
                 FontAttributes="Bold"
                 VerticalOptions="Center" 
                 HorizontalOptions="CenterAndExpand" />
-            <Label FontSize="Small"
-                Margin="5"
+            <Label Margin="5"
                 VerticalOptions="Center" 
                 HorizontalOptions="CenterAndExpand">
                 <Label.FormattedText>
                     <FormattedString>
-                        <Span Text= "- Go to the " />
-                        <Span Text = "Get It Measured" FontAttributes="Bold" /> 
-                        <Span Text = " page to submit an address for measuring." />
+                        <Span Text= "- Go to the " FontSize="Small" />
+                        <Span Text = "Get It Measured" FontAttributes="Bold" FontSize="Small"/>
+                        <Span Text = " page to submit an address for measuring." FontSize="Small" />
                     </FormattedString>
                 </Label.FormattedText>
             </Label>
-            <Label FontSize="Small"
-                Margin="5"
+            <Label Margin="5"
                 VerticalOptions="Center" 
                 HorizontalOptions="CenterAndExpand">
                 <Label.FormattedText>
                     <FormattedString>
-                        <Span Text= "- View your completed and pending orders on the " />
-                        <Span Text = "My Roofs" FontAttributes="Bold" /> 
-                        <Span Text = " page." />
+                        <Span Text= "- View your completed and pending orders on the " FontSize="Small"/>
+                        <Span Text = "My Roofs" FontAttributes="Bold" FontSize="Small"/>
+                        <Span Text = " page." FontSize="Small"/>
                     </FormattedString>
                 </Label.FormattedText>
             </Label>
-            <Label Text="- Submitted orders will be completed in ONE business day."
+            <Label 
                 FontSize="Small"
                 Margin="5"
-                FontAttributes="Bold"
                 VerticalOptions="Center" 
-                HorizontalOptions="CenterAndExpand" />
-            <Label FontSize="Small"
-                Margin="5"
+                HorizontalOptions="CenterAndExpand" >
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="- Submitted orders will be completed in ONE business day." FontSize="Small" FontAttributes="Bold"/>
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
+            <Label Margin="5"
                 VerticalOptions="Center" 
                 HorizontalOptions="CenterAndExpand">
                 <Label.FormattedText>
                     <FormattedString>
-                        <Span Text= "-This app is still in beta and is subject to change. Please use the " />
-                        <Span Text = "Send Feedback" FontAttributes="Bold" /> 
-                        <Span Text = " feature on the " />
-                        <Span Text = "My Account" FontAttributes="Bold" /> 
-                        <Span Text = " page to send your questions/comments to the developers." />
+                        <Span Text= "-This app is still in beta and is subject to change. Please use the " FontSize="Small" />
+                        <Span Text = "Send Feedback" FontAttributes="Bold" FontSize="Small" />
+                        <Span Text = " feature on the " FontSize="Small" />
+                        <Span Text = "My Account" FontAttributes="Bold" FontSize="Small" />
+                        <Span Text = " page to send your questions/comments to the developers." FontSize="Small"/>
                     </FormattedString>
                 </Label.FormattedText>
             </Label>
             <Label Text="Thank you for using Fair Squares!"
-                FontSize="Medium"
+                FontSize="Small"
                 Margin="5"
                 FontAttributes="Bold"
                 VerticalOptions="Center" 
