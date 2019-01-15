@@ -5,13 +5,18 @@
     <ContentPage.Content>
         <ScrollView>
             <StackLayout>
-                <Label x:Name="OrderId"
-                VerticalOptions="Center" 
-                HorizontalOptions="Center" />
                 <Label x:Name="Address"
+                FontSize="Large"
+                Margin="5"
+                FontAttributes="Bold"
                 VerticalOptions="Center" 
                 HorizontalOptions="CenterAndExpand" />
+                <Label x:Name="OrderId"
+                Margin="5"
+                VerticalOptions="Center" 
+                HorizontalOptions="Center" />
                 <Image x:Name="TopImage"
+                    Margin="5"
                     VerticalOptions="Center"
                     HorizontalOptions="CenterAndExpand" >
                     <Image.GestureRecognizers>
@@ -20,32 +25,49 @@
                     </Image.GestureRecognizers>
                 </Image>
                 <StackLayout
-                    Orientation="Horizontal">
+                    Orientation="Horizontal"
+                    Margin="5">
                     <Label x:Name="Pitch"
+                       Margin="5"
                        Text="Predominant Pitch: "
                        VerticalOptions="Center"
                        HorizontalOptions="Start" />
                     <Stepper x:Name="PitchStepper"
+                        Margin="5"
                         Minimum="0"
                         Maximum="25"/>
                 </StackLayout>
                 <Label x:Name="Area"
+                    Margin="5"
                     VerticalOptions="Center" 
                     HorizontalOptions="Start" />
                 <Label x:Name="Squares"
                     FontAttributes="Bold"
+                    FontSize="Large"
+                    Margin="10"
                     VerticalOptions="Center" 
-                    HorizontalOptions="Start" />
-
+                    HorizontalOptions="CenterAndExpand" />
                 <Label Text="Safety Stock Calculations"
                     FontAttributes="Bold"
                     VerticalOptions="Center" 
                     Margin="10"
-                    HorizontalOptions="CenterAndExpand" />
-                <TableView Intent="Data" x:Name="SafetyStockTable">
-                    <TableRoot Title="Safety Stock Calculations">
-                    </TableRoot>
-                </TableView>
+                    HorizontalOptions="Start" />
+                <ListView x:Name="SafetyStockTable"
+                    Margin="5"
+                    IsGroupingEnabled="True"
+                    GroupDisplayBinding="{Binding Title}"
+                    SeparatorColor="LightGray"
+                    VerticalOptions="End"
+                    HorizontalOptions="Center">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <TextCell Text="{Binding Text}"
+                                  Detail="{Binding Detail}"
+                                  TextColor= "LightGray"
+                                  DetailColor="{Binding DetailColor}" />
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
             </StackLayout>
         </ScrollView>
     </ContentPage.Content>

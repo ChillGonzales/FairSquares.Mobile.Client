@@ -27,6 +27,8 @@ namespace MobileClient.iOS
             global::Xamarin.Forms.Forms.Init();
             global::Xamarin.Auth.Presenters.XamarinIOS.AuthenticationConfiguration.Init();
             LoadApplication(new App());
+            var x = typeof(Xamarin.Forms.Themes.DarkThemeResources);
+            x = typeof(Xamarin.Forms.Themes.iOS.UnderlineEffect);
 
             // Firebase component initialize
             Firebase.Core.App.Configure();

@@ -145,19 +145,33 @@ namespace MobileClient.Views
         }
         private void RefreshTableView(double totalArea)
         {
-            SafetyStockTable.Root.Clear();
-            var mainSection = new TableSection();
+            SafetyStockTable.ItemsSource = null;
+            var groups = new List<WasteGroup>();
             var pcts = new[] { .05, .10, .15, .20 };
             foreach (var pct in pcts)
             {
-                mainSection.Add(new TextCell()
+                var group = new WasteGroup() { Title = pct.ToString("P0") + " Waste" };
+                group.Add(new WasteViewModel()
                 {
-                    Text = pct.ToString("P0") + " Waste",
-                    TextColor = Color.Blue,
-                    Detail = Math.Ceiling((totalArea * (1 + pct)) / 100).ToString() + " Squares"
+                    Text = Math.Ceiling((totalArea * (1 + pct)) / 100).ToString() + " Squares",
+                    TextColor = Color.Green
                 });
+                groups.Add(group);
             }
-            SafetyStockTable.Root.Add(mainSection);
+            SafetyStockTable.ItemsSource = groups;
         }
+    }
+    class WasteViewModel
+    {
+        public string Text { get; set; }
+        public Color TextColor { get; set; }
+        public string Detail { get; set; }
+        public Color DetailColor { get; set; }
+
+    }
+
+    class WasteGroup : List<WasteViewModel>
+    {
+        public string Title { get; set; }
     }
 }

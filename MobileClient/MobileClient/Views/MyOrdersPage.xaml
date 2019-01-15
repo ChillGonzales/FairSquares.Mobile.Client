@@ -9,14 +9,15 @@
                 IsPullToRefreshEnabled="True"
                 IsGroupingEnabled="True"
                 GroupDisplayBinding="{Binding Title}"
+                SeparatorColor="LightGray"
                 VerticalOptions="CenterAndExpand"
                 HorizontalOptions="CenterAndExpand">
             <ListView.ItemTemplate>
                     <DataTemplate>
                         <TextCell Text="{Binding Text}"
                                   Detail="{Binding Detail}"
-                                  TextColor="{Binding TextColor}"
-                                  DetailColor="{Binding DetailColor}"/>
+                                  TextColor= "LightGray"
+                                  DetailColor="{Binding DetailColor}" />
                     </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>

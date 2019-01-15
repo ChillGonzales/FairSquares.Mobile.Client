@@ -20,6 +20,8 @@
                 </StackLayout>
                 <Button x:Name="LogoutButton"
                     Text="Log Out"
+                    WidthRequest="200"
+                    StyleClass="Danger"
                     VerticalOptions="Center"
                     HorizontalOptions="CenterAndExpand" />
             </StackLayout>
@@ -29,6 +31,8 @@
                 <Label Margin="5" Text="Fair Squares is an application that leverages cutting edge technology to make roof measuring fast, easy, and 100% online. Get accurate roof measurements, with adjustable pitch calculations, completely on the go." />
                 <Button x:Name="FeedbackButton"
                     Text="Send Feedback"
+                    StyleClass="Info"
+                    WidthRequest="250"
                     HorizontalOptions="CenterAndExpand"
                     VerticalOptions="Center" />
             </StackLayout>

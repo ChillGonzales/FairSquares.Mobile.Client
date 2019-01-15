@@ -11,69 +11,69 @@
                     <Label Text="Address" 
                            FontSize="Small"
                            VerticalOptions="Center"
-                           HorizontalOptions="StartAndExpand"/>
+                           HorizontalOptions="End"/>
                     <mobileclient:BorderlessEntry x:Name="AddressLine1"
                             FontSize="Medium"
                             WidthRequest="250"
                             VerticalOptions="Center"
-                            HorizontalOptions="End" />
+                            HorizontalOptions="EndAndExpand" />
                 </StackLayout>
                 <StackLayout Orientation="Horizontal">
                     <Label Text="Address 2" 
                        FontSize="Small"
                        VerticalOptions="Center"
-                       HorizontalOptions="StartAndExpand"/>
+                       HorizontalOptions="End"/>
                     <mobileclient:BorderlessEntry x:Name="AddressLine2"
                         FontSize="Medium"
                         WidthRequest="250"
                         VerticalOptions="Center"
-                        HorizontalOptions="End" />
+                        HorizontalOptions="EndAndExpand" />
                 </StackLayout>
                 <StackLayout Orientation="Horizontal">
                     <Label Text="City" 
                            FontSize="Small"
                            VerticalOptions="Center"
-                           HorizontalOptions="StartAndExpand"/>
+                           HorizontalOptions="End"/>
                     <mobileclient:BorderlessEntry x:Name="City"
                         FontSize="Medium"
                         WidthRequest="250"
                         VerticalOptions="Center"
-                        HorizontalOptions="End" />
+                        HorizontalOptions="EndAndExpand" />
                 </StackLayout>
                 <StackLayout Orientation="Horizontal">
                     <Label Text="State" 
                        FontSize="Small"
                        VerticalOptions="Center"
-                       HorizontalOptions="StartAndExpand"/>
+                       HorizontalOptions="End"/>
                     <Picker x:Name="StatePicker"
                         FontSize="Medium"
                         WidthRequest="250"
                         VerticalOptions="Center"
-                        HorizontalOptions="End" />
+                        HorizontalOptions="EndAndExpand" />
                 </StackLayout>
                 <StackLayout Orientation="Horizontal">
                     <Label Text="Zip" 
                        FontSize="Small"
                        VerticalOptions="Center"
-                       HorizontalOptions="StartAndExpand"/>
+                       HorizontalOptions="End"/>
                     <mobileclient:BorderlessEntry x:Name="Zip"
                         VerticalOptions="Center"
                         FontSize="Medium"
                         WidthRequest="250"
                         Keyboard="Numeric"
-                        HorizontalOptions="End" />
+                        HorizontalOptions="EndAndExpand" />
                 </StackLayout>
                 <StackLayout Orientation="Horizontal">
                     <Label Text="Comments" 
                        FontSize="Small"
                        VerticalOptions="Center"
-                       HorizontalOptions="StartAndExpand"/>
+                       HorizontalOptions="End"/>
                     <mobileclient:BorderlessEntry x:Name="Comments"
                         VerticalOptions="Center"
                         FontSize="Medium"
                         WidthRequest="250"
                         Keyboard="Numeric"
-                        HorizontalOptions="End" />
+                        HorizontalOptions="EndAndExpand" />
                 </StackLayout>
                 <Label x:Name="ErrorMessage"
                    TextColor="Red"
@@ -82,6 +82,7 @@
                    HorizontalOptions="CenterAndExpand" />
                 <Button Text="Submit"
                     x:Name="SubmitButton"
+                    StyleClass="Success"
                     WidthRequest="200"
                     HorizontalOptions="CenterAndExpand"/>
             </StackLayout>
