@@ -217,6 +217,9 @@
     <PackageReference Include="Xamarin.Forms.Theme.Dark">
       <Version>1.0.0.43-pre1</Version>
     </PackageReference>
+    <PackageReference Include="Xamarin.Forms.Theme.Light">
+      <Version>1.0.0.43-pre1</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <ItemGroup>
@@ -224,5 +227,14 @@
       <Project>{9E5E05ED-9DB6-4BDB-B2A6-EB48E80770C9}</Project>
       <Name>MobileClient</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\ic_action_account_circle.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\ic_action_folder_open.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\ic_action_straighten.png" />
   </ItemGroup>
 </Project>

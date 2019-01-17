@@ -48,6 +48,7 @@
                     VerticalOptions="Center" 
                     HorizontalOptions="CenterAndExpand" />
                 <Label Text="Safety Stock Calculations"
+                    x:Name="SafetyStockLabel"
                     FontAttributes="Bold"
                     VerticalOptions="Center" 
                     Margin="10"
@@ -56,14 +57,13 @@
                     Margin="5"
                     IsGroupingEnabled="True"
                     GroupDisplayBinding="{Binding Title}"
-                    SeparatorColor="LightGray"
                     VerticalOptions="End"
                     HorizontalOptions="Center">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <TextCell Text="{Binding Text}"
                                   Detail="{Binding Detail}"
-                                  TextColor= "LightGray"
+                                  TextColor= "Black"
                                   DetailColor="{Binding DetailColor}" />
                         </DataTemplate>
                     </ListView.ItemTemplate>

@@ -6,6 +6,7 @@
         <StackLayout>
             <Button x:Name="GoogleLogin"
                     Text="Login with Google"
+                    WidthRequest="250"
                     StyleClass="Info"
                     HorizontalOptions="CenterAndExpand"
                     VerticalOptions="CenterAndExpand" />

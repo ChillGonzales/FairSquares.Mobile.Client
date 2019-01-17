@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<TabbedPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:views="clr-namespace:MobileClient.Views"
+             xmlns:android="clr-namespace:Xamarin.Forms.PlatformConfiguration.AndroidSpecific;assembly=Xamarin.Forms.Core"
+             android:TabbedPage.ToolbarPlacement="Bottom"
+             BarBackgroundColor="#527754"
+             BarTextColor="White"
+             android:TabbedPage.BarItemColor="#66FFFFFF"
+             android:TabbedPage.BarSelectedItemColor="White"
+             x:Class="MobileClient.Views.BaseTabPage">
+  <!--Pages can be added as references or inline-->
+    <NavigationPage Title="Measure It"
+        BarBackgroundColor="{StaticResource primary-back-title-color}"
+        BarTextColor="{StaticResource primary-title-color}"
+        Icon="ic_action_straighten.png">
+        <x:Arguments>
+            <views:OrderPage />
+        </x:Arguments>
+    </NavigationPage>
+    <NavigationPage Title="My Orders" 
+        BarBackgroundColor="{StaticResource primary-back-title-color}"
+        BarTextColor="{StaticResource primary-title-color}"
+        Icon="ic_action_folder_open.png">
+        <x:Arguments>
+            <views:MyOrdersPage />
+        </x:Arguments>
+    </NavigationPage>
+    <NavigationPage Title="My Account"
+        BarBackgroundColor="{StaticResource primary-back-title-color}"
+        BarTextColor="{StaticResource primary-title-color}"
+        Icon="ic_action_account_circle.png">
+        <x:Arguments>
+            <views:AccountPage />
+        </x:Arguments>
+    </NavigationPage>
+</TabbedPage>

@@ -9,7 +9,7 @@
             <StackLayout Margin="10">
                 <StackLayout Orientation="Horizontal">
                     <Label Text="Address" 
-                           FontSize="Small"
+                           FontSize="Medium"
                            VerticalOptions="Center"
                            HorizontalOptions="End"/>
                     <mobileclient:BorderlessEntry x:Name="AddressLine1"
@@ -20,7 +20,7 @@
                 </StackLayout>
                 <StackLayout Orientation="Horizontal">
                     <Label Text="Address 2" 
-                       FontSize="Small"
+                       FontSize="Medium"
                        VerticalOptions="Center"
                        HorizontalOptions="End"/>
                     <mobileclient:BorderlessEntry x:Name="AddressLine2"
@@ -31,7 +31,7 @@
                 </StackLayout>
                 <StackLayout Orientation="Horizontal">
                     <Label Text="City" 
-                           FontSize="Small"
+                           FontSize="Medium"
                            VerticalOptions="Center"
                            HorizontalOptions="End"/>
                     <mobileclient:BorderlessEntry x:Name="City"
@@ -42,7 +42,7 @@
                 </StackLayout>
                 <StackLayout Orientation="Horizontal">
                     <Label Text="State" 
-                       FontSize="Small"
+                       FontSize="Medium"
                        VerticalOptions="Center"
                        HorizontalOptions="End"/>
                     <Picker x:Name="StatePicker"
@@ -53,7 +53,7 @@
                 </StackLayout>
                 <StackLayout Orientation="Horizontal">
                     <Label Text="Zip" 
-                       FontSize="Small"
+                       FontSize="Medium"
                        VerticalOptions="Center"
                        HorizontalOptions="End"/>
                     <mobileclient:BorderlessEntry x:Name="Zip"
@@ -65,7 +65,7 @@
                 </StackLayout>
                 <StackLayout Orientation="Horizontal">
                     <Label Text="Comments" 
-                       FontSize="Small"
+                       FontSize="Medium"
                        VerticalOptions="Center"
                        HorizontalOptions="End"/>
                     <mobileclient:BorderlessEntry x:Name="Comments"
@@ -78,7 +78,7 @@
                 <Label x:Name="ErrorMessage"
                    TextColor="Red"
                    VerticalOptions="Center"
-                   FontSize="Small"
+                   FontSize="Medium"
                    HorizontalOptions="CenterAndExpand" />
                 <Button Text="Submit"
                     x:Name="SubmitButton"

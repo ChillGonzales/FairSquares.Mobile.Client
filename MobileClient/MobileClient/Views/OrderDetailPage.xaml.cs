@@ -45,6 +45,8 @@ namespace MobileClient.Views
 
                 PitchStepper.IsVisible = false;
                 Pitch.Text = $"Your property is in the process of being measured!";
+                SafetyStockLabel.IsVisible = false;
+                SafetyStockTable.IsVisible = false;
                 // TODO: Handle error of no property found
                 _logger.LogError($"Property with order id '{order.OrderId}' was not found in cache.");
                 return;

@@ -6,19 +6,23 @@
     <ContentPage.Content>
         <StackLayout>
             <Label Text="Submit Feedback"
+                Margin="10"
                 FontAttributes="Bold"
                 FontSize="Large"
                 TextDecorations="Underline"
                 VerticalOptions="Center" 
                 HorizontalOptions="CenterAndExpand" />
-        <mobileclient:BorderlessEntry x:Name="FeedbackEditor"
-                FontSize="Small"
+            <mobileclient:BorderlessEntry x:Name="FeedbackEditor"
+                FontSize="Medium"
                 Margin="10"
                 WidthRequest="300"
+                HeightRequest="200"
                 VerticalOptions="Center"
                 HorizontalOptions="CenterAndExpand" />
             <Button x:Name="SubmitButton" Margin="10"
                 Text="Submit Feedback"
+                WidthRequest="250"
+                Style="Info"
                 VerticalOptions="Center"
                 HorizontalOptions="CenterAndExpand" />
         </StackLayout>

@@ -145,7 +145,7 @@ namespace MobileClient
         public App()
         {
             InitializeComponent();
-            MainPage = new MainPage();
+            MainPage = new BaseTabPage();
         }
 
         protected override void OnStart()

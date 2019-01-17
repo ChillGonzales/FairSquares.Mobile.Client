@@ -16,7 +16,7 @@
                     <DataTemplate>
                         <TextCell Text="{Binding Text}"
                                   Detail="{Binding Detail}"
-                                  TextColor= "LightGray"
+                                  TextColor= "Black"
                                   DetailColor="{Binding DetailColor}" />
                     </DataTemplate>
             </ListView.ItemTemplate>

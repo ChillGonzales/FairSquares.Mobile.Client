@@ -18,7 +18,7 @@ namespace MobileClient.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class OrderPage : ContentPage
     {
-        private MainPage RootPage { get => Application.Current.MainPage as MainPage; }
+        private BaseTabPage RootPage { get => Application.Current.MainPage as BaseTabPage; }
         private readonly ICurrentUserService _userService;
         private readonly IOrderService _orderService;
         private readonly IMessage _toast;
@@ -88,7 +88,7 @@ namespace MobileClient.Views
                 StatePicker.SelectedIndex = -1;
                 Zip.Text = "";
                 Comments.Text = "";
-                await RootPage.NavigateFromMenu(PageType.MyOrders);
+                RootPage.NavigateFromMenu(PageType.MyOrders);
             }
             catch (Exception ex)
             {

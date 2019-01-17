@@ -22,7 +22,6 @@ namespace MobileClient.Views
         private readonly ILogger<MyOrdersPage> _logger;
         private readonly ICacheRefresher _cacheRefresher;
         private readonly ICurrentUserService _userService;
-        private MainPage RootPage { get => Application.Current.MainPage as MainPage; }
         public static IList<OrderGroup> All { private set; get; }
 
         public MyOrdersPage()
