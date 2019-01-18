@@ -2,90 +2,138 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:mobileclient="clr-namespace:MobileClient"
-             Title="Enter Address For Measuring"
+             Title="Enter Address of Property"
              x:Class="MobileClient.Views.OrderPage">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Icon="ic_action_info_outline.png" 
+                     Activated="ToolbarItem_Activated" />
+    </ContentPage.ToolbarItems>
     <ContentPage.Content>
-        <ScrollView>
-            <StackLayout Margin="10">
-                <StackLayout Orientation="Horizontal">
-                    <Label Text="Address" 
+        <Grid Margin="20" ColumnSpacing="20" x:Name="Grid">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="90" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+                <Label Text="Address" 
                            FontSize="Medium"
+                           Grid.Row="0"
+                           Grid.Column="0"
                            VerticalOptions="Center"
                            HorizontalOptions="End"/>
-                    <mobileclient:BorderlessEntry x:Name="AddressLine1"
+                <mobileclient:BorderlessEntry x:Name="AddressLine1"
                             FontSize="Medium"
+                            Grid.Row="0"
+                            Grid.Column="1"
                             WidthRequest="250"
                             VerticalOptions="Center"
                             HorizontalOptions="EndAndExpand" />
-                </StackLayout>
-                <StackLayout Orientation="Horizontal">
-                    <Label Text="Address 2" 
+                <Label Text="Address 2" 
                        FontSize="Medium"
+                       Grid.Row="1"
+                       Grid.Column="0"
                        VerticalOptions="Center"
                        HorizontalOptions="End"/>
-                    <mobileclient:BorderlessEntry x:Name="AddressLine2"
+                <mobileclient:BorderlessEntry x:Name="AddressLine2"
                         FontSize="Medium"
+                        Grid.Row="1"
+                        Grid.Column="1"
                         WidthRequest="250"
                         VerticalOptions="Center"
                         HorizontalOptions="EndAndExpand" />
-                </StackLayout>
-                <StackLayout Orientation="Horizontal">
-                    <Label Text="City" 
+                <Label Text="City" 
                            FontSize="Medium"
+                           Grid.Row="2"
+                           Grid.Column="0"
                            VerticalOptions="Center"
                            HorizontalOptions="End"/>
-                    <mobileclient:BorderlessEntry x:Name="City"
+                <mobileclient:BorderlessEntry x:Name="City"
                         FontSize="Medium"
+                        Grid.Row="2"
+                        Grid.Column="1"
                         WidthRequest="250"
                         VerticalOptions="Center"
                         HorizontalOptions="EndAndExpand" />
-                </StackLayout>
-                <StackLayout Orientation="Horizontal">
-                    <Label Text="State" 
+                <Label Text="State" 
                        FontSize="Medium"
+                       Grid.Row="3"
+                       Grid.Column="0"
                        VerticalOptions="Center"
                        HorizontalOptions="End"/>
-                    <Picker x:Name="StatePicker"
+                <Picker x:Name="StatePicker"
                         FontSize="Medium"
+                        Grid.Row="3"
+                        Grid.Column="1"
                         WidthRequest="250"
                         VerticalOptions="Center"
                         HorizontalOptions="EndAndExpand" />
-                </StackLayout>
-                <StackLayout Orientation="Horizontal">
-                    <Label Text="Zip" 
+                <Label Text="Zip" 
+                       Grid.Row="4"
+                       Grid.Column="0"
                        FontSize="Medium"
                        VerticalOptions="Center"
                        HorizontalOptions="End"/>
-                    <mobileclient:BorderlessEntry x:Name="Zip"
+                <mobileclient:BorderlessEntry x:Name="Zip"
                         VerticalOptions="Center"
+                        FontSize="Medium"
+                        Grid.Row="4"
+                        Grid.Column="1"
+                        WidthRequest="100"
+                        Keyboard="Numeric"
+                        HorizontalOptions="StartAndExpand" />
+                <Label Text="Option" 
+                       FontSize="Medium"
+                       Grid.Row="5"
+                       Grid.Column="0"
+                       VerticalOptions="Center"
+                       HorizontalOptions="End" />
+                <Picker x:Name="OptionPicker" 
+                        FontSize="Medium"
+                        Grid.Row="5"
+                        Grid.Column="1"
+                        WidthRequest="250" 
+                        VerticalOptions="Center"
+                        HorizontalOptions="EndAndExpand" />
+                <Label Text="Comments" 
+                       FontSize="Medium"
+                       Grid.Row="6"
+                       Grid.Column="0"
+                       VerticalOptions="Center"
+                       HorizontalOptions="End"/>
+                <mobileclient:BorderlessEntry x:Name="Comments"
+                        VerticalOptions="Center"
+                        Grid.Row="6"
+                        Grid.Column="1"
                         FontSize="Medium"
                         WidthRequest="250"
                         Keyboard="Numeric"
                         HorizontalOptions="EndAndExpand" />
-                </StackLayout>
-                <StackLayout Orientation="Horizontal">
-                    <Label Text="Comments" 
-                       FontSize="Medium"
-                       VerticalOptions="Center"
-                       HorizontalOptions="End"/>
-                    <mobileclient:BorderlessEntry x:Name="Comments"
-                        VerticalOptions="Center"
-                        FontSize="Medium"
-                        WidthRequest="250"
-                        Keyboard="Numeric"
-                        HorizontalOptions="EndAndExpand" />
-                </StackLayout>
-                <Label x:Name="ErrorMessage"
+            <Label x:Name="ErrorMessage"
                    TextColor="Red"
+                   Grid.Row="7"
+                   Grid.Column="0"
+                   Grid.ColumnSpan="2"
                    VerticalOptions="Center"
                    FontSize="Medium"
                    HorizontalOptions="CenterAndExpand" />
-                <Button Text="Submit"
+            <Button Text="Submit"
                     x:Name="SubmitButton"
                     StyleClass="Success"
+                    Grid.Row="8"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
                     WidthRequest="200"
                     HorizontalOptions="CenterAndExpand"/>
-            </StackLayout>
-        </ScrollView>
+        </Grid>
     </ContentPage.Content>
 </ContentPage>

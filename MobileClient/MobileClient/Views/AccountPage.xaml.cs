@@ -56,6 +56,11 @@ namespace MobileClient.Views
             await Navigation.PushAsync(new LandingPage());
         }
 
+        private async void ToolbarItem_Activated(object sender, EventArgs e)
+        {
+            await this.Navigation.PushAsync(new InstructionPage());
+        }
+
         private void SetUIToAccount(AccountModel account)
         {
             if (account == null)

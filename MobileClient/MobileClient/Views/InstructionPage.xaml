@@ -1,25 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             Title="Fair Squares"
+             Title="Information"
              x:Class="MobileClient.Views.InstructionPage">
     <ContentPage.Content>
         <StackLayout Margin="10">
-            <Label Text="Tips"
-                FontSize="Large"
-                Margin="5"
-                TextDecorations="Underline"
-                FontAttributes="Bold"
-                VerticalOptions="Center" 
-                HorizontalOptions="CenterAndExpand" />
             <Label Margin="5"
                 VerticalOptions="Center" 
                 HorizontalOptions="CenterAndExpand">
                 <Label.FormattedText>
                     <FormattedString>
-                        <Span Text= "- Go to the " FontSize="Small" />
-                        <Span Text = "Get It Measured" FontAttributes="Bold" FontSize="Small"/>
-                        <Span Text = " page to submit an address for measuring." FontSize="Small" />
+                        <Span Text= "- Go to the " FontSize="Medium" />
+                        <Span Text = "Measure It" FontAttributes="Bold" FontSize="Medium"/>
+                        <Span Text = " page to submit an address for measuring." FontSize="Medium" />
                     </FormattedString>
                 </Label.FormattedText>
             </Label>
@@ -28,20 +21,20 @@
                 HorizontalOptions="CenterAndExpand">
                 <Label.FormattedText>
                     <FormattedString>
-                        <Span Text= "- View your completed and pending orders on the " FontSize="Small"/>
-                        <Span Text = "My Roofs" FontAttributes="Bold" FontSize="Small"/>
-                        <Span Text = " page." FontSize="Small"/>
+                        <Span Text= "- View your completed and pending orders on the " FontSize="Medium"/>
+                        <Span Text = "My Orders" FontAttributes="Bold" FontSize="Medium"/>
+                        <Span Text = " page." FontSize="Medium"/>
                     </FormattedString>
                 </Label.FormattedText>
             </Label>
             <Label 
-                FontSize="Small"
+                FontSize="Medium"
                 Margin="5"
                 VerticalOptions="Center" 
                 HorizontalOptions="CenterAndExpand" >
                 <Label.FormattedText>
                     <FormattedString>
-                        <Span Text="- Submitted orders will be completed in ONE business day." FontSize="Small" FontAttributes="Bold"/>
+                        <Span Text="- Submitted orders will be completed in ONE business day." FontSize="Medium" FontAttributes="Bold"/>
                     </FormattedString>
                 </Label.FormattedText>
             </Label>
@@ -50,16 +43,16 @@
                 HorizontalOptions="CenterAndExpand">
                 <Label.FormattedText>
                     <FormattedString>
-                        <Span Text= "-This app is still in beta and is subject to change. Please use the " FontSize="Small" />
-                        <Span Text = "Send Feedback" FontAttributes="Bold" FontSize="Small" />
-                        <Span Text = " feature on the " FontSize="Small" />
-                        <Span Text = "My Account" FontAttributes="Bold" FontSize="Small" />
-                        <Span Text = " page to send your questions/comments to the developers." FontSize="Small"/>
+                        <Span Text= "-This app is still in beta and is subject to change. Please use the " FontSize="Medium" />
+                        <Span Text = "Send Feedback" FontAttributes="Bold" FontSize="Medium" />
+                        <Span Text = " feature on the " FontSize="Medium" />
+                        <Span Text = "My Account" FontAttributes="Bold" FontSize="Medium" />
+                        <Span Text = " page to send your questions/comments to the developers." FontSize="Medium"/>
                     </FormattedString>
                 </Label.FormattedText>
             </Label>
             <Label Text="Thank you for using Fair Squares!"
-                FontSize="Small"
+                FontSize="Large"
                 Margin="5"
                 FontAttributes="Bold"
                 VerticalOptions="Center" 

@@ -19,6 +19,7 @@ namespace MobileClient.Views
     public partial class OrderPage : ContentPage
     {
         private BaseTabPage RootPage { get => Application.Current.MainPage as BaseTabPage; }
+        private readonly int _errorIndex = 7;
         private readonly ICurrentUserService _userService;
         private readonly IOrderService _orderService;
         private readonly IMessage _toast;
@@ -33,7 +34,10 @@ namespace MobileClient.Views
             _orderService = App.Container.GetInstance<IOrderService>();
             _subStatus = App.Container.GetInstance<ISubscriptionStatus>();
             _toast = DependencyService.Get<IMessage>();
+            Grid.RowDefinitions[_errorIndex].Height = 0;
             StatePicker.ItemsSource = States.Select(x => x.Text).ToList();
+            OptionPicker.ItemsSource = Options.Select(x => x.Text).ToList();
+            OptionPicker.SelectedIndex = 0;
             SubmitButton.Clicked += async (s, e) => await HandleSubmitClick(s, e);
         }
 
@@ -47,12 +51,14 @@ namespace MobileClient.Views
                     || StatePicker.SelectedIndex < 0
                     || string.IsNullOrWhiteSpace(Zip.Text))
                 {
+                    Grid.RowDefinitions[_errorIndex].Height = GridLength.Star;
                     ErrorMessage.Text = "Please fill out all fields before submitting.";
                     return;
                 }
                 var user = _userService.GetLoggedInAccount();
                 if (user == null)
                 {
+                    Grid.RowDefinitions[_errorIndex].Height = GridLength.Star;
                     ErrorMessage.Text = "You must be logged in to submit an order.";
                     return;
                 }
@@ -78,6 +84,7 @@ namespace MobileClient.Views
                     ReportType = ReportType.Basic,
                     MemberId = user.UserId,
                     MemberEmail = user.Email,
+                    RoofOption = Options[OptionPicker.SelectedIndex].RoofOption,
                     Comments = Comments.Text
                 }));
                 _toast.ShortAlert($"Your address has been submitted!");
@@ -85,16 +92,32 @@ namespace MobileClient.Views
                 AddressLine1.Text = "";
                 AddressLine2.Text = "";
                 City.Text = "";
+                Grid.RowDefinitions[_errorIndex].Height = 0;
                 StatePicker.SelectedIndex = -1;
+                OptionPicker.SelectedIndex = 0;
                 Zip.Text = "";
                 Comments.Text = "";
                 RootPage.NavigateFromMenu(PageType.MyOrders);
             }
             catch (Exception ex)
             {
+                Grid.RowDefinitions[_errorIndex].Height = GridLength.Star;
+                ErrorMessage.Text = $"Failed to submit order with error {ex.ToString()}";
                 Debug.WriteLine("Failed to submit order with error '" + ex.ToString() + "'");
             }
         }
+
+        private async void ToolbarItem_Activated(object sender, EventArgs e)
+        {
+            await this.Navigation.PushAsync(new InstructionPage());
+        }
+
+        private readonly List<OptionViewModel> Options = new List<OptionViewModel>()
+        {
+            new OptionViewModel() { RoofOption = Models.RoofOption.PrimaryOnly, Text = "Primary Roof Only" },
+            new OptionViewModel() { RoofOption = Models.RoofOption.RoofDetachedGarage, Text = "Include Detached Garage" },
+            new OptionViewModel() { RoofOption = Models.RoofOption.RoofShedBarn, Text = "Include Barn/Shed" }
+        };
         private readonly List<StateViewModel> States = new List<StateViewModel>()
         {
             new StateViewModel() {Code = "AL", Text = "Alabama"},

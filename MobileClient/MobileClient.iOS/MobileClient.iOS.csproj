@@ -112,6 +112,7 @@
     <Compile Include="BorderlessEntryRenderer.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
+    <Compile Include="Utilities\CustomList.cs" />
     <Compile Include="Utilities\iOSMessage.cs" />
     <Compile Include="Utilities\MessagingSubscriber.cs" />
     <None Include="Entitlements.plist" />
@@ -236,5 +237,14 @@
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\ic_action_straighten.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\ic_action_info_outline.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\ic_action_keyboard_arrow_down.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\ic_action_keyboard_arrow_up.png" />
   </ItemGroup>
 </Project>

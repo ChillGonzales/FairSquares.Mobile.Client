@@ -3,6 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              Title="My Account"
              x:Class="MobileClient.Views.AccountPage">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Icon="ic_action_info_outline.png" 
+                     Activated="ToolbarItem_Activated" />
+    </ContentPage.ToolbarItems>
     <ContentPage.Content>
         <StackLayout Margin="10">
             <StackLayout Orientation="Vertical"

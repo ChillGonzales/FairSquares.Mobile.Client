@@ -94,6 +94,11 @@ namespace MobileClient.Views
             All = new List<OrderGroup>() { fulGroup, penGroup };
             OrderListView.ItemsSource = All;
         }
+
+        private async void ToolbarItem_Activated(object sender, EventArgs e)
+        {
+            await this.Navigation.PushAsync(new InstructionPage());
+        }
     }
 
     public class OrderViewCell

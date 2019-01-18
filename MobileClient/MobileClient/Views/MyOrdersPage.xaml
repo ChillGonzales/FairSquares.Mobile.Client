@@ -1,15 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             Title="My Roofs"
+             Title="View Submitted Orders"
              x:Class="MobileClient.Views.MyOrdersPage">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Icon="ic_action_info_outline.png" 
+                     Activated="ToolbarItem_Activated" />
+    </ContentPage.ToolbarItems>
     <ContentPage.Content>
         <StackLayout>
             <ListView x:Name="OrderListView"
                 IsPullToRefreshEnabled="True"
                 IsGroupingEnabled="True"
                 GroupDisplayBinding="{Binding Title}"
-                SeparatorColor="LightGray"
                 VerticalOptions="CenterAndExpand"
                 HorizontalOptions="CenterAndExpand">
             <ListView.ItemTemplate>

@@ -43,8 +43,9 @@ namespace MobileClient.Views
             if (prop == null)
             {
 
-                PitchStepper.IsVisible = false;
                 Pitch.Text = $"Your property is in the process of being measured!";
+                DownButton.IsVisible = false;
+                UpButton.IsVisible = false;
                 SafetyStockLabel.IsVisible = false;
                 SafetyStockTable.IsVisible = false;
                 // TODO: Handle error of no property found
@@ -60,12 +61,11 @@ namespace MobileClient.Views
             _recalculated = GetViewModelFromProperty(_property);
 
             // Set GUI and event handlers
-            OrderId.Text = $"Order #{order.OrderId}";
-            Pitch.Text = $"Pitch: {_recalculated.CurrentPitch}:12";
-            PitchStepper.IsVisible = true;
-            PitchStepper.Value = _recalculated.CurrentPitch;
-            PitchStepper.ValueChanged += OnPitchStepperValueChanged;
+            OrderId.Text = $"Order ID: {order.OrderId}";
+            Pitch.Text = $"Predominant Pitch: {_recalculated.CurrentPitch}:12";
             ImageGR.Tapped += OnImageTapped;
+            DownButton.Clicked += (s, e) => OnPitchValueChanged(_recalculated.CurrentPitch, _recalculated.CurrentPitch - 1);
+            UpButton.Clicked += (s, e) => OnPitchValueChanged(_recalculated.CurrentPitch, _recalculated.CurrentPitch + 1);
 
             var img = _imageCache.Get(prop.OrderId);
             var stream = new StreamImageSource();
@@ -101,16 +101,17 @@ namespace MobileClient.Views
                 OriginalPitch = overallPitch
             };
         }
-        private void OnPitchStepperValueChanged(object sender, ValueChangedEventArgs e)
+        private void OnPitchValueChanged(int oldValue, int newValue)
         {
             try
             {
-                var newVal = Math.Round(e.NewValue, 0);
-                Pitch.Text = $"Pitch: {newVal}:12";
-                _recalculated.CurrentPitch = (int)newVal;
+                if (newValue > 25 || newValue < 0)
+                    return;
+                Pitch.Text = $"Predominant Pitch: {newValue}:12";
+                _recalculated.CurrentPitch = newValue;
                 foreach (var section in _recalculated.RecalculatedSections)
                 {
-                    section.PitchRise = newVal;
+                    section.PitchRise = newValue;
                     var totals = SectionUtilities.CalculateAreaAndSquares(new CalculateSectionModelRequest()
                     {
                         Length = section.Length,
