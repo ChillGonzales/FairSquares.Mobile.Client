@@ -44,16 +44,10 @@ namespace MobileClient.Views
         //    // TODO: Implement user update
         //}
 
-        private async void LogoutButton_Clicked(object sender, EventArgs e)
+        private void LogoutButton_Clicked(object sender, EventArgs e)
         {
-            if (_userCache.GetLoggedInAccount() == null)
-            {
-                await Navigation.PushAsync(new LandingPage());
-                return;
-            }
             _userCache.LogOut();
             SetUIToAccount(null);
-            await Navigation.PushAsync(new LandingPage());
         }
 
         private async void ToolbarItem_Activated(object sender, EventArgs e)
@@ -67,11 +61,13 @@ namespace MobileClient.Views
             {
                 EmailLabel.Text = "Please Log In To Continue";
                 LogoutButton.Text = "Log In";
+                LogoutButton.StyleClass = new List<string>() { "Info" };
             }
             else
             {
-                EmailLabel.Text = account.Email;
+                EmailLabel.Text = $"Member Email: {account.Email}";
                 LogoutButton.Text = "Log Out";
+                LogoutButton.StyleClass = new List<string>() { "Danger" };
             }
         }
     }

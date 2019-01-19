@@ -30,8 +30,6 @@ namespace MobileClient.Views
             try
             {
                 _userService = App.Container.GetInstance<ICurrentUserService>();
-                if (_userService.GetLoggedInAccount() == null)
-                    Navigation.PushAsync(new LandingPage(), true);
                 _orderService = App.Container.GetInstance<IOrderService>();
                 _orderCache = App.Container.GetInstance<ICache<Order>>();
                 _logger = App.Container.GetInstance<ILogger<MyOrdersPage>>();

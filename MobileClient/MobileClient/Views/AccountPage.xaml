@@ -11,17 +11,10 @@
         <StackLayout Margin="10">
             <StackLayout Orientation="Vertical"
                      VerticalOptions="CenterAndExpand">
-                <StackLayout Orientation="Horizontal"
-                         VerticalOptions="Center">
-                    <Label Text="Member Email: "
+                <Label x:Name="EmailLabel"
+                        Text="Email Label: "
                         VerticalOptions="Center" 
-                        HorizontalOptions="StartAndExpand" />
-                    <Label x:Name="EmailLabel"
-                        Text=""
-                        WidthRequest="250"
-                        VerticalOptions="Center" 
-                        HorizontalOptions="End" />
-                </StackLayout>
+                        HorizontalOptions="CenterAndExpand" />
                 <Button x:Name="LogoutButton"
                     Text="Log Out"
                     WidthRequest="200"

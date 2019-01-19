@@ -29,8 +29,6 @@ namespace MobileClient.Views
         {
             InitializeComponent();
             _userService = App.Container.GetInstance<ICurrentUserService>();
-            if (_userService.GetLoggedInAccount() == null)
-                Navigation.PushAsync(new LandingPage(), true);
             _orderService = App.Container.GetInstance<IOrderService>();
             _subStatus = App.Container.GetInstance<ISubscriptionStatus>();
             _toast = DependencyService.Get<IMessage>();
@@ -45,6 +43,7 @@ namespace MobileClient.Views
         {
             try
             {
+                SubmitButton.IsEnabled = false;
                 ErrorMessage.Text = "";
                 if (string.IsNullOrWhiteSpace(AddressLine1.Text)
                     || string.IsNullOrWhiteSpace(City.Text)
@@ -53,6 +52,7 @@ namespace MobileClient.Views
                 {
                     Grid.RowDefinitions[_errorIndex].Height = GridLength.Star;
                     ErrorMessage.Text = "Please fill out all fields before submitting.";
+                    SubmitButton.IsEnabled = true;
                     return;
                 }
                 var user = _userService.GetLoggedInAccount();
@@ -60,6 +60,7 @@ namespace MobileClient.Views
                 {
                     Grid.RowDefinitions[_errorIndex].Height = GridLength.Star;
                     ErrorMessage.Text = "You must be logged in to submit an order.";
+                    SubmitButton.IsEnabled = true;
                     return;
                 }
 
@@ -96,6 +97,7 @@ namespace MobileClient.Views
                 StatePicker.SelectedIndex = -1;
                 OptionPicker.SelectedIndex = 0;
                 Zip.Text = "";
+                SubmitButton.IsEnabled = true;
                 Comments.Text = "";
                 RootPage.NavigateFromMenu(PageType.MyOrders);
             }

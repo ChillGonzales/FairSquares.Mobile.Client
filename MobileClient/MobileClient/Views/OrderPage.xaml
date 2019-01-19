@@ -9,17 +9,19 @@
                      Activated="ToolbarItem_Activated" />
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
-        <Grid Margin="20" ColumnSpacing="20" x:Name="Grid">
+        <Grid Margin="20" ColumnSpacing="25" RowSpacing="8" x:Name="Grid">
             <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
+                <RowDefinition x:Name="AddressRow" Height="40" />
+                <RowDefinition x:Name="Address2Row" Height="40" />
+                <RowDefinition x:Name="CityRow" Height="40" />
+                <RowDefinition x:Name ="StateRow" Height="40" />
+                <RowDefinition x:Name="ZipRow" Height="40" />
+                <RowDefinition x:Name="OptionRow" Height="40" />
+                <RowDefinition x:Name="CommentsRow" Height="40" />
+                <RowDefinition x:Name="PaddingRow" Height="60" />
+                <RowDefinition x:Name="ErrorMessageRow" Height="40" />
+                <RowDefinition x:Name="SubmitRow" Height="40" />
+                <RowDefinition x:Name="PaddingBottomRow" Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="90" />
@@ -37,7 +39,7 @@
                             Grid.Column="1"
                             WidthRequest="250"
                             VerticalOptions="Center"
-                            HorizontalOptions="EndAndExpand" />
+                            HorizontalOptions="StartAndExpand" />
                 <Label Text="Address 2" 
                        FontSize="Medium"
                        Grid.Row="1"
@@ -50,7 +52,7 @@
                         Grid.Column="1"
                         WidthRequest="250"
                         VerticalOptions="Center"
-                        HorizontalOptions="EndAndExpand" />
+                        HorizontalOptions="StartAndExpand" />
                 <Label Text="City" 
                            FontSize="Medium"
                            Grid.Row="2"
@@ -63,7 +65,7 @@
                         Grid.Column="1"
                         WidthRequest="250"
                         VerticalOptions="Center"
-                        HorizontalOptions="EndAndExpand" />
+                        HorizontalOptions="StartAndExpand" />
                 <Label Text="State" 
                        FontSize="Medium"
                        Grid.Row="3"
@@ -76,7 +78,7 @@
                         Grid.Column="1"
                         WidthRequest="250"
                         VerticalOptions="Center"
-                        HorizontalOptions="EndAndExpand" />
+                        HorizontalOptions="StartAndExpand" />
                 <Label Text="Zip" 
                        Grid.Row="4"
                        Grid.Column="0"
@@ -103,7 +105,7 @@
                         Grid.Column="1"
                         WidthRequest="250" 
                         VerticalOptions="Center"
-                        HorizontalOptions="EndAndExpand" />
+                        HorizontalOptions="StartAndExpand" />
                 <Label Text="Comments" 
                        FontSize="Medium"
                        Grid.Row="6"
@@ -117,10 +119,10 @@
                         FontSize="Medium"
                         WidthRequest="250"
                         Keyboard="Numeric"
-                        HorizontalOptions="EndAndExpand" />
+                        HorizontalOptions="StartAndExpand" />
             <Label x:Name="ErrorMessage"
                    TextColor="Red"
-                   Grid.Row="7"
+                   Grid.Row="8"
                    Grid.Column="0"
                    Grid.ColumnSpan="2"
                    VerticalOptions="Center"
@@ -129,7 +131,7 @@
             <Button Text="Submit"
                     x:Name="SubmitButton"
                     StyleClass="Success"
-                    Grid.Row="8"
+                    Grid.Row="9"
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
                     WidthRequest="200"

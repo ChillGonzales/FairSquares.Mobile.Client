@@ -145,7 +145,14 @@ namespace MobileClient
         public App()
         {
             InitializeComponent();
-            MainPage = new BaseTabPage();
+            var userService = Container.GetInstance<ICurrentUserService>();
+            userService.OnLoggedIn += (s, e) => MainPage = new BaseTabPage();
+            userService.OnLoggedOut += (s, e) => MainPage = new LandingPage();
+
+            if (userService.GetLoggedInAccount() == null)
+                MainPage = new LandingPage();
+            else
+                MainPage = new BaseTabPage();
         }
 
         protected override void OnStart()

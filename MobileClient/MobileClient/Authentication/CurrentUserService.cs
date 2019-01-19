@@ -14,6 +14,7 @@ namespace MobileClient.Authentication
         private readonly AccountStore _store;
         private AccountModel _loggedIn;
         public event EventHandler<LoggedInEventArgs> OnLoggedIn;
+        public event EventHandler OnLoggedOut;
 
         public CurrentUserService(AccountStore store)
         {
@@ -44,6 +45,7 @@ namespace MobileClient.Authentication
             var acct = _store.FindAccountsForService(Configuration.AppName).FirstOrDefault();
             _store.Delete(acct, Configuration.AppName);
             _loggedIn = null;
+            OnLoggedOut?.Invoke(this, new EventArgs());
         }
 
         private AccountModel GetModelFromAccount(Account token)

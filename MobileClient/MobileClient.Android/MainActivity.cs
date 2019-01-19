@@ -48,7 +48,7 @@ namespace MobileClient.Droid
                 CrossCurrentActivity.Current.Init(this, savedInstanceState);
                 Plugin.CurrentActivity.CrossCurrentActivity.Current.Activity = this;
                 LoadApplication(new App());
-                var x = typeof(Xamarin.Forms.Themes.DarkThemeResources);
+                var x = typeof(Xamarin.Forms.Themes.LightThemeResources);
                 x = typeof(Xamarin.Forms.Themes.Android.UnderlineEffect);
             }
             catch (Exception ex)
