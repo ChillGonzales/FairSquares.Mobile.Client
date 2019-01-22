@@ -20,23 +20,21 @@ namespace MobileClient.Views
 
         public void NavigateFromMenu(PageType pageType)
         {
-            Page newPage = null;
             switch (pageType)
             {
                 case PageType.Account:
-                    newPage = new AccountPage();
+                    CurrentPage = AccountTab;
                     break;
                 case PageType.MyOrders:
-                    newPage = new MyOrdersPage();
+                    CurrentPage = MyOrdersTab;
                     break;
                 case PageType.Order:
-                    newPage = new OrderPage();
+                    CurrentPage = OrderTab;
                     break;
                 default:
-                    newPage = new OrderPage();
+                    CurrentPage = OrderTab;
                     break;
             }
-            this.CurrentPage = newPage;
         }
     }
 }

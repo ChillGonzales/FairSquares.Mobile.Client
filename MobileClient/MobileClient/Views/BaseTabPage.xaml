@@ -10,7 +10,8 @@
              android:TabbedPage.BarSelectedItemColor="White"
              x:Class="MobileClient.Views.BaseTabPage">
   <!--Pages can be added as references or inline-->
-    <NavigationPage Title="Measure It"
+    <NavigationPage x:Name="OrderTab"
+        Title="Measure It"
         BarBackgroundColor="{StaticResource primary-back-title-color}"
         BarTextColor="{StaticResource primary-title-color}"
         Icon="ic_action_straighten.png">
@@ -18,7 +19,8 @@
             <views:OrderPage />
         </x:Arguments>
     </NavigationPage>
-    <NavigationPage Title="My Orders" 
+    <NavigationPage x:Name="MyOrdersTab"
+        Title="My Orders" 
         BarBackgroundColor="{StaticResource primary-back-title-color}"
         BarTextColor="{StaticResource primary-title-color}"
         Icon="ic_action_folder_open.png">
@@ -26,7 +28,8 @@
             <views:MyOrdersPage />
         </x:Arguments>
     </NavigationPage>
-    <NavigationPage Title="My Account"
+    <NavigationPage x:Name="AccountTab"
+        Title="My Account"
         BarBackgroundColor="{StaticResource primary-back-title-color}"
         BarTextColor="{StaticResource primary-title-color}"
         Icon="ic_action_account_circle.png">

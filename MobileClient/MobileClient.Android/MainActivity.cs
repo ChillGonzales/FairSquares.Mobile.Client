@@ -42,7 +42,6 @@ namespace MobileClient.Droid
 
                 CreateNotificationChannel();
                 IsPlayServicesAvailable();
-                Log.Info("FairSquares", $"Token: '{FirebaseInstanceId.Instance.Token.ToString()}'");
                 global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
                 global::Xamarin.Auth.Presenters.XamarinAndroid.AuthenticationConfiguration.Init(this, savedInstanceState);
                 CrossCurrentActivity.Current.Init(this, savedInstanceState);

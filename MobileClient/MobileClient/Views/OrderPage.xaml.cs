@@ -1,5 +1,6 @@
 ﻿using FairSquares.Measurement.Core.Models;
 using MobileClient.Authentication;
+using MobileClient.Models;
 using MobileClient.Services;
 using MobileClient.Utilities;
 using MobileClient.ViewModels;
@@ -24,6 +25,7 @@ namespace MobileClient.Views
         private readonly IOrderService _orderService;
         private readonly IMessage _toast;
         private readonly ISubscriptionStatus _subStatus;
+        private readonly ICache<Order> _orderCache;
 
         public OrderPage()
         {
@@ -31,6 +33,7 @@ namespace MobileClient.Views
             _userService = App.Container.GetInstance<ICurrentUserService>();
             _orderService = App.Container.GetInstance<IOrderService>();
             _subStatus = App.Container.GetInstance<ISubscriptionStatus>();
+            _orderCache = App.Container.GetInstance<ICache<Order>>();
             _toast = DependencyService.Get<IMessage>();
             Grid.RowDefinitions[_errorIndex].Height = 0;
             StatePicker.ItemsSource = States.Select(x => x.Text).ToList();
@@ -78,7 +81,7 @@ namespace MobileClient.Views
                 //}
 
                 // Submit order
-                await Task.Run(() => _orderService.AddOrder(new Models.Order()
+                var newOrder = new Models.Order()
                 {
                     StreetAddress = $"{AddressLine1.Text}\n{(string.IsNullOrWhiteSpace(AddressLine2.Text) ? "" : AddressLine2.Text + "\n")}\n" +
                                     $"{City.Text}, {States[StatePicker.SelectedIndex].Code} {Zip.Text}",
@@ -87,7 +90,9 @@ namespace MobileClient.Views
                     MemberEmail = user.Email,
                     RoofOption = Options[OptionPicker.SelectedIndex].RoofOption,
                     Comments = Comments.Text
-                }));
+                };
+                newOrder.OrderId = await _orderService.AddOrder(newOrder);
+                _orderCache.Put(newOrder.OrderId, newOrder);
                 _toast.ShortAlert($"Your address has been submitted!");
                 // Clear all fields
                 AddressLine1.Text = "";

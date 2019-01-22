@@ -118,7 +118,6 @@
                         Grid.Column="1"
                         FontSize="Medium"
                         WidthRequest="250"
-                        Keyboard="Numeric"
                         HorizontalOptions="StartAndExpand" />
             <Label x:Name="ErrorMessage"
                    TextColor="Red"
