@@ -69,6 +69,11 @@ namespace MobileClient.Views
             }
         }
 
+        protected override void OnAppearing()
+        {
+            SetListViewSource(_orderCache.GetAll().Select(x => x.Value).ToList());
+        }
+
         private void SetListViewSource(List<Order> orders)
         {
             var fulGroup = new OrderGroup() { Title = "Completed" };
