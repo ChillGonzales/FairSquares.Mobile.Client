@@ -4,7 +4,12 @@
              Title="Please Login to Continue"
              x:Class="MobileClient.Views.LandingPage">
     <ContentPage.Content>
-        <StackLayout>
+        <StackLayout Margin="20" Orientation="Vertical">
+            <Label Text="Please Login to Continue"
+                    FontSize="Large"
+                    FontAttributes="Bold"
+                    VerticalOptions="Start"
+                    HorizontalOptions="CenterAndExpand" />
             <Button x:Name="GoogleLogin"
                     Text="Login with Google"
                     WidthRequest="250"

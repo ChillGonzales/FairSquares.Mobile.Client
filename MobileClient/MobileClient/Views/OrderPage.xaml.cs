@@ -23,8 +23,8 @@ namespace MobileClient.Views
         private readonly int _errorIndex = 7;
         private readonly ICurrentUserService _userService;
         private readonly IOrderService _orderService;
+        private readonly ICache<SubscriptionModel> _subCache;
         private readonly IMessage _toast;
-        private readonly ISubscriptionStatus _subStatus;
         private readonly ICache<Order> _orderCache;
 
         public OrderPage()
@@ -32,8 +32,8 @@ namespace MobileClient.Views
             InitializeComponent();
             _userService = App.Container.GetInstance<ICurrentUserService>();
             _orderService = App.Container.GetInstance<IOrderService>();
-            _subStatus = App.Container.GetInstance<ISubscriptionStatus>();
             _orderCache = App.Container.GetInstance<ICache<Order>>();
+            _subCache = App.Container.GetInstance<ICache<SubscriptionModel>>();
             _toast = DependencyService.Get<IMessage>();
             Grid.RowDefinitions[_errorIndex].Height = 0;
             StatePicker.ItemsSource = States.Select(x => x.Text).ToList();
@@ -67,18 +67,20 @@ namespace MobileClient.Views
                     return;
                 }
 
-                // TODO: Make some reminder for how much time is left or something
-                // TODO: Re-enable this checking
-                //if (_subStatus.FreeTrialActive)
-                //if (!_subStatus.SubscriptionActive)
-                //{
-                //    await Navigation.PushAsync(new PurchasePage(_subStatus));
-                //    if (!_subStatus.SubscriptionActive)
-                //    {
-                //        ErrorMessage.Text = "Please select a subscription plan to continue.";
-                //        return;
-                //    }
-                //}
+                var subStatus = _subCache.Get(_userService.GetLoggedInAccount().UserId);
+                if (!SubscriptionUtilities.SubscriptionActive(subStatus))
+                {
+                    await Navigation.PushAsync(new PurchasePage());
+                    await Task.Delay(500);
+                    // Refresh subscription to make sure transaction has gone through.
+                    subStatus = _subCache.Get(_userService.GetLoggedInAccount().UserId);
+                    if (!SubscriptionUtilities.SubscriptionActive(subStatus))
+                    {
+                        ErrorMessage.Text = "Please select a subscription plan to continue.";
+                        SubmitButton.IsEnabled = true;
+                        return;
+                    }
+                }
 
                 // Submit order
                 var newOrder = new Models.Order()
@@ -109,6 +111,7 @@ namespace MobileClient.Views
             catch (Exception ex)
             {
                 Grid.RowDefinitions[_errorIndex].Height = GridLength.Star;
+                SubmitButton.IsEnabled = true;
                 ErrorMessage.Text = $"Failed to submit order with error {ex.ToString()}";
                 Debug.WriteLine("Failed to submit order with error '" + ex.ToString() + "'");
             }

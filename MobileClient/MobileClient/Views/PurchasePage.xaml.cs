@@ -1,4 +1,5 @@
 ﻿using MobileClient.Authentication;
+using MobileClient.Models;
 using MobileClient.Services;
 using MobileClient.Utilities;
 using System;
@@ -15,41 +16,54 @@ namespace MobileClient.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class PurchasePage : ContentPage
     {
-        private IPurchasingService _purchaseService;
-        private ISubscriptionStatus _subStatus;
-        private ISubscriptionService _subService;
-        private ICurrentUserService _userCache;
-        private const string _subName = "premium_subscription_monthly";
+        private readonly IPurchasingService _purchaseService;
+        private readonly ICache<SubscriptionModel> _subCache;
+        private readonly ISubscriptionService _subService;
+        private readonly ICurrentUserService _userCache;
+        private readonly IOrderService _orderService;
+        private const string _subNamePremium = "premium_subscription_monthly";
+        private const string _subNameBasic = "basic_subscription_monthly";
+        private const string _subNameUnlimited = "unlimited_subscription_monthly";
 
         public PurchasePage()
-        {
-            Init();
-        }
-        public PurchasePage(ISubscriptionStatus subStatus)
-        {
-            Init();
-
-            _subStatus = subStatus;
-        }
-
-        private void Init()
         {
             InitializeComponent();
 
             _subService = App.Container.GetInstance<ISubscriptionService>();
             _purchaseService = App.Container.GetInstance<IPurchasingService>();
             _userCache = App.Container.GetInstance<ICurrentUserService>();
-            PurchaseButton.Clicked += PurchaseButton_Clicked;
+            _orderService = App.Container.GetInstance<IOrderService>();
+            _subCache = App.Container.GetInstance<ICache<SubscriptionModel>>();
+            ErrorCol.Height = 0;
+            BasicButton.Clicked += (s, e) => { PurchaseSubscription(SubscriptionType.Basic); };
+            PremiumButton.Clicked += (s, e) => { PurchaseSubscription(SubscriptionType.Premium); };
+            UnlimitedButton.Clicked += (s, e) => { PurchaseSubscription(SubscriptionType.Unlimited); };
+            SetFreeReportButton();
         }
 
-        private async void PurchaseButton_Clicked(object sender, EventArgs e)
+        private async void PurchaseSubscription(SubscriptionType subType)
         {
             try
             {
-                var sub = await _purchaseService.PurchaseSubscription(_subName, "");
+                ErrorCol.Height = 0;
+                var subCode = _subNameBasic;
+                switch (subType)
+                {
+                    case SubscriptionType.Basic:
+                        subCode = _subNameBasic;
+                        break;
+                    case SubscriptionType.Premium:
+                        subCode = _subNamePremium;
+                        break;
+                    case SubscriptionType.Unlimited:
+                        subCode = _subNameUnlimited;
+                        break;
+                }
+                var sub = await _purchaseService.PurchaseSubscription(subCode, "");
                 var model = new Models.SubscriptionModel()
                 {
                     PurchaseId = sub.Id,
+                    PurchaseToken = sub.PurchaseToken,
                     SubscriptionId = "0",
                     StartDateTime = DateTimeOffset.Now,
                     PurchasedDateTime = DateTimeOffset.Now,
@@ -57,13 +71,38 @@ namespace MobileClient.Views
                     PurchaseSource = Device.RuntimePlatform == Device.Android ? Models.PurchaseSource.GooglePlay : Models.PurchaseSource.AppStore,
                     UserId = _userCache.GetLoggedInAccount().UserId
                 };
+                _subCache.Put(_userCache.GetLoggedInAccount().UserId, model);
                 _subService.AddSubscription(model);
-                _subStatus.Subscription = model;
             }
             catch (Exception ex)
             {
+                ErrorCol.Height = 50;
                 ErrorLabel.Text = ex.Message;
             }
         }
+
+        private void SetFreeReportButton()
+        {
+            // TODO: Remodel how this is being fetched. It's messy.
+            // If they've ordered before, hide free report button.
+            var orders = Task.Run(() => _orderService.GetMemberOrders(_userCache.GetLoggedInAccount().UserId)).Result;
+            if (orders != null && orders.Any())
+            {
+                FreeReportCol.Height = 0;
+                BasicButton.StyleClass = new List<string>() { "Success" };
+            }
+            else
+            {
+                FreeReportCol.Height = GridLength.Star;
+                BasicButton.StyleClass = new List<string>() { "Info" };
+            }
+        }
+    }
+
+    enum SubscriptionType
+    {
+        Basic = 0,
+        Premium = 1,
+        Unlimited = 2
     }
 }

@@ -8,31 +8,64 @@
                      Activated="ToolbarItem_Activated" />
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
-        <StackLayout Margin="10">
-            <StackLayout Orientation="Vertical"
-                     VerticalOptions="CenterAndExpand">
-                <Label x:Name="EmailLabel"
-                        Text="Email Label: "
-                        VerticalOptions="Center" 
+        <Grid Margin="10" ColumnSpacing="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="25" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Label x:Name="EmailTitleLabel"
+                   Text="Logged In User"
+                   Grid.Row="0"
+                   FontSize="Medium"
+                   FontAttributes="Bold"
+                   Grid.Column="0"
+                   Grid.ColumnSpan="2"
+                   VerticalOptions="CenterAndExpand"
+                   HorizontalOptions="CenterAndExpand" />
+            <Label x:Name="EmailLabel"
+                            FontSize="Medium"
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            VerticalOptions="Center" 
+                            HorizontalOptions="CenterAndExpand" />
+            <Button x:Name="LogoutButton"
+                        Text="Log Out"
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        WidthRequest="200"
+                        StyleClass="Danger"
+                        VerticalOptions="Center"
                         HorizontalOptions="CenterAndExpand" />
-                <Button x:Name="LogoutButton"
-                    Text="Log Out"
-                    WidthRequest="200"
-                    StyleClass="Danger"
-                    VerticalOptions="Center"
-                    HorizontalOptions="CenterAndExpand" />
-            </StackLayout>
-            <StackLayout Margin="10" 
-                         Orientation="Vertical"
-                         VerticalOptions="CenterAndExpand">
-                <Label Margin="5" Text="Fair Squares is an application that leverages cutting edge technology to make roof measuring fast, easy, and 100% online. Get accurate roof measurements, with adjustable pitch calculations, completely on the go." />
-                <Button x:Name="FeedbackButton"
+            <Label x:Name="SubscriptionLabel" 
+                       Text="Status: Not Active"
+                       FontSize="Medium"
+                       Grid.Row="2"
+                       Grid.Column="0"
+                       VerticalOptions="Center"
+                       HorizontalOptions="CenterAndExpand" />
+            <Button x:Name="SubscribeButton"
+                       Text="Go Premium"
+                       Grid.Row="2"
+                       Grid.Column="1"
+                       WidthRequest="200"
+                       StyleClass="Success"
+                       VerticalOptions="Center"
+                       HorizontalOptions="CenterAndExpand" />
+            <Button x:Name="FeedbackButton"
                     Text="Send Feedback"
+                    Grid.Row="3"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
                     StyleClass="Info"
                     WidthRequest="250"
                     HorizontalOptions="CenterAndExpand"
                     VerticalOptions="Center" />
-            </StackLayout>
-        </StackLayout>
+        </Grid>
     </ContentPage.Content>
 </ContentPage>

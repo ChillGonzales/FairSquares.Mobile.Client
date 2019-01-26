@@ -39,7 +39,13 @@ namespace MobileClient.Services
             try
             {
                 var result = _http.GetAsync($"?userId={userId}").Result;
-                result.EnsureSuccessStatusCode();
+                if (!result.IsSuccessStatusCode)
+                {
+                    if (result.StatusCode == System.Net.HttpStatusCode.NotFound)
+                        return null;
+                    else
+                        throw new Exception(result.Content.ReadAsStringAsync().Result);
+                }
                 return JsonConvert.DeserializeObject<SubscriptionModel>(result.Content.ReadAsStringAsync().Result);
             }
             catch (Exception ex)

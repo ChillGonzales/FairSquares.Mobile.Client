@@ -3,25 +3,95 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MobileClient.Views.PurchasePage">
     <ContentPage.Content>
-        <StackLayout>
-            <Label Text="Premium Plan"
-                TextDecorations="Underline"
-                VerticalOptions="CenterAndExpand" 
-                HorizontalOptions="CenterAndExpand" />
-            <Label Text="Start your free 30-day trial now!"
-                VerticalOptions="CenterAndExpand"
-                HorizontalOptions="CenterAndExpand" />
-            <Label Text="Monthly subscription is $89.99 after free trial ends."
-                VerticalOptions="CenterAndExpand"
-                HorizontalOptions="CenterAndExpand" />
+        <Grid Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="25"/>
+                <RowDefinition x:Name="FreeReportCol" Height="*"/>
+                <RowDefinition x:Name="BasicCol" Height="*"/>
+                <RowDefinition x:Name="PremiumCol" Height="*"/>
+                <RowDefinition x:Name="UnlCol" Height="*"/>
+                <RowDefinition x:Name="ErrorCol" Height="50"/>
+            </Grid.RowDefinitions>
+            <Label Text="Choose Your Plan. Cancel Anytime."
+                   FontSize="Medium"
+                   FontAttributes="Bold"
+                   HorizontalOptions="CenterAndExpand"
+                   VerticalOptions="CenterAndExpand"
+                   Grid.Row="0"
+                   Grid.Column="0"
+                   Grid.ColumnSpan="2" />
+
+            <Label Text="Try a Free Report On Us."
+                   Font="Medium"
+                   HorizontalOptions="CenterAndExpand"
+                   VerticalOptions="CenterAndExpand"
+                   Grid.Row="1"
+                   Grid.Column="0" />
+            <Button Text="Try For Free"
+                    StyleClass="Success"
+                    HorizontalOptions="CenterAndExpand"
+                    VerticalOptions="Center"
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    WidthRequest="250" />
+
+            <Label Text="3 Reports Per Month. First month is FREE! $24.99/month after trial ends."
+                   Font="Medium"
+                   HorizontalOptions="CenterAndExpand"
+                   VerticalOptions="CenterAndExpand"
+                   Grid.Row="2"
+                   Grid.Column="0">
+            </Label>
+            <Button Text="Start Your Free Trial"
+                    x:Name="BasicButton"
+                    StyleClass="Success"
+                    HorizontalOptions="CenterAndExpand"
+                    VerticalOptions="Center"
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    WidthRequest="250" />
+
+            <Label Text="8 Reports Per Month. $49.99/month"
+                   Font="Medium"
+                   HorizontalOptions="CenterAndExpand"
+                   VerticalOptions="CenterAndExpand"
+                   Grid.Row="3"
+                   Grid.Column="0" />
+            <Button Text="Purchase Premium"
+                    x:Name="PremiumButton"
+                    StyleClass="Info"
+                    HorizontalOptions="CenterAndExpand"
+                    VerticalOptions="Center"
+                    Grid.Row="3"
+                    Grid.Column="1"
+                    WidthRequest="250" />
+
+            <Label Text="25 Reports Per Month. $99.99/month"
+                   Font="Medium"
+                   HorizontalOptions="CenterAndExpand"
+                   VerticalOptions="CenterAndExpand"
+                   Grid.Row="4"
+                   Grid.Column="0" />
+            <Button Text="Purchase Business"
+                    x:Name="UnlimitedButton"
+                    StyleClass="Info"
+                    HorizontalOptions="CenterAndExpand"
+                    VerticalOptions="Center"
+                    Grid.Row="4"
+                    Grid.Column="1"
+                    WidthRequest="250" />
+
             <Label x:Name="ErrorLabel"
                    TextColor="Red"
+                   Grid.Row="5"
+                   Grid.Column="0"
+                   Grid.ColumnSpan="2"
                    VerticalOptions="CenterAndExpand"
                    HorizontalOptions="CenterAndExpand" />
-            <Button x:Name="PurchaseButton"
-                Text="Start Free Trial"
-                VerticalOptions="CenterAndExpand"
-                HorizontalOptions="CenterAndExpand" />
-        </StackLayout>
+        </Grid>
     </ContentPage.Content>
 </ContentPage>

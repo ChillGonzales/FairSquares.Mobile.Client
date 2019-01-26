@@ -42,6 +42,8 @@ namespace MobileClient
                 var orderService = new AzureOrderService(_orderEndpoint, _apiKey);
                 var propertyService = new PropertyService(_propertyEndpoint, new DebugLogger<PropertyService>());
                 var imageService = new BlobImageService(_blobEndpoint, new DebugLogger<BlobImageService>());
+                var subService = new SubscriptionService(new HttpClient() { BaseAddress = new Uri(_subEndpoint) }, 
+                    new DebugLogger<SubscriptionService>());
                 var authenticator = new OAuth2Authenticator(Configuration.ClientId, 
                                                             null, 
                                                             Configuration.Scope, 
@@ -64,6 +66,7 @@ namespace MobileClient
                 var propertyCache = new LocalSqlCache<PropertyModel>(Path.Combine(dbBasePath, "property.db3"), new DebugLogger<LocalSqlCache<PropertyModel>>());
                 var orderCache = new LocalSqlCache<Order>(Path.Combine(dbBasePath, "order.db3"), new DebugLogger<LocalSqlCache<Order>>());
                 var imageCache = new LocalSqlCache<ImageModel>(Path.Combine(dbBasePath, "images.db3"), new DebugLogger<LocalSqlCache<ImageModel>>());
+                var subCache = new LocalSqlCache<SubscriptionModel>(Path.Combine(dbBasePath, "subs.db3"), new DebugLogger<LocalSqlCache<SubscriptionModel>>());
 
                 Func<string, Task> RefreshCaches = userId => Task.Run(async () =>
                 {
@@ -89,7 +92,12 @@ namespace MobileClient
                             var images = imageService.GetImages(orders.Select(x => x.OrderId).ToList());
                             imageCache.Update(images);
                         });
-                        await Task.WhenAll(new[] { propTask, imgTask, subTask });
+                        var subscriptionTask = Task.Run(() =>
+                        {
+                            var sub = subService.GetSubscription(userId);
+                            subCache.Update(new Dictionary<string, SubscriptionModel>() { { userId, sub } });
+                        });
+                        await Task.WhenAll(new[] { propTask, imgTask, subTask, subscriptionTask });
                     }
                     catch (Exception ex)
                     {
@@ -118,12 +126,8 @@ namespace MobileClient
                 Container.Register<AccountStore>(() => AccountStore.Create(), Lifestyle.Singleton);
                 Container.Register<ICurrentUserService>(() => userService, Lifestyle.Singleton);
                 Container.Register<IPurchasingService>(() => purchaseService);
-                Container.Register<ISubscriptionStatus>(() => new SubscriptionStatus(null), Lifestyle.Singleton);
                 Container.Register<ICacheRefresher>(() => new CacheRefresher(new DebugLogger<CacheRefresher>(), RefreshCaches), Lifestyle.Singleton);
-                Container.Register<ISubscriptionService>(() => new SubscriptionService(new HttpClient()
-                {
-                    BaseAddress = new Uri(_subEndpoint)
-                }, new DebugLogger<SubscriptionService>()), Lifestyle.Singleton);
+                Container.Register<ISubscriptionService>(() => subService, Lifestyle.Singleton);
                 Container.Register<IUserService>(() => new UserService(new HttpClient()
                 {
                     BaseAddress = new Uri(_userEndpoint)
@@ -133,6 +137,7 @@ namespace MobileClient
                 Container.Register<ICache<PropertyModel>>(() => propertyCache, Lifestyle.Singleton);
                 Container.Register<ICache<Order>>(() => orderCache, Lifestyle.Singleton);
                 Container.Register<ICache<ImageModel>>(() => imageCache, Lifestyle.Singleton);
+                Container.Register<ICache<SubscriptionModel>>(() => subCache, Lifestyle.Singleton);
                 Container.RegisterConditional(typeof(ICache<>), typeof(MemoryCache<>), c => !c.Handled);
             }
             catch (Exception ex)
