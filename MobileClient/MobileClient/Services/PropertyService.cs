@@ -29,7 +29,7 @@ namespace MobileClient.Services
             {
                 var response = await _http.PostAsync(_baseUrl, new StringContent(JsonConvert.SerializeObject(orderIds), Encoding.UTF8, "application/json"));
                 if (!response.IsSuccessStatusCode)
-                    throw new Exception($"HTTP call returned an error code of '{response.StatusCode}'.");
+                    throw new Exception($"HTTP call returned an error code of '{response.StatusCode}' and message '{response.Content.ReadAsStringAsync().Result}'.");
                 var content = JsonConvert.DeserializeObject<List<PropertyModel>>(await response.Content.ReadAsStringAsync() ?? "[]");
                 return content.ToDictionary(x => x.OrderId, x => x);
             }

@@ -35,13 +35,17 @@ namespace MobileClient.Views
             _orderService = App.Container.GetInstance<IOrderService>();
             _subCache = App.Container.GetInstance<ICache<SubscriptionModel>>();
             ErrorCol.Height = 0;
+            TryForFreeButton.Clicked += (s, e) => 
+            {
+                Navigation.PopAsync();
+            };
             BasicButton.Clicked += (s, e) => { PurchaseSubscription(SubscriptionType.Basic); };
             PremiumButton.Clicked += (s, e) => { PurchaseSubscription(SubscriptionType.Premium); };
             UnlimitedButton.Clicked += (s, e) => { PurchaseSubscription(SubscriptionType.Unlimited); };
             SetFreeReportButton();
         }
 
-        private async void PurchaseSubscription(SubscriptionType subType)
+        private void PurchaseSubscription(SubscriptionType subType)
         {
             try
             {
@@ -59,12 +63,12 @@ namespace MobileClient.Views
                         subCode = _subNameUnlimited;
                         break;
                 }
-                var sub = await _purchaseService.PurchaseSubscription(subCode, "");
+                var sub = _purchaseService.PurchaseSubscription(subCode, "");
                 var model = new Models.SubscriptionModel()
                 {
                     PurchaseId = sub.Id,
                     PurchaseToken = sub.PurchaseToken,
-                    SubscriptionId = "0",
+                    SubscriptionType = SubscriptionUtilities.GetTypeFromProductId(sub.ProductId),
                     StartDateTime = DateTimeOffset.Now,
                     PurchasedDateTime = DateTimeOffset.Now,
                     EndDateTime = DateTimeOffset.Now.AddMonths(1),

@@ -27,6 +27,10 @@ namespace MobileClient.Utilities
         {
             _connection.Delete<Storable>(key);
         }
+        public void Clear()
+        {
+            _connection.DeleteAll<Storable>();
+        }
         public T Get(string key)
         {
             var stored = _connection.Find<Storable>(key);

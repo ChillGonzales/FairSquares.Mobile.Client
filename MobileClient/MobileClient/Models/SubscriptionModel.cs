@@ -11,9 +11,16 @@ namespace MobileClient.Models
         public string PurchaseId { get; set; }
         public PurchaseSource PurchaseSource { get; set; }
         public string UserId { get; set; }
-        public string SubscriptionId { get; set; }
+        public SubscriptionType SubscriptionType { get; set; }
         public DateTimeOffset PurchasedDateTime { get; set; }
         public DateTimeOffset StartDateTime { get; set; }
         public DateTimeOffset EndDateTime { get; set; }
+    }
+
+    public enum SubscriptionType
+    {
+        Basic = 0,
+        Premium = 1,
+        Unlimited = 2
     }
 }

@@ -54,20 +54,5 @@ namespace MobileClient.Services
                 throw;
             }
         }
-
-        public List<SubscriptionTypeModel> GetSubscriptionTypes()
-        {
-            try
-            {
-                var result = _http.GetAsync("/types").Result;
-                result.EnsureSuccessStatusCode();
-                return JsonConvert.DeserializeObject<List<SubscriptionTypeModel>>(result.Content.ReadAsStringAsync().Result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Failed to get subscription types.", ex);
-                throw;
-            }
-        }
     }
 }

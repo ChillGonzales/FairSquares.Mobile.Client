@@ -32,6 +32,7 @@
                    Grid.Row="1"
                    Grid.Column="0" />
             <Button Text="Try For Free"
+                    x:Name="TryForFreeButton"
                     StyleClass="Success"
                     HorizontalOptions="CenterAndExpand"
                     VerticalOptions="Center"
@@ -70,13 +71,13 @@
                     Grid.Column="1"
                     WidthRequest="250" />
 
-            <Label Text="25 Reports Per Month. $99.99/month"
+            <Label Text="Unlimited Reports Per Month. $99.99/month"
                    Font="Medium"
                    HorizontalOptions="CenterAndExpand"
                    VerticalOptions="CenterAndExpand"
                    Grid.Row="4"
                    Grid.Column="0" />
-            <Button Text="Purchase Business"
+            <Button Text="Purchase Unlimited"
                     x:Name="UnlimitedButton"
                     StyleClass="Info"
                     HorizontalOptions="CenterAndExpand"

@@ -10,6 +10,7 @@ namespace MobileClient.Utilities
         T Get(string key);
         void Put(string key, T value);
         void Delete(string key);
+        void Clear();
         void Put(Dictionary<string, T> keyValuePairs);
         void Update(Dictionary<string, T> keyValuePairs);
     }

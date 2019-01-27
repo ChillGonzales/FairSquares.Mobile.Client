@@ -53,6 +53,9 @@ namespace MobileClient
                                                             null, 
                                                             true);
                 var userService = new CurrentUserService(AccountStore.Create());
+                var notifyService = new NotificationService(new HttpClient(), _notifyEndpoint, _apiKey);
+                var emailLogger = new EmailLogger<PurchasingService>(notifyService, userService);
+                var purchaseService = new PurchasingService(emailLogger);
                 authenticator.Completed += (s, e) =>
                 {
                     if (e.IsAuthenticated)
@@ -68,6 +71,17 @@ namespace MobileClient
                 var imageCache = new LocalSqlCache<ImageModel>(Path.Combine(dbBasePath, "images.db3"), new DebugLogger<LocalSqlCache<ImageModel>>());
                 var subCache = new LocalSqlCache<SubscriptionModel>(Path.Combine(dbBasePath, "subs.db3"), new DebugLogger<LocalSqlCache<SubscriptionModel>>());
 
+                Action ClearCaches = () =>
+                {
+                    try
+                    {
+                        orderCache.Clear();
+                        propertyCache.Clear();
+                        imageCache.Clear();
+                        subCache.Clear();
+                    }
+                    catch { }
+                };
                 Func<string, Task> RefreshCaches = userId => Task.Run(async () =>
                 {
                     try
@@ -94,8 +108,28 @@ namespace MobileClient
                         });
                         var subscriptionTask = Task.Run(() =>
                         {
+                            // TODO: This should be somewhere else, not in the client.
                             var sub = subService.GetSubscription(userId);
-                            subCache.Update(new Dictionary<string, SubscriptionModel>() { { userId, sub } });
+                            var purchases = purchaseService.GetPurchases();
+                            // Check app store purchases to see if they auto-renewed
+                            if (!SubscriptionUtilities.SubscriptionActive(sub))
+                            {
+                                var mostRecent = purchases?.OrderByDescending(x => x.TransactionDateUtc)?.FirstOrDefault();
+                                if (mostRecent != null)
+                                {
+                                    var newSub = SubscriptionUtilities.GetModelFromIAP(mostRecent, userId, sub);
+                                    if (newSub != null)
+                                        sub = newSub;
+                                }
+                            }
+                            if (sub == null)
+                            {
+                                subCache.Clear();
+                            }
+                            else
+                            {
+                                subCache.Update(new Dictionary<string, SubscriptionModel>() { { userId, sub } });
+                            }
                         });
                         await Task.WhenAll(new[] { propTask, imgTask, subTask, subscriptionTask });
                     }
@@ -110,11 +144,10 @@ namespace MobileClient
 
                 userService.OnLoggedIn += (s, e) =>
                 {
+                    ClearCaches();
                     RefreshCaches(e.Account.UserId);
                 };
-                var notifyService = new NotificationService(new HttpClient(), _notifyEndpoint, _apiKey);
-                var emailLogger = new EmailLogger<PurchasingService>(notifyService, userService);
-                var purchaseService = new PurchasingService(emailLogger);
+                userService.OnLoggedOut += (s, e) => ClearCaches();
 
                 // Register services
                 Container.Register<IOrderService>(() => orderService, Lifestyle.Singleton);

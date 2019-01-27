@@ -1,4 +1,5 @@
 ﻿using MobileClient.Authentication;
+using MobileClient.Models;
 using MobileClient.Services;
 using MobileClient.Utilities;
 using Plugin.InAppBilling;
@@ -19,6 +20,7 @@ namespace MobileClient.Views
     public partial class AccountPage : ContentPage
     {
         private readonly ICurrentUserService _userCache;
+        private readonly ICache<SubscriptionModel> _subCache;
         private readonly AccountModel _user;
         private readonly ILogger<AccountPage> _logger;
 
@@ -28,6 +30,7 @@ namespace MobileClient.Views
             _userCache = App.Container.GetInstance<ICurrentUserService>();
             _logger = App.Container.GetInstance<EmailLogger<AccountPage>>();
             _user = _userCache.GetLoggedInAccount();
+            _subCache = App.Container.GetInstance<ICache<SubscriptionModel>>();
             _userCache.OnLoggedIn += (s, e) => SetUIToAccount(e.Account);
             SetUIToAccount(_user);
             LogoutButton.Clicked += LogoutButton_Clicked;
@@ -44,19 +47,20 @@ namespace MobileClient.Views
         {
             try
             {
-                await Navigation.PushAsync(new PurchasePage());
+                if (!SubscriptionUtilities.SubscriptionActive(_subCache.Get(_user.UserId)))
+                {
+                    await Navigation.PushAsync(new PurchasePage());
+                }
+                else
+                {
+                    await Navigation.PushAsync(new ManageSubscriptionPage());
+                }
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Error occurred attempting to purchase subscription.{ex.ToString()}");
             }
         }
-        //private void SaveButton_Clicked(object sender, EventArgs e)
-        //{
-        //    if (string.IsNullOrWhiteSpace(FirstName.Text) || string.IsNullOrWhiteSpace(LastName.Text))
-        //        return;
-        //    // TODO: Implement user update
-        //}
 
         private void LogoutButton_Clicked(object sender, EventArgs e)
         {

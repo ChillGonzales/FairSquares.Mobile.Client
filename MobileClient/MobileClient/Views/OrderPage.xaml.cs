@@ -26,6 +26,7 @@ namespace MobileClient.Views
         private readonly ICache<SubscriptionModel> _subCache;
         private readonly IMessage _toast;
         private readonly ICache<Order> _orderCache;
+        private PurchasePage _puchasePage;
 
         public OrderPage()
         {
@@ -67,19 +68,17 @@ namespace MobileClient.Views
                     return;
                 }
 
+                bool anyOrders = _orderCache.GetAll().Any();
                 var subStatus = _subCache.Get(_userService.GetLoggedInAccount().UserId);
-                if (!SubscriptionUtilities.SubscriptionActive(subStatus))
+                // Secondary condition so that first order can be free w/o subscription
+                // TODO: Redo this validation, it is bad
+                if (!SubscriptionUtilities.SubscriptionActive(subStatus) && 
+                    (_puchasePage == null || anyOrders))
                 {
-                    await Navigation.PushAsync(new PurchasePage());
-                    await Task.Delay(500);
-                    // Refresh subscription to make sure transaction has gone through.
-                    subStatus = _subCache.Get(_userService.GetLoggedInAccount().UserId);
-                    if (!SubscriptionUtilities.SubscriptionActive(subStatus))
-                    {
-                        ErrorMessage.Text = "Please select a subscription plan to continue.";
-                        SubmitButton.IsEnabled = true;
-                        return;
-                    }
+                    SubmitButton.IsEnabled = true;
+                    _puchasePage = new PurchasePage();
+                    await Navigation.PushAsync(_puchasePage);
+                    return;
                 }
 
                 // Submit order

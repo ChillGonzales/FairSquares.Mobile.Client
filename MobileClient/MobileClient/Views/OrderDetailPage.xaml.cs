@@ -43,7 +43,7 @@ namespace MobileClient.Views
             if (prop == null)
             {
 
-                Pitch.Text = $"Your property is in the process of being measured!";
+                Pitch.Text = $"Your order has been submitted and is in the process of being measured.";
                 DownButton.IsVisible = false;
                 UpButton.IsVisible = false;
                 SafetyStockLabel.IsVisible = false;

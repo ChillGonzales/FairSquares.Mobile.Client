@@ -9,6 +9,5 @@ namespace MobileClient.Services
     {
         SubscriptionModel GetSubscription(string userId);
         void AddSubscription(SubscriptionModel model);
-        List<SubscriptionTypeModel> GetSubscriptionTypes();
     }
 }

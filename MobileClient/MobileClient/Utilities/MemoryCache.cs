@@ -30,6 +30,19 @@ namespace MobileClient.Utilities
             }
         }
 
+        public void Clear()
+        {
+            try
+            {
+                _cached.Clear();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error clearing cache.", ex);
+                throw;
+            }
+        }
+
         public Dictionary<string, T> GetAll()
         {
             try

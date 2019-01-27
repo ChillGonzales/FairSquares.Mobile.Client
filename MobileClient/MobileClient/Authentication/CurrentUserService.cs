@@ -42,9 +42,13 @@ namespace MobileClient.Authentication
 
         public void LogOut()
         {
-            var acct = _store.FindAccountsForService(Configuration.AppName).FirstOrDefault();
-            _store.Delete(acct, Configuration.AppName);
-            _loggedIn = null;
+            try
+            {
+                var acct = _store.FindAccountsForService(Configuration.AppName).FirstOrDefault();
+                _store.Delete(acct, Configuration.AppName);
+                _loggedIn = null;
+            } 
+            catch { }
             OnLoggedOut?.Invoke(this, new EventArgs());
         }
 
