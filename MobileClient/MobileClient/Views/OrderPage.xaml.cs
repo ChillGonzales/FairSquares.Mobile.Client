@@ -93,6 +93,7 @@ namespace MobileClient.Views
                     Comments = Comments.Text
                 };
                 newOrder.OrderId = await _orderService.AddOrder(newOrder);
+                DependencyService.Get<IMessagingSubscriber>().Subscribe(new List<string>() { newOrder.OrderId });
                 _orderCache.Put(newOrder.OrderId, newOrder);
                 _toast.ShortAlert($"Your address has been submitted!");
                 // Clear all fields

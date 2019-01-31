@@ -5,6 +5,7 @@ using MobileClient.Services;
 using MobileClient.Utilities;
 using MobileClient.Views;
 using Newtonsoft.Json;
+using Plugin.InAppBilling.Abstractions;
 using SimpleInjector;
 using System;
 using System.Collections.Generic;
@@ -42,15 +43,15 @@ namespace MobileClient
                 var orderService = new AzureOrderService(_orderEndpoint, _apiKey);
                 var propertyService = new PropertyService(_propertyEndpoint, new DebugLogger<PropertyService>());
                 var imageService = new BlobImageService(_blobEndpoint, new DebugLogger<BlobImageService>());
-                var subService = new SubscriptionService(new HttpClient() { BaseAddress = new Uri(_subEndpoint) }, 
+                var subService = new SubscriptionService(new HttpClient() { BaseAddress = new Uri(_subEndpoint) },
                     new DebugLogger<SubscriptionService>());
-                var authenticator = new OAuth2Authenticator(Configuration.ClientId, 
-                                                            null, 
-                                                            Configuration.Scope, 
+                var authenticator = new OAuth2Authenticator(Configuration.ClientId,
+                                                            null,
+                                                            Configuration.Scope,
                                                             new Uri(GoogleAuthorizeUrl),
-                                                            new Uri(Configuration.RedirectNoPath + ":" + Configuration.RedirectPath), 
-                                                            new Uri(GoogleAccessTokenUrl), 
-                                                            null, 
+                                                            new Uri(Configuration.RedirectNoPath + ":" + Configuration.RedirectPath),
+                                                            new Uri(GoogleAccessTokenUrl),
+                                                            null,
                                                             true);
                 var userService = new CurrentUserService(AccountStore.Create());
                 var notifyService = new NotificationService(new HttpClient(), _notifyEndpoint, _apiKey);
@@ -110,10 +111,15 @@ namespace MobileClient
                         {
                             // TODO: This should be somewhere else, not in the client.
                             var sub = subService.GetSubscription(userId);
-                            var purchases = purchaseService.GetPurchases();
                             // Check app store purchases to see if they auto-renewed
-                            if (!SubscriptionUtilities.SubscriptionActive(sub))
+                            if (sub != null && !SubscriptionUtilities.SubscriptionActive(sub))
                             {
+                                var purchases = new List<InAppBillingPurchase>();
+                                try
+                                {
+                                    purchases = purchaseService.GetPurchases().ToList();
+                                }
+                                catch { }
                                 var mostRecent = purchases?.OrderByDescending(x => x.TransactionDateUtc)?.FirstOrDefault();
                                 if (mostRecent != null)
                                 {

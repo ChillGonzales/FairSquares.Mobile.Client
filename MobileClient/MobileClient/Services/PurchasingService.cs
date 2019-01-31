@@ -4,6 +4,7 @@ using Plugin.InAppBilling;
 using Plugin.InAppBilling.Abstractions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -44,7 +45,7 @@ namespace MobileClient.Services
                 try
                 {
                     //check purchases
-                    purchase = Task.Run(async () => await billing.PurchaseAsync(name, ItemType.Subscription, payload)).Result;
+                    purchase = Task.Run(() => billing.PurchaseAsync(name, ItemType.Subscription, payload))?.Result;
                 }
                 catch (InAppBillingPurchaseException purchaseEx)
                 {
@@ -134,7 +135,7 @@ namespace MobileClient.Services
                 try
                 {
                     // fetch purchases
-                    return Task.Run(() => billing.GetPurchasesAsync(ItemType.Subscription)).Result;
+                    return Task.Run(() => billing.GetPurchasesAsync(ItemType.Subscription))?.Result ?? Enumerable.Empty<InAppBillingPurchase>();
                 }
                 catch (InAppBillingPurchaseException purchaseEx)
                 {
@@ -182,7 +183,7 @@ namespace MobileClient.Services
                 catch (Exception ex)
                 {
                     // Something else has gone wrong, log it
-                    _logger.LogError("Failed to purchase subscription.", ex);
+                    _logger.LogError("Failed to get purchases.", ex);
                     throw new InvalidOperationException(ex.Message, ex);
                 }
                 finally
