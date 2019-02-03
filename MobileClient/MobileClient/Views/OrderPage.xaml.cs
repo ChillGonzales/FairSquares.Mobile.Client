@@ -21,10 +21,10 @@ namespace MobileClient.Views
     {
         private BaseTabPage RootPage { get => Application.Current.MainPage as BaseTabPage; }
         private readonly int _errorIndex = 7;
+        private readonly IOrderValidationService _orderValidator;
         private readonly ICurrentUserService _userService;
         private readonly IOrderService _orderService;
-        private readonly ICache<SubscriptionModel> _subCache;
-        private readonly IMessage _toast;
+        private readonly IAlertService _toast;
         private readonly ICache<Order> _orderCache;
         private PurchasePage _puchasePage;
 
@@ -34,8 +34,8 @@ namespace MobileClient.Views
             _userService = App.Container.GetInstance<ICurrentUserService>();
             _orderService = App.Container.GetInstance<IOrderService>();
             _orderCache = App.Container.GetInstance<ICache<Order>>();
-            _subCache = App.Container.GetInstance<ICache<SubscriptionModel>>();
-            _toast = DependencyService.Get<IMessage>();
+            _orderValidator = App.Container.GetInstance<IOrderValidationService>();
+            _toast = DependencyService.Get<IAlertService>();
             Grid.RowDefinitions[_errorIndex].Height = 0;
             StatePicker.ItemsSource = States.Select(x => x.Text).ToList();
             OptionPicker.ItemsSource = Options.Select(x => x.Text).ToList();
@@ -68,16 +68,21 @@ namespace MobileClient.Views
                     return;
                 }
 
-                bool anyOrders = _orderCache.GetAll().Any();
-                var subStatus = _subCache.Get(_userService.GetLoggedInAccount().UserId);
-                // Secondary condition so that first order can be free w/o subscription
-                // TODO: Redo this validation, it is bad
-                if (!SubscriptionUtilities.SubscriptionActive(subStatus) && 
-                    (_puchasePage == null || anyOrders))
+                var validation = await _orderValidator.ValidateOrderRequest(_userService.GetLoggedInAccount());
+                // Show purchase page once for very first order or every time if they don't have a subscription
+                if ((validation.Success && !validation.UserHasSubscription && _puchasePage == null) ||
+                    (!validation.Success) && !validation.UserHasSubscription)
                 {
                     SubmitButton.IsEnabled = true;
-                    _puchasePage = new PurchasePage();
+                    _puchasePage = new PurchasePage(validation.Success);
                     await Navigation.PushAsync(_puchasePage);
+                    return;
+                }
+                if (!validation.Success && validation.UserHasSubscription)
+                {
+                    SubmitButton.IsEnabled = true;
+                    Grid.RowDefinitions[_errorIndex].Height = GridLength.Star;
+                    ErrorMessage.Text = "You have used all of the orders you purchased in your subscription. Please upgrade your subscription for more orders.";
                     return;
                 }
 

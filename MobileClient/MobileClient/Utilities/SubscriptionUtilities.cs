@@ -9,9 +9,11 @@ namespace MobileClient.Utilities
 {
     public static class SubscriptionUtilities
     {
-        private const string _subNamePremium = "premium_subscription_monthly";
-        private const string _subNameBasic = "basic_subscription_monthly";
-        private const string _subNameUnlimited = "unlimited_subscription_monthly";
+        public const string SUB_NAME_PREMIUM = "premium_subscription_monthly";
+        public const string SUB_NAME_BASIC = "basic_subscription_monthly";
+        public const string SUB_NAME_UNLIMITED = "unlimited_subscription_monthly";
+        public const int BasicOrderCount = 3;
+        public const int PremiumOrderCount = 8;
 
         public static bool SubscriptionActive(SubscriptionModel model)
         {
@@ -49,11 +51,11 @@ namespace MobileClient.Utilities
         {
             switch (productId)
             {
-                case _subNameBasic:
+                case SUB_NAME_BASIC:
                     return SubscriptionType.Basic;
-                case _subNamePremium:
+                case SUB_NAME_PREMIUM:
                     return SubscriptionType.Premium;
-                case _subNameUnlimited:
+                case SUB_NAME_UNLIMITED:
                     return SubscriptionType.Unlimited;
                 default:
                     return SubscriptionType.Basic;

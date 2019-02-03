@@ -17,14 +17,14 @@ namespace MobileClient.Views
     {
         private readonly INotificationService _notifier;
         private readonly ICurrentUserService _userCache;
-        private readonly IMessage _toast;
+        private readonly IAlertService _toast;
 
         public FeedbackPage()
         {
             InitializeComponent();
             _notifier = App.Container.GetInstance<INotificationService>();
             _userCache = App.Container.GetInstance<ICurrentUserService>();
-            _toast = DependencyService.Get<IMessage>();
+            _toast = DependencyService.Get<IAlertService>();
             SubmitButton.Clicked += SubmitButton_Clicked;
         }
 

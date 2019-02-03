@@ -4,7 +4,7 @@ using System.Text;
 
 namespace MobileClient.Utilities
 {
-    public interface IMessage
+    public interface IAlertService
     {
         void LongAlert(string message);
         void ShortAlert(string message);

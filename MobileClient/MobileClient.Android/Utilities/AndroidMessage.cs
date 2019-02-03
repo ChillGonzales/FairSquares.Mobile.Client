@@ -15,7 +15,7 @@ using MobileClient.Utilities;
 [assembly: Xamarin.Forms.Dependency(typeof(AndroidMessage))]
 namespace MobileClient.Droid.Utilities
 {
-    public class AndroidMessage : IMessage
+    public class AndroidMessage : IAlertService
     {
         public void LongAlert(string message)
         {

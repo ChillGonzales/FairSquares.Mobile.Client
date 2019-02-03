@@ -11,11 +11,13 @@ namespace MobileClient.Services
     public class SubscriptionService : ISubscriptionService
     {
         private readonly HttpClient _http;
+        private readonly string _baseUri;
         private readonly ILogger<SubscriptionService> _logger;
 
-        public SubscriptionService(HttpClient http, ILogger<SubscriptionService> logger)
+        public SubscriptionService(string baseUri, ILogger<SubscriptionService> logger)
         {
-            _http = http;
+            _http = new HttpClient();
+            _baseUri = baseUri;
             _logger = logger;
         }
 
@@ -23,8 +25,8 @@ namespace MobileClient.Services
         {
             try
             {
-                var content = new StringContent(JsonConvert.SerializeObject(model));
-                var result = _http.PostAsync("", content).Result;
+                var content = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                var result = _http.PostAsync(_baseUri, content).Result;
                 result.EnsureSuccessStatusCode();
             }
             catch (Exception ex)
@@ -38,7 +40,7 @@ namespace MobileClient.Services
         {
             try
             {
-                var result = _http.GetAsync($"?userId={userId}").Result;
+                var result = _http.GetAsync($"{_baseUri}?userId={userId}").Result;
                 if (!result.IsSuccessStatusCode)
                 {
                     if (result.StatusCode == System.Net.HttpStatusCode.NotFound)

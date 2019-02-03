@@ -11,7 +11,7 @@ using UIKit;
 [assembly: Xamarin.Forms.Dependency(typeof(iOSMessage))]
 namespace MobileClient.iOS.Utilities
 {
-    public class iOSMessage : IMessage
+    public class iOSMessage : IAlertService
     {
         const double LONG_DELAY = 3.5;
         const double SHORT_DELAY = 2.0;

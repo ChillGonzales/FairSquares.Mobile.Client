@@ -21,6 +21,7 @@ namespace MobileClient.Views
     {
         private readonly ICurrentUserService _userCache;
         private readonly ICache<SubscriptionModel> _subCache;
+        private readonly IOrderValidationService _orderValidator;
         private readonly AccountModel _user;
         private readonly ILogger<AccountPage> _logger;
 
@@ -31,6 +32,7 @@ namespace MobileClient.Views
             _logger = App.Container.GetInstance<EmailLogger<AccountPage>>();
             _user = _userCache.GetLoggedInAccount();
             _subCache = App.Container.GetInstance<ICache<SubscriptionModel>>();
+            _orderValidator = App.Container.GetInstance<IOrderValidationService>();
             _userCache.OnLoggedIn += (s, e) => SetUIToAccount(e.Account);
             SetUIToAccount(_user);
             LogoutButton.Clicked += LogoutButton_Clicked;
@@ -47,9 +49,10 @@ namespace MobileClient.Views
         {
             try
             {
-                if (!SubscriptionUtilities.SubscriptionActive(_subCache.Get(_user.UserId)))
+                var validation = await _orderValidator.ValidateOrderRequest(_userCache.GetLoggedInAccount());
+                if (!validation.UserHasSubscription)
                 {
-                    await Navigation.PushAsync(new PurchasePage());
+                    await Navigation.PushAsync(new PurchasePage(validation.Success));
                 }
                 else
                 {

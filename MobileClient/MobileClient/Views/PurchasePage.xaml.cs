@@ -2,6 +2,7 @@
 using MobileClient.Models;
 using MobileClient.Services;
 using MobileClient.Utilities;
+using Plugin.InAppBilling.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,16 +17,22 @@ namespace MobileClient.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class PurchasePage : ContentPage
     {
-        private readonly IPurchasingService _purchaseService;
-        private readonly ICache<SubscriptionModel> _subCache;
-        private readonly ISubscriptionService _subService;
-        private readonly ICurrentUserService _userCache;
-        private readonly IOrderService _orderService;
-        private const string _subNamePremium = "premium_subscription_monthly";
-        private const string _subNameBasic = "basic_subscription_monthly";
-        private const string _subNameUnlimited = "unlimited_subscription_monthly";
+        private BaseTabPage RootPage { get => Application.Current.MainPage as BaseTabPage; }
+        private IPurchasingService _purchaseService;
+        private ICache<SubscriptionModel> _subCache;
+        private ISubscriptionService _subService;
+        private ICurrentUserService _userCache;
+        private IOrderService _orderService;
+        private IAlertService _alertService;
+        private bool _showFreeReportButton;
 
-        public PurchasePage()
+        public PurchasePage(bool showFreeReportButton)
+        {
+            _showFreeReportButton = showFreeReportButton;
+            Init();
+        }
+
+        private void Init()
         {
             InitializeComponent();
 
@@ -33,37 +40,46 @@ namespace MobileClient.Views
             _purchaseService = App.Container.GetInstance<IPurchasingService>();
             _userCache = App.Container.GetInstance<ICurrentUserService>();
             _orderService = App.Container.GetInstance<IOrderService>();
+            _alertService = DependencyService.Get<IAlertService>();
             _subCache = App.Container.GetInstance<ICache<SubscriptionModel>>();
             ErrorCol.Height = 0;
             TryForFreeButton.Clicked += (s, e) => 
             {
-                Navigation.PopAsync();
+                RootPage.NavigateFromMenu(ViewModels.PageType.Order);
             };
             BasicButton.Clicked += (s, e) => { PurchaseSubscription(SubscriptionType.Basic); };
             PremiumButton.Clicked += (s, e) => { PurchaseSubscription(SubscriptionType.Premium); };
             UnlimitedButton.Clicked += (s, e) => { PurchaseSubscription(SubscriptionType.Unlimited); };
-            SetFreeReportButton();
+            SetFreeReportButton(_showFreeReportButton);
         }
-
-        private void PurchaseSubscription(SubscriptionType subType)
+        private async void PurchaseSubscription(SubscriptionType subType)
         {
             try
             {
                 ErrorCol.Height = 0;
-                var subCode = _subNameBasic;
+                var subCode = SubscriptionUtilities.SUB_NAME_BASIC;
                 switch (subType)
                 {
                     case SubscriptionType.Basic:
-                        subCode = _subNameBasic;
+                        subCode = SubscriptionUtilities.SUB_NAME_BASIC;
                         break;
                     case SubscriptionType.Premium:
-                        subCode = _subNamePremium;
+                        subCode = SubscriptionUtilities.SUB_NAME_PREMIUM;
                         break;
                     case SubscriptionType.Unlimited:
-                        subCode = _subNameUnlimited;
+                        subCode = SubscriptionUtilities.SUB_NAME_UNLIMITED;
                         break;
                 }
-                var sub = _purchaseService.PurchaseSubscription(subCode, "");
+#if RELEASE
+                var sub = await _purchaseService.PurchaseSubscription(subCode, "payload");
+#else
+                var sub = new InAppBillingPurchase()
+                {
+                    PurchaseToken = "PurchaseToken",
+                    ProductId = subCode,
+                    Id = "12345"
+                };
+#endif
                 var model = new Models.SubscriptionModel()
                 {
                     PurchaseId = sub.Id,
@@ -76,7 +92,11 @@ namespace MobileClient.Views
                     UserId = _userCache.GetLoggedInAccount().UserId
                 };
                 _subCache.Put(_userCache.GetLoggedInAccount().UserId, model);
+#if RELEASE
                 _subService.AddSubscription(model);
+#endif
+                _alertService.LongAlert($"Thank you for your purchase!");
+                RootPage.NavigateFromMenu(ViewModels.PageType.Order);
             }
             catch (Exception ex)
             {
@@ -85,12 +105,10 @@ namespace MobileClient.Views
             }
         }
 
-        private void SetFreeReportButton()
+        private void SetFreeReportButton(bool showButton)
         {
-            // TODO: Remodel how this is being fetched. It's messy.
             // If they've ordered before, hide free report button.
-            var orders = Task.Run(() => _orderService.GetMemberOrders(_userCache.GetLoggedInAccount().UserId)).Result;
-            if (orders != null && orders.Any())
+            if (!showButton)
             {
                 FreeReportCol.Height = 0;
                 BasicButton.StyleClass = new List<string>() { "Success" };

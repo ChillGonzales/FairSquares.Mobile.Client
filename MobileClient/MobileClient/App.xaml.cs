@@ -43,8 +43,7 @@ namespace MobileClient
                 var orderService = new AzureOrderService(_orderEndpoint, _apiKey);
                 var propertyService = new PropertyService(_propertyEndpoint, new DebugLogger<PropertyService>());
                 var imageService = new BlobImageService(_blobEndpoint, new DebugLogger<BlobImageService>());
-                var subService = new SubscriptionService(new HttpClient() { BaseAddress = new Uri(_subEndpoint) },
-                    new DebugLogger<SubscriptionService>());
+                var subService = new SubscriptionService(_subEndpoint, new DebugLogger<SubscriptionService>());
                 var authenticator = new OAuth2Authenticator(Configuration.ClientId,
                                                             null,
                                                             Configuration.Scope,
@@ -107,7 +106,7 @@ namespace MobileClient
                             var images = imageService.GetImages(orders.Select(x => x.OrderId).ToList());
                             imageCache.Update(images);
                         });
-                        var subscriptionTask = Task.Run(() =>
+                        var subscriptionTask = Task.Run(async () =>
                         {
                             // TODO: This should be somewhere else, not in the client.
                             var sub = subService.GetSubscription(userId);
@@ -117,7 +116,7 @@ namespace MobileClient
                                 var purchases = new List<InAppBillingPurchase>();
                                 try
                                 {
-                                    purchases = purchaseService.GetPurchases().ToList();
+                                    purchases = (await purchaseService.GetPurchases()).ToList();
                                 }
                                 catch { }
                                 var mostRecent = purchases?.OrderByDescending(x => x.TransactionDateUtc)?.FirstOrDefault();
@@ -167,6 +166,7 @@ namespace MobileClient
                 Container.Register<IPurchasingService>(() => purchaseService);
                 Container.Register<ICacheRefresher>(() => new CacheRefresher(new DebugLogger<CacheRefresher>(), RefreshCaches), Lifestyle.Singleton);
                 Container.Register<ISubscriptionService>(() => subService, Lifestyle.Singleton);
+                Container.Register<IOrderValidationService, OrderValidationService>();
                 Container.Register<IUserService>(() => new UserService(new HttpClient()
                 {
                     BaseAddress = new Uri(_userEndpoint)
