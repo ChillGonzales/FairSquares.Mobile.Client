@@ -96,6 +96,7 @@ namespace MobileClient.Views
                 _subService.AddSubscription(model);
 #endif
                 _alertService.LongAlert($"Thank you for your purchase!");
+                Device.BeginInvokeOnMainThread(async () => await Navigation.PopAsync());
                 RootPage.NavigateFromMenu(ViewModels.PageType.Order);
             }
             catch (Exception ex)

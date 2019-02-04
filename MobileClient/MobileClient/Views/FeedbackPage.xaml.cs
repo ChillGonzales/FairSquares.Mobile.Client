@@ -54,7 +54,7 @@ namespace MobileClient.Views
             }
             finally
             {
-                Navigation.PopAsync();
+                Device.BeginInvokeOnMainThread(async () => await Navigation.PopAsync());
             }
         }
     }

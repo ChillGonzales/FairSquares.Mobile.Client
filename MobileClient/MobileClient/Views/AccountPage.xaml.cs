@@ -45,6 +45,11 @@ namespace MobileClient.Views
             await Navigation.PushAsync(new FeedbackPage());
         }
 
+        protected override void OnAppearing()
+        {
+            SetSubUI();
+        }
+
         private async void SubscribeButton_Clicked(object sender, EventArgs e)
         {
             try
@@ -56,7 +61,12 @@ namespace MobileClient.Views
                 }
                 else
                 {
-                    await Navigation.PushAsync(new ManageSubscriptionPage());
+                    await Navigation.PushAsync(new ManageSubscriptionPage(new ViewModels.ManageSubscriptionViewModel()
+                    {
+                        RemainingOrders = validation.RemainingOrders,
+                        SubscriptionType = validation.Subscription.SubscriptionType,
+                        EndDateTime = validation.Subscription.EndDateTime
+                    }));
                 }
             }
             catch (Exception ex)
@@ -89,6 +99,18 @@ namespace MobileClient.Views
                 EmailLabel.Text = $"{account.Email}";
                 LogoutButton.Text = "Log Out";
                 LogoutButton.StyleClass = new List<string>() { "Danger" };
+            }
+        }
+
+        private void SetSubUI()
+        {
+            var valid = Task.Run(async () => await _orderValidator.ValidateOrderRequest(_user)).Result;
+            if (valid.UserHasSubscription)
+            {
+                SubscriptionLabel.Text = $"Reports remaining this period: {(valid.RemainingOrders == -1 ? "Unlimited" : valid.RemainingOrders.ToString())}";
+                SubscribeButton.StyleClass.Clear();
+                SubscribeButton.StyleClass.Add("Info");
+                SubscribeButton.Text = "Manage";
             }
         }
     }

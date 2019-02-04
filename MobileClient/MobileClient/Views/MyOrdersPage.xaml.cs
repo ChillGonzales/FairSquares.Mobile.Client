@@ -71,7 +71,9 @@ namespace MobileClient.Views
 
         protected override void OnAppearing()
         {
+            OrderListView.IsRefreshing = true;
             SetListViewSource(_orderCache.GetAll().Select(x => x.Value).ToList());
+            OrderListView.IsRefreshing = false;
         }
 
         private void SetListViewSource(List<Order> orders)

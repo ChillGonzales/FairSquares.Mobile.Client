@@ -56,14 +56,20 @@ namespace MobileClient.Services
                     {
                         Success = false,
                         UserHasSubscription = true,
+                        RemainingOrders = 0,
+                        Subscription = sub,
                         Message = "User has used all of their orders for this subscription period."
                     };
                 }
                 else
                 {
+                    var remainingCount = sub.SubscriptionType == SubscriptionType.Basic ? SubscriptionUtilities.BasicOrderCount - activeSubOrderCount :
+                        (sub.SubscriptionType == SubscriptionType.Premium ? SubscriptionUtilities.PremiumOrderCount - activeSubOrderCount : -1);
                     return new ValidationResponse()
                     {
                         Success = true,
+                        Subscription = sub,
+                        RemainingOrders = remainingCount,
                         UserHasSubscription = true
                     };
                 }
@@ -85,5 +91,7 @@ namespace MobileClient.Services
         public bool Success { get; set; }
         public string Message { get; set; }
         public bool UserHasSubscription { get; set; }
+        public int RemainingOrders { get; set; }
+        public SubscriptionModel Subscription { get; set; }
     }
 }

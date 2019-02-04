@@ -50,7 +50,7 @@
                        VerticalOptions="Center"
                        HorizontalOptions="CenterAndExpand" />
             <Button x:Name="SubscribeButton"
-                       Text="Manage Subscription"
+                       Text="Purchase"
                        Grid.Row="2"
                        Grid.Column="1"
                        WidthRequest="250"
