@@ -44,6 +44,7 @@ namespace MobileClient.Droid
                 IsPlayServicesAvailable();
                 global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
                 global::Xamarin.Auth.Presenters.XamarinAndroid.AuthenticationConfiguration.Init(this, savedInstanceState);
+                global::Xamarin.Auth.CustomTabsConfiguration.CustomTabsClosingMessage = null;
                 CrossCurrentActivity.Current.Init(this, savedInstanceState);
                 Plugin.CurrentActivity.CrossCurrentActivity.Current.Activity = this;
                 LoadApplication(new App());

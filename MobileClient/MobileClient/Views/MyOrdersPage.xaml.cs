@@ -36,7 +36,7 @@ namespace MobileClient.Views
                 _cacheRefresher = App.Container.GetInstance<ICacheRefresher>();
                 SetListViewSource(_orderCache.GetAll().Select(x => x.Value).ToList());
 
-                OrderListView.RefreshCommand = new Command(() =>
+                Action refreshAction = () =>
                 {
                     try
                     {
@@ -52,8 +52,9 @@ namespace MobileClient.Views
                     {
                         _logger.LogError($"Failed to refresh order list. \n{ex.ToString()}");
                     }
-                });
-
+                };
+                _userService.OnLoggedIn += (s, e) => refreshAction();
+                OrderListView.RefreshCommand = new Command(refreshAction);
                 OrderListView.ItemSelected += async (s, e) =>
                 {
                     if (e.SelectedItem == null)
@@ -84,8 +85,6 @@ namespace MobileClient.Views
                 Text = x.StreetAddress.Split('\n')[0],
                 TextColor = Color.Black,
                 OrderId = x.OrderId
-                //Detail = x.Fulfilled ? "Complete" : "Pending",
-                //DetailColor = x.Fulfilled ? Color.DarkGreen : Color.DarkBlue
             }));
             var penGroup = new OrderGroup() { Title = "Pending" };
             penGroup.AddRange(_orderCache.GetAll().Select(x => x.Value).Where(x => !x.Fulfilled).Select(x => new OrderViewCell()
@@ -93,8 +92,6 @@ namespace MobileClient.Views
                 Text = x.StreetAddress.Split('\n')[0],
                 TextColor = Color.Black,
                 OrderId = x.OrderId
-                //Detail = x.Fulfilled ? "Complete" : "Pending",
-                //DetailColor = x.Fulfilled ? Color.DarkGreen : Color.DarkBlue
             }));
             All = new List<OrderGroup>() { fulGroup, penGroup };
             OrderListView.ItemsSource = All;

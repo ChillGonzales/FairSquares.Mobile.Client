@@ -190,8 +190,8 @@ namespace MobileClient
         {
             InitializeComponent();
             var userService = Container.GetInstance<ICurrentUserService>();
-            userService.OnLoggedIn += (s, e) => MainPage = new BaseTabPage();
-            userService.OnLoggedOut += (s, e) => MainPage = new LandingPage();
+            userService.OnLoggedIn += (s, e) => Device.BeginInvokeOnMainThread(() => MainPage = new BaseTabPage());
+            userService.OnLoggedOut += (s, e) => Device.BeginInvokeOnMainThread(() => MainPage = new LandingPage());
 
             if (userService.GetLoggedInAccount() == null)
                 MainPage = new LandingPage();
