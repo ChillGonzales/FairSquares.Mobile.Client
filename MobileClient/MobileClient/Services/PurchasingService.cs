@@ -119,13 +119,10 @@ namespace MobileClient.Services
             catch (Exception ex)
             {
                 var message = $"Error occurred while try to connect to billing service.";
-                _logger.LogError(message, ex);
                 throw new InvalidOperationException(message);
             }
             if (!connected)
             {
-                // we are offline or can't connect, don't try to purchase
-                _logger.LogError($"Can't connect to billing service.");
                 throw new InvalidOperationException($"Can't connect to billing service. Check connection to internet.");
             }
 
@@ -137,7 +134,6 @@ namespace MobileClient.Services
             catch (InAppBillingPurchaseException purchaseEx)
             {
                 // Billing Exception handle this based on the type
-                _logger.LogError("Billing error occurred.", purchaseEx);
                 var errorMsg = "";
                 switch (purchaseEx.PurchaseError)
                 {
@@ -180,7 +176,6 @@ namespace MobileClient.Services
             catch (Exception ex)
             {
                 // Something else has gone wrong, log it
-                _logger.LogError("Failed to get purchases.", ex);
                 throw new InvalidOperationException(ex.Message, ex);
             }
             finally

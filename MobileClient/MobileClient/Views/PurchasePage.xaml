@@ -3,96 +3,126 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MobileClient.Views.PurchasePage">
     <ContentPage.Content>
-        <Grid Margin="10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="25"/>
-                <RowDefinition x:Name="FreeReportCol" Height="*"/>
-                <RowDefinition x:Name="BasicCol" Height="*"/>
-                <RowDefinition x:Name="PremiumCol" Height="*"/>
-                <RowDefinition x:Name="UnlCol" Height="*"/>
-                <RowDefinition x:Name="ErrorCol" Height="50"/>
-            </Grid.RowDefinitions>
-            <Label Text="Choose Your Plan. Cancel Anytime."
+        <ScrollView>
+            <Grid Margin="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="25"/>
+                    <RowDefinition x:Name="FreeReportCol" Height="*"/>
+                    <RowDefinition x:Name="FreeReportButtonCol" Height="*"/>
+                    <RowDefinition x:Name="Pad1" Height="15"/>
+                    <RowDefinition x:Name="BasicHeaderCol" Height="*"/>
+                    <RowDefinition x:Name="BasicLabelCol" Height="50"/>
+                    <RowDefinition x:Name="BasicButtonCol" Height="*"/>
+                    <RowDefinition x:Name="Pad2" Height="15"/>
+                    <RowDefinition x:Name="PremiumHeaderCol" Height="*"/>
+                    <RowDefinition x:Name="PremiumCol" Height="*"/>
+                    <RowDefinition x:Name="PremButtonCol" Height="*"/>
+                    <RowDefinition x:Name="Pad3" Height="15"/>
+                    <RowDefinition x:Name="UnlHeaderCol" Height="*"/>
+                    <RowDefinition x:Name="UnlCol" Height="*"/>
+                    <RowDefinition x:Name="UnlButtonCol" Height="*"/>
+                    <RowDefinition x:Name="ErrorCol" Height="25"/>
+                </Grid.RowDefinitions>
+                <Label Text="Choose Your Plan. Cancel Anytime."
                    FontSize="Medium"
                    FontAttributes="Bold"
                    HorizontalOptions="CenterAndExpand"
                    VerticalOptions="CenterAndExpand"
                    Grid.Row="0"
-                   Grid.Column="0"
-                   Grid.ColumnSpan="2" />
+                   Grid.Column="0" />
 
-            <Label Text="Try a Free Report On Us."
+                <Label Text="Try a Free Report On Us."
                    Font="Medium"
                    HorizontalOptions="CenterAndExpand"
                    VerticalOptions="CenterAndExpand"
                    Grid.Row="1"
                    Grid.Column="0" />
-            <Button Text="Try For Free"
+                <Button Text="Try For Free"
                     x:Name="TryForFreeButton"
-                    StyleClass="Success"
-                    HorizontalOptions="CenterAndExpand"
-                    VerticalOptions="Center"
-                    Grid.Row="1"
-                    Grid.Column="1"
-                    WidthRequest="250" />
-
-            <Label Text="3 Reports Per Month. First month is FREE! $24.99/month after trial ends."
-                   Font="Medium"
-                   HorizontalOptions="CenterAndExpand"
-                   VerticalOptions="CenterAndExpand"
-                   Grid.Row="2"
-                   Grid.Column="0">
-            </Label>
-            <Button Text="Start Your Free Trial"
-                    x:Name="BasicButton"
-                    StyleClass="Success"
+                    StyleClass="Small"
                     HorizontalOptions="CenterAndExpand"
                     VerticalOptions="Center"
                     Grid.Row="2"
-                    Grid.Column="1"
-                    WidthRequest="250" />
+                    Grid.Column="0"
+                    WidthRequest="200" />
 
-            <Label Text="8 Reports Per Month. $49.99/month"
+                <Label Text="Basic"
                    Font="Medium"
-                   HorizontalOptions="CenterAndExpand"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Start"
                    VerticalOptions="CenterAndExpand"
                    Grid.Row="3"
                    Grid.Column="0" />
-            <Button Text="Purchase Premium"
-                    x:Name="PremiumButton"
-                    StyleClass="Info"
-                    HorizontalOptions="CenterAndExpand"
-                    VerticalOptions="Center"
-                    Grid.Row="3"
-                    Grid.Column="1"
-                    WidthRequest="250" />
-
-            <Label Text="Unlimited Reports Per Month. $99.99/month"
-                   Font="Medium"
+                <Label Text="3 Reports Per Month. First month is FREE! $24.99/month after trial ends."
+                   Font="Small"
                    HorizontalOptions="CenterAndExpand"
                    VerticalOptions="CenterAndExpand"
                    Grid.Row="4"
-                   Grid.Column="0" />
-            <Button Text="Purchase Unlimited"
-                    x:Name="UnlimitedButton"
-                    StyleClass="Info"
+                   Grid.Column="0">
+                </Label>
+                <Button Text="Start Your Free Trial"
+                    x:Name="BasicButton"
+                    StyleClass="Small"
                     HorizontalOptions="CenterAndExpand"
                     VerticalOptions="Center"
-                    Grid.Row="4"
-                    Grid.Column="1"
-                    WidthRequest="250" />
+                    Grid.Row="5"
+                    Grid.Column="0"
+                    WidthRequest="200" />
 
-            <Label x:Name="ErrorLabel"
+                <Label Text="Premium"
+                   Font="Medium"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Start"
+                   VerticalOptions="CenterAndExpand"
+                   Grid.Row="7"
+                   Grid.Column="0" />
+                <Label Text="8 Reports Per Month. $49.99/month"
+                   Font="Small"
+                   HorizontalOptions="CenterAndExpand"
+                   VerticalOptions="CenterAndExpand"
+                   Grid.Row="8"
+                   Grid.Column="0" />
+                <Button Text="Purchase Premium"
+                    x:Name="PremiumButton"
+                    StyleClass="Small"
+                    HorizontalOptions="CenterAndExpand"
+                    VerticalOptions="Center"
+                    Grid.Row="9"
+                    Grid.Column="0"
+                    WidthRequest="200" />
+
+                <Label Text="Unlimited"
+                   Font="Medium"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Start"
+                   VerticalOptions="CenterAndExpand"
+                   Grid.Row="11"
+                   Grid.Column="0" />
+                <Label Text="Unlimited Reports Per Month. $99.99/month"
+                   Font="Small"
+                   HorizontalOptions="CenterAndExpand"
+                   VerticalOptions="CenterAndExpand"
+                   Grid.Row="12"
+                   Grid.Column="0" />
+                <Button Text="Purchase Unlimited"
+                    x:Name="UnlimitedButton"
+                    StyleClass="Small"
+                    HorizontalOptions="CenterAndExpand"
+                    VerticalOptions="Center"
+                    Grid.Row="13"
+                    Grid.Column="0"
+                    WidthRequest="200" />
+
+                <Label x:Name="ErrorLabel"
                    TextColor="Red"
-                   Grid.Row="5"
+                   Grid.Row="14"
                    Grid.Column="0"
-                   Grid.ColumnSpan="2"
                    VerticalOptions="CenterAndExpand"
                    HorizontalOptions="CenterAndExpand" />
-        </Grid>
+            </Grid>
+        </ScrollView>
     </ContentPage.Content>
 </ContentPage>

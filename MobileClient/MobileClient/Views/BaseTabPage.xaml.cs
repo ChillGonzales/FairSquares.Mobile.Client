@@ -1,4 +1,6 @@
-﻿using MobileClient.ViewModels;
+﻿using MobileClient.Models;
+using MobileClient.Utilities;
+using MobileClient.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,9 +15,23 @@ namespace MobileClient.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class BaseTabPage : TabbedPage
     {
-        public BaseTabPage ()
+        private readonly ICache<SettingsModel> _settings;
+        private bool _dialogShown;
+
+        public BaseTabPage()
         {
             InitializeComponent();
+            _settings = App.Container.GetInstance<ICache<SettingsModel>>();
+        }
+
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+            if (!_dialogShown && (!_settings.GetAll().Any() || _settings.Get("").DisplayWelcomeMessage))
+            {
+                _dialogShown = true;
+                this.Navigation.PushModalAsync(new InstructionPage(true));
+            }
         }
 
         public void NavigateFromMenu(PageType pageType)

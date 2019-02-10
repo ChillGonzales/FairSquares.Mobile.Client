@@ -38,7 +38,6 @@ namespace MobileClient
         {
             try
             {
-                var http = new HttpClient();
                 Container = new Container();
                 var orderService = new AzureOrderService(_orderEndpoint, _apiKey);
                 var propertyService = new PropertyService(_propertyEndpoint, new DebugLogger<PropertyService>());
@@ -70,6 +69,7 @@ namespace MobileClient
                 var orderCache = new LocalSqlCache<Order>(Path.Combine(dbBasePath, "order.db3"), new DebugLogger<LocalSqlCache<Order>>());
                 var imageCache = new LocalSqlCache<ImageModel>(Path.Combine(dbBasePath, "images.db3"), new DebugLogger<LocalSqlCache<ImageModel>>());
                 var subCache = new LocalSqlCache<SubscriptionModel>(Path.Combine(dbBasePath, "subs.db3"), new DebugLogger<LocalSqlCache<SubscriptionModel>>());
+                var settingsCache = new LocalSqlCache<SettingsModel>(Path.Combine(dbBasePath, "sets.db3"), new DebugLogger<LocalSqlCache<SettingsModel>>());
 
                 Action ClearCaches = () =>
                 {
@@ -79,6 +79,7 @@ namespace MobileClient
                         propertyCache.Clear();
                         imageCache.Clear();
                         subCache.Clear();
+                        settingsCache.Clear();
                     }
                     catch { }
                 };
@@ -177,6 +178,7 @@ namespace MobileClient
                 Container.Register<ICache<Order>>(() => orderCache, Lifestyle.Singleton);
                 Container.Register<ICache<ImageModel>>(() => imageCache, Lifestyle.Singleton);
                 Container.Register<ICache<SubscriptionModel>>(() => subCache, Lifestyle.Singleton);
+                Container.Register<ICache<SettingsModel>>(() => settingsCache, Lifestyle.Singleton);
                 Container.RegisterConditional(typeof(ICache<>), typeof(MemoryCache<>), c => !c.Handled);
             }
             catch (Exception ex)

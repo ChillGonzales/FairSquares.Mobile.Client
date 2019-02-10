@@ -4,59 +4,92 @@
              Title="Information"
              x:Class="MobileClient.Views.InstructionPage">
     <ContentPage.Content>
-        <StackLayout Margin="10">
-            <Label Margin="5"
+        <ScrollView Margin="10">
+            <Grid RowSpacing="15" x:Name="InstructionGrid">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="50" />
+                    <RowDefinition Height="50" />
+                    <RowDefinition Height="50" />
+                    <RowDefinition Height="125" />
+                    <RowDefinition Height="50" />
+                    <RowDefinition Height="50" />
+                    <RowDefinition Height="50" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Label
+                Grid.Row="0"
+                Grid.Column="0"
                 VerticalOptions="Center" 
                 HorizontalOptions="CenterAndExpand">
-                <Label.FormattedText>
-                    <FormattedString>
-                        <Span Text= "- Go to the " FontSize="Medium" />
-                        <Span Text = "Measure It" FontAttributes="Bold" FontSize="Medium"/>
-                        <Span Text = " page to submit an address for measuring." FontSize="Medium" />
-                    </FormattedString>
-                </Label.FormattedText>
-            </Label>
-            <Label Margin="5"
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text= "- Go to the " FontSize="Medium" />
+                            <Span Text = "Measure It" FontAttributes="Bold" FontSize="Medium"/>
+                            <Span Text = " page to submit an address for measuring." FontSize="Medium" />
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+                <Label
+                Grid.Row="1"
+                Grid.Column="0"
                 VerticalOptions="Center" 
                 HorizontalOptions="CenterAndExpand">
-                <Label.FormattedText>
-                    <FormattedString>
-                        <Span Text= "- View your completed and pending orders on the " FontSize="Medium"/>
-                        <Span Text = "My Orders" FontAttributes="Bold" FontSize="Medium"/>
-                        <Span Text = " page." FontSize="Medium"/>
-                    </FormattedString>
-                </Label.FormattedText>
-            </Label>
-            <Label 
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text= "- View your completed and pending orders on the " FontSize="Medium"/>
+                            <Span Text = "My Orders" FontAttributes="Bold" FontSize="Medium"/>
+                            <Span Text = " page." FontSize="Medium"/>
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+                <Label 
                 FontSize="Medium"
-                Margin="5"
+                Grid.Row="2"
+                Grid.Column="0"
                 VerticalOptions="Center" 
                 HorizontalOptions="CenterAndExpand" >
-                <Label.FormattedText>
-                    <FormattedString>
-                        <Span Text="- Submitted orders will be completed in ONE business day." FontSize="Medium" FontAttributes="Bold"/>
-                    </FormattedString>
-                </Label.FormattedText>
-            </Label>
-            <Label Margin="5"
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text="- Submitted orders will be completed in ONE business day." FontSize="Medium" FontAttributes="Bold"/>
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+                <Label 
+                Grid.Row="3"
+                Grid.Column="0"
                 VerticalOptions="Center" 
                 HorizontalOptions="CenterAndExpand">
-                <Label.FormattedText>
-                    <FormattedString>
-                        <Span Text= "-This app is still in beta and is subject to change. Please use the " FontSize="Medium" />
-                        <Span Text = "Send Feedback" FontAttributes="Bold" FontSize="Medium" />
-                        <Span Text = " feature on the " FontSize="Medium" />
-                        <Span Text = "My Account" FontAttributes="Bold" FontSize="Medium" />
-                        <Span Text = " page to send your questions/comments to the developers." FontSize="Medium"/>
-                    </FormattedString>
-                </Label.FormattedText>
-            </Label>
-            <Label Text="Thank you for using Fair Squares!"
-                FontSize="Large"
-                Margin="5"
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text= "-This app is still in beta and is subject to change. Please use the " FontSize="Medium" />
+                            <Span Text = "Send Feedback" FontAttributes="Bold" FontSize="Medium" />
+                            <Span Text = " feature on the " FontSize="Medium" />
+                            <Span Text = "My Account" FontAttributes="Bold" FontSize="Medium" />
+                            <Span Text = " page to send your questions/comments to the developers." FontSize="Medium"/>
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+                <Label Text="Thank you for using Fair Squares!"
+                FontSize="Medium"
+                Grid.Row="4"
+                Grid.Column="0"
                 FontAttributes="Bold"
                 VerticalOptions="Center" 
                 HorizontalOptions="CenterAndExpand" />
-        </StackLayout>
+                <StackLayout Orientation="Horizontal" Grid.Row="5" Grid.Column="0">
+                    <Switch x:Name="NotShowAgainToggle" HorizontalOptions="Start" VerticalOptions="Center"/>
+                    <Label Text="Don't show this message again." HorizontalOptions="StartAndExpand" VerticalOptions="Center" />
+                </StackLayout>
+                <Button x:Name="DismissButton"
+                StyleClass="Info"
+                Text="Got It, Thanks"
+                WidthRequest="250"
+                HorizontalOptions="CenterAndExpand"
+                VerticalOptions="Center"
+                Grid.Row="6" />
+            </Grid>
+        </ScrollView>
     </ContentPage.Content>
 </ContentPage>

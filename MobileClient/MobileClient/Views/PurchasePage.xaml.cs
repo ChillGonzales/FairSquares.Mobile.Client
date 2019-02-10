@@ -25,6 +25,8 @@ namespace MobileClient.Views
         private IOrderService _orderService;
         private IAlertService _alertService;
         private bool _showFreeReportButton;
+        private string _successGreen = "449d44";
+        private string _infoBlue = "31b0d5";
 
         public PurchasePage(bool showFreeReportButton)
         {
@@ -112,13 +114,18 @@ namespace MobileClient.Views
             if (!showButton)
             {
                 FreeReportCol.Height = 0;
-                BasicButton.StyleClass = new List<string>() { "Success" };
+                FreeReportButtonCol.Height = 0;
+                BasicButton.BackgroundColor = Color.FromHex(_successGreen);
             }
             else
             {
                 FreeReportCol.Height = GridLength.Star;
-                BasicButton.StyleClass = new List<string>() { "Info" };
+                FreeReportButtonCol.Height = GridLength.Star;
+                TryForFreeButton.BackgroundColor = Color.FromHex(_successGreen);
+                BasicButton.BackgroundColor = Color.FromHex(_infoBlue);
             }
+            PremiumButton.BackgroundColor = Color.FromHex(_infoBlue);
+            UnlimitedButton.BackgroundColor = Color.FromHex(_infoBlue);
         }
     }
 

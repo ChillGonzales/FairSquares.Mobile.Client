@@ -8,64 +8,85 @@
                      Activated="ToolbarItem_Activated" />
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
-        <Grid Margin="10" ColumnSpacing="5">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="25" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <Label x:Name="EmailTitleLabel"
-                   Text="Logged In User"
+        <ScrollView Margin="10">
+            <Grid ColumnSpacing="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition x:Name="EmailHeader" Height="25" />
+                    <RowDefinition x:Name="EmailLabelRow" Height="25" />
+                    <RowDefinition x:Name="SignOutButton" Height="75" />
+                    <RowDefinition x:Name="Pad1" Height="10" />
+                    <RowDefinition x:Name="SubscriptionHeaderRow" Height="25" />
+                    <RowDefinition x:Name="SubscriptionLabelRow" Height="50" />
+                    <RowDefinition x:Name="PurchaseButtonRow" Height="75" />
+                    <RowDefinition x:Name="Pad2" Height="10" />
+                    <RowDefinition x:Name="FeedbackHeaderRow" Height="25" />
+                    <RowDefinition x:Name="FeedbackButtonRow" Height="*" />
+                </Grid.RowDefinitions>
+                <Label x:Name="EmailTitleLabel"
+                   Text="Account Information"
                    Grid.Row="0"
                    FontSize="Medium"
                    FontAttributes="Bold"
                    Grid.Column="0"
-                   Grid.ColumnSpan="2"
                    VerticalOptions="CenterAndExpand"
-                   HorizontalOptions="CenterAndExpand" />
-            <Label x:Name="EmailLabel"
-                            FontSize="Medium"
+                   HorizontalOptions="StartAndExpand" />
+                <Label x:Name="EmailLabel"
+                            FontSize="Small"
                             Grid.Row="1"
                             Grid.Column="0"
                             VerticalOptions="Center" 
                             HorizontalOptions="CenterAndExpand" />
-            <Button x:Name="LogoutButton"
-                        Text="Log Out"
-                        Grid.Row="1"
-                        Grid.Column="1"
-                        WidthRequest="200"
+                <Button x:Name="LogoutButton"
+                        Text="Sign Out"
+                        Grid.Row="2"
+                        Grid.Column="0"
+                        WidthRequest="150"
                         StyleClass="Danger"
                         VerticalOptions="Center"
                         HorizontalOptions="CenterAndExpand" />
-            <Label x:Name="SubscriptionLabel" 
+                <Label x:Name="SubscriptionHeaderLabel"
+                   Text="Subscription"
+                   Grid.Row="4"
+                   FontSize="Medium"
+                   FontAttributes="Bold"
+                   Grid.Column="0"
+                   VerticalOptions="CenterAndExpand"
+                   HorizontalOptions="StartAndExpand" />
+                <Label x:Name="SubscriptionLabel" 
                        Text="Purchase a monthly subscription that fits your needs."
-                       FontSize="Medium"
-                       Grid.Row="2"
+                       FontSize="Small"
+                       Grid.Row="5"
                        Grid.Column="0"
                        VerticalOptions="Center"
                        HorizontalOptions="CenterAndExpand" />
-            <Button x:Name="SubscribeButton"
+                <Button x:Name="SubscribeButton"
                        Text="Purchase"
-                       Grid.Row="2"
-                       Grid.Column="1"
-                       WidthRequest="250"
+                       Grid.Row="6"
+                       Grid.Column="0"
+                       WidthRequest="150"
                        StyleClass="Success"
                        VerticalOptions="Center"
                        HorizontalOptions="CenterAndExpand" />
-            <Button x:Name="FeedbackButton"
+                <Label x:Name="FeedbackHeaderLabel"
+                   Text="Feedback"
+                   Grid.Row="8"
+                   Grid.Column="0"
+                   FontSize="Medium"
+                   FontAttributes="Bold"
+                   VerticalOptions="CenterAndExpand"
+                   HorizontalOptions="StartAndExpand" />
+                <Button x:Name="FeedbackButton"
                     Text="Send Feedback"
-                    Grid.Row="3"
+                    Grid.Row="9"
                     Grid.Column="0"
-                    Grid.ColumnSpan="2"
                     StyleClass="Info"
-                    WidthRequest="250"
+                    WidthRequest="150"
                     HorizontalOptions="CenterAndExpand"
                     VerticalOptions="Center" />
-        </Grid>
+            </Grid>
+        </ScrollView>
     </ContentPage.Content>
 </ContentPage>

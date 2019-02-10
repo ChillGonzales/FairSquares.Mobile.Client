@@ -96,8 +96,8 @@ namespace MobileClient.Views
             }
             else
             {
-                EmailLabel.Text = $"{account.Email}";
-                LogoutButton.Text = "Log Out";
+                EmailLabel.Text = $"Email: {account.Email}";
+                LogoutButton.Text = "Sign Out";
                 LogoutButton.StyleClass = new List<string>() { "Danger" };
             }
         }
