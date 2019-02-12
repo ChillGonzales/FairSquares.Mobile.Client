@@ -14,15 +14,15 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition x:Name="EmailHeader" Height="25" />
-                    <RowDefinition x:Name="EmailLabelRow" Height="25" />
-                    <RowDefinition x:Name="SignOutButton" Height="75" />
-                    <RowDefinition x:Name="Pad1" Height="10" />
-                    <RowDefinition x:Name="SubscriptionHeaderRow" Height="25" />
-                    <RowDefinition x:Name="SubscriptionLabelRow" Height="50" />
-                    <RowDefinition x:Name="PurchaseButtonRow" Height="75" />
-                    <RowDefinition x:Name="Pad2" Height="10" />
-                    <RowDefinition x:Name="FeedbackHeaderRow" Height="25" />
+                    <RowDefinition x:Name="EmailHeader" Height="*" />
+                    <RowDefinition x:Name="EmailLabelRow" Height="*" />
+                    <RowDefinition x:Name="SignOutButton" Height="*" />
+                    <RowDefinition x:Name="Pad1" Height="30" />
+                    <RowDefinition x:Name="SubscriptionHeaderRow" Height="*" />
+                    <RowDefinition x:Name="SubscriptionLabelRow" Height="*" />
+                    <RowDefinition x:Name="PurchaseButtonRow" Height="*" />
+                    <RowDefinition x:Name="Pad2" Height="30" />
+                    <RowDefinition x:Name="FeedbackHeaderRow" Height="*" />
                     <RowDefinition x:Name="FeedbackButtonRow" Height="*" />
                 </Grid.RowDefinitions>
                 <Label x:Name="EmailTitleLabel"
@@ -31,21 +31,21 @@
                    FontSize="Medium"
                    FontAttributes="Bold"
                    Grid.Column="0"
-                   VerticalOptions="CenterAndExpand"
+                   VerticalOptions="End"
                    HorizontalOptions="StartAndExpand" />
                 <Label x:Name="EmailLabel"
                             FontSize="Small"
                             Grid.Row="1"
                             Grid.Column="0"
                             VerticalOptions="Center" 
-                            HorizontalOptions="CenterAndExpand" />
+                            HorizontalOptions="Start" />
                 <Button x:Name="LogoutButton"
                         Text="Sign Out"
                         Grid.Row="2"
                         Grid.Column="0"
                         WidthRequest="150"
                         StyleClass="Danger"
-                        VerticalOptions="Center"
+                        VerticalOptions="Start"
                         HorizontalOptions="CenterAndExpand" />
                 <Label x:Name="SubscriptionHeaderLabel"
                    Text="Subscription"
@@ -53,22 +53,22 @@
                    FontSize="Medium"
                    FontAttributes="Bold"
                    Grid.Column="0"
-                   VerticalOptions="CenterAndExpand"
+                   VerticalOptions="End"
                    HorizontalOptions="StartAndExpand" />
                 <Label x:Name="SubscriptionLabel" 
                        Text="Purchase a monthly subscription that fits your needs."
                        FontSize="Small"
                        Grid.Row="5"
                        Grid.Column="0"
-                       VerticalOptions="Center"
-                       HorizontalOptions="CenterAndExpand" />
+                       VerticalOptions="Start"
+                       HorizontalOptions="StartAndExpand" />
                 <Button x:Name="SubscribeButton"
                        Text="Purchase"
                        Grid.Row="6"
                        Grid.Column="0"
                        WidthRequest="150"
                        StyleClass="Success"
-                       VerticalOptions="Center"
+                       VerticalOptions="Start"
                        HorizontalOptions="CenterAndExpand" />
                 <Label x:Name="FeedbackHeaderLabel"
                    Text="Feedback"
@@ -76,7 +76,7 @@
                    Grid.Column="0"
                    FontSize="Medium"
                    FontAttributes="Bold"
-                   VerticalOptions="CenterAndExpand"
+                   VerticalOptions="End"
                    HorizontalOptions="StartAndExpand" />
                 <Button x:Name="FeedbackButton"
                     Text="Send Feedback"
@@ -85,7 +85,7 @@
                     StyleClass="Info"
                     WidthRequest="150"
                     HorizontalOptions="CenterAndExpand"
-                    VerticalOptions="Center" />
+                    VerticalOptions="Start" />
             </Grid>
         </ScrollView>
     </ContentPage.Content>

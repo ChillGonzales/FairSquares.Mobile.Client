@@ -7,7 +7,7 @@ namespace MobileClient.Services
 {
     public interface ISubscriptionService
     {
-        SubscriptionModel GetSubscription(string userId);
+        List<SubscriptionModel> GetSubscriptions(string userId);
         void AddSubscription(SubscriptionModel model);
     }
 }

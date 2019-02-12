@@ -14,8 +14,9 @@ namespace MobileClient.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class InstructionPage : ContentPage
     {
-        private const int _dismissButtonCol = 6;
-        private const int _switchCol = 5;
+        private const int _dismissButtonCol = 7;
+        private const int _switchCol = 6;
+        private const int _titleCol = 0;
         private readonly ICache<SettingsModel> _settings;
 
         public InstructionPage(bool? showDismissButton = false)
@@ -26,6 +27,7 @@ namespace MobileClient.Views
             {
                 InstructionGrid.RowDefinitions[_dismissButtonCol].Height = 0;
                 InstructionGrid.RowDefinitions[_switchCol].Height = 0;
+                InstructionGrid.RowDefinitions[_titleCol].Height = 0;
             }
             else
             {

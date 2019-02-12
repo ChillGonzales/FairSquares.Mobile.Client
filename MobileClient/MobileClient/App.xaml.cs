@@ -110,7 +110,7 @@ namespace MobileClient
                         var subscriptionTask = Task.Run(async () =>
                         {
                             // TODO: This should be somewhere else, not in the client.
-                            var sub = subService.GetSubscription(userId);
+                            var sub = subService.GetSubscriptions(userId).OrderBy(x => x.StartDateTime).FirstOrDefault();
                             // Check app store purchases to see if they auto-renewed
                             if (sub != null && !SubscriptionUtilities.SubscriptionActive(sub))
                             {

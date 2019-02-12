@@ -26,7 +26,7 @@ namespace MobileClient.Services
         {
             try
             {
-                var sub = _subService.GetSubscription(user.UserId);
+                var sub = _subService.GetSubscriptions(user.UserId).OrderBy(x => x.StartDateTime).LastOrDefault();
                 var orders = await _orderService.GetMemberOrders(user.UserId);
                 if (!SubscriptionUtilities.SubscriptionActive(sub) && orders.Any())
                 {

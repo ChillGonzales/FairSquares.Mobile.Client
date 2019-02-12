@@ -4,59 +4,61 @@
              Title="Manage Subscription"
              x:Class="MobileClient.Views.ManageSubscriptionPage">
     <ContentPage.Content>
-        <Grid Margin="10" RowSpacing="10">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="25" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <Label x:Name="SubscriptionTypeLabel"
-                Text="Subscription Type: "
-                FontSize="Medium"
-                Grid.Row="0"
-                Grid.Column="0"
-                Grid.ColumnSpan="2"
-                VerticalOptions="CenterAndExpand" 
-                HorizontalOptions="CenterAndExpand" />
-            <Label x:Name="RemainingOrdersLabel"
-                Text="Remaining Orders This Period: "
-                FontSize="Medium"
-                Grid.Row="1"
-                Grid.Column="0"
-                Grid.ColumnSpan="2"
-                VerticalOptions="CenterAndExpand"
-                HorizontalOptions="CenterAndExpand" />
-            <Label x:Name="EndDateLabel"
-                Text="Subscription Renews On: "
-                FontSize="Medium"
-                Grid.Row="2"
-                Grid.Column="0"
-                Grid.ColumnSpan="2"
-                VerticalOptions="CenterAndExpand"
-                HorizontalOptions="CenterAndExpand" />
-            <Button x:Name="CancelSubButton"
-                Text="Cancel Subscription"
-                StyleClass="Danger"
-                Grid.Row="4"
-                Grid.Column="0"
-                Grid.ColumnSpan="2"
-                WidthRequest="300"
-                VerticalOptions="CenterAndExpand"
-                HorizontalOptions="Center" />
-            <Label x:Name="DisclaimerLabel"
-                Text="NOTE: Subscriptions cannot be cancelled through the app. This button will open a web browser with instructions on how to cancel from your device."
-                Grid.Row="5"
-                Grid.Column="0"
-                Grid.ColumnSpan="2"
-                VerticalOptions="CenterAndExpand"
-                HorizontalOptions="CenterAndExpand" />
-        </Grid>
+        <ScrollView>
+            <Grid Margin="10" RowSpacing="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="25" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Label x:Name="SubscriptionTypeLabel"
+                    Text="Subscription Type: "
+                    FontSize="Medium"
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    VerticalOptions="CenterAndExpand" 
+                    HorizontalOptions="CenterAndExpand" />
+                <Label x:Name="RemainingOrdersLabel"
+                    Text="Remaining Orders This Period: "
+                    FontSize="Medium"
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    VerticalOptions="CenterAndExpand"
+                    HorizontalOptions="CenterAndExpand" />
+                <Label x:Name="EndDateLabel"
+                    Text="Subscription Renews On: "
+                    FontSize="Medium"
+                    Grid.Row="2"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    VerticalOptions="CenterAndExpand"
+                    HorizontalOptions="CenterAndExpand" />
+                <Button x:Name="CancelSubButton"
+                    Text="Cancel Subscription"
+                    StyleClass="Danger"
+                    Grid.Row="4"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    WidthRequest="300"
+                    VerticalOptions="CenterAndExpand"
+                    HorizontalOptions="Center" />
+                <Label x:Name="DisclaimerLabel"
+                    Text="NOTE: Subscriptions cannot be cancelled through the app. This button will open a web browser with instructions on how to cancel from your device."
+                    Grid.Row="5"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    VerticalOptions="CenterAndExpand"
+                    HorizontalOptions="CenterAndExpand" />
+            </Grid>
+        </ScrollView>
     </ContentPage.Content>
 </ContentPage>

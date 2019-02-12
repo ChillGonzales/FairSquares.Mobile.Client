@@ -10,6 +10,7 @@
                     <RowDefinition Height="50" />
                     <RowDefinition Height="50" />
                     <RowDefinition Height="50" />
+                    <RowDefinition Height="50" />
                     <RowDefinition Height="125" />
                     <RowDefinition Height="50" />
                     <RowDefinition Height="50" />
@@ -18,8 +19,15 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
+                <Label Grid.Row="0"
+                       Grid.Column="0"
+                       FontSize="Large"
+                       Text="Welcome!"
+                       FontAttributes="Bold"
+                       VerticalOptions="Center"
+                       HorizontalOptions="CenterAndExpand" />
                 <Label
-                Grid.Row="0"
+                Grid.Row="1"
                 Grid.Column="0"
                 VerticalOptions="Center" 
                 HorizontalOptions="CenterAndExpand">
@@ -32,7 +40,7 @@
                     </Label.FormattedText>
                 </Label>
                 <Label
-                Grid.Row="1"
+                Grid.Row="2"
                 Grid.Column="0"
                 VerticalOptions="Center" 
                 HorizontalOptions="CenterAndExpand">
@@ -46,7 +54,7 @@
                 </Label>
                 <Label 
                 FontSize="Medium"
-                Grid.Row="2"
+                Grid.Row="3"
                 Grid.Column="0"
                 VerticalOptions="Center" 
                 HorizontalOptions="CenterAndExpand" >
@@ -57,7 +65,7 @@
                     </Label.FormattedText>
                 </Label>
                 <Label 
-                Grid.Row="3"
+                Grid.Row="4"
                 Grid.Column="0"
                 VerticalOptions="Center" 
                 HorizontalOptions="CenterAndExpand">
@@ -73,12 +81,12 @@
                 </Label>
                 <Label Text="Thank you for using Fair Squares!"
                 FontSize="Medium"
-                Grid.Row="4"
+                Grid.Row="5"
                 Grid.Column="0"
                 FontAttributes="Bold"
                 VerticalOptions="Center" 
                 HorizontalOptions="CenterAndExpand" />
-                <StackLayout Orientation="Horizontal" Grid.Row="5" Grid.Column="0">
+                <StackLayout Orientation="Horizontal" Grid.Row="6" Grid.Column="0">
                     <Switch x:Name="NotShowAgainToggle" HorizontalOptions="Start" VerticalOptions="Center"/>
                     <Label Text="Don't show this message again." HorizontalOptions="StartAndExpand" VerticalOptions="Center" />
                 </StackLayout>
@@ -88,7 +96,7 @@
                 WidthRequest="250"
                 HorizontalOptions="CenterAndExpand"
                 VerticalOptions="Center"
-                Grid.Row="6" />
+                Grid.Row="7" />
             </Grid>
         </ScrollView>
     </ContentPage.Content>

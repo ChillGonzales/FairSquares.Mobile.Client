@@ -25,8 +25,6 @@ namespace MobileClient.Views
         private IOrderService _orderService;
         private IAlertService _alertService;
         private bool _showFreeReportButton;
-        private string _successGreen = "449d44";
-        private string _infoBlue = "31b0d5";
 
         public PurchasePage(bool showFreeReportButton)
         {
@@ -98,8 +96,8 @@ namespace MobileClient.Views
                 _subService.AddSubscription(model);
 #endif
                 _alertService.LongAlert($"Thank you for your purchase!");
-                Device.BeginInvokeOnMainThread(async () => await Navigation.PopAsync());
                 RootPage.NavigateFromMenu(ViewModels.PageType.Order);
+                Device.BeginInvokeOnMainThread(async () => await Navigation.PopAsync());
             }
             catch (Exception ex)
             {
@@ -115,17 +113,13 @@ namespace MobileClient.Views
             {
                 FreeReportCol.Height = 0;
                 FreeReportButtonCol.Height = 0;
-                BasicButton.BackgroundColor = Color.FromHex(_successGreen);
+                BasicButton.StyleClass = new List<string>() { "Success" };
             }
             else
             {
                 FreeReportCol.Height = GridLength.Star;
                 FreeReportButtonCol.Height = GridLength.Star;
-                TryForFreeButton.BackgroundColor = Color.FromHex(_successGreen);
-                BasicButton.BackgroundColor = Color.FromHex(_infoBlue);
             }
-            PremiumButton.BackgroundColor = Color.FromHex(_infoBlue);
-            UnlimitedButton.BackgroundColor = Color.FromHex(_infoBlue);
         }
     }
 

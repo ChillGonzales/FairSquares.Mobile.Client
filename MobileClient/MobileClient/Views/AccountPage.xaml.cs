@@ -35,6 +35,7 @@ namespace MobileClient.Views
             _orderValidator = App.Container.GetInstance<IOrderValidationService>();
             _userCache.OnLoggedIn += (s, e) => SetUIToAccount(e.Account);
             SetUIToAccount(_user);
+            SetSubUI();
             LogoutButton.Clicked += LogoutButton_Clicked;
             FeedbackButton.Clicked += FeedbackButton_Clicked;
             SubscribeButton.Clicked += SubscribeButton_Clicked;

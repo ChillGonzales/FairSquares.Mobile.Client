@@ -36,7 +36,7 @@ namespace MobileClient.Services
             }
         }
 
-        public SubscriptionModel GetSubscription(string userId)
+        public List<SubscriptionModel> GetSubscriptions(string userId)
         {
             try
             {
@@ -48,7 +48,7 @@ namespace MobileClient.Services
                     else
                         throw new Exception(result.Content.ReadAsStringAsync().Result);
                 }
-                return JsonConvert.DeserializeObject<SubscriptionModel>(result.Content.ReadAsStringAsync().Result);
+                return JsonConvert.DeserializeObject<List<SubscriptionModel>>(result.Content.ReadAsStringAsync().Result);
             }
             catch (Exception ex)
             {
