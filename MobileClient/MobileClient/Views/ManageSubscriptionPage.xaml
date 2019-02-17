@@ -5,7 +5,7 @@
              x:Class="MobileClient.Views.ManageSubscriptionPage">
     <ContentPage.Content>
         <ScrollView>
-            <Grid Margin="10" RowSpacing="10">
+            <Grid Margin="10" RowSpacing="5">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                     <RowDefinition Height="*" />
@@ -20,12 +20,12 @@
                 </Grid.ColumnDefinitions>
                 <Label x:Name="SubscriptionTypeLabel"
                     Text="Subscription Type: "
-                    FontSize="Medium"
+                    FontSize="Small"
                     Grid.Row="0"
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
                     VerticalOptions="CenterAndExpand" 
-                    HorizontalOptions="CenterAndExpand" />
+                    HorizontalOptions="Start" />
                 <Label x:Name="RemainingOrdersLabel"
                     Text="Remaining Orders This Period: "
                     FontSize="Medium"
@@ -33,7 +33,7 @@
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
                     VerticalOptions="CenterAndExpand"
-                    HorizontalOptions="CenterAndExpand" />
+                    HorizontalOptions="Start" />
                 <Label x:Name="EndDateLabel"
                     Text="Subscription Renews On: "
                     FontSize="Medium"
@@ -41,7 +41,7 @@
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
                     VerticalOptions="CenterAndExpand"
-                    HorizontalOptions="CenterAndExpand" />
+                    HorizontalOptions="Start" />
                 <Button x:Name="CancelSubButton"
                     Text="Cancel Subscription"
                     StyleClass="Danger"

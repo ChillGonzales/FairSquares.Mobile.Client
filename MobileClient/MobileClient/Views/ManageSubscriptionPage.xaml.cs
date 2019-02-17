@@ -23,7 +23,7 @@ namespace MobileClient.Views
             _purchaseService = App.Container.GetInstance<IPurchasingService>();
             _model = model;
             SubscriptionTypeLabel.Text += _model.SubscriptionType.ToString();
-            RemainingOrdersLabel.Text += _model.RemainingOrders.ToString();
+            RemainingOrdersLabel.Text += _model.SubscriptionType == Models.SubscriptionType.Unlimited ? "Unlimited" : _model.RemainingOrders.ToString();
             EndDateLabel.Text += _model.EndDateTime.ToString("dddd, dd MMMM yyyy");
             var compName = Device.RuntimePlatform == Device.Android ? "Google" : "Apple";
             var supportUri = Device.RuntimePlatform == Device.Android ? "https://support.google.com/googleplay/answer/7018481" :
