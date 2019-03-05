@@ -5,17 +5,25 @@
              x:Class="MobileClient.Views.LandingPage">
     <ContentPage.Content>
         <StackLayout Margin="20" Orientation="Vertical">
-            <Label Text="Please Login to Continue"
+            <ActivityIndicator x:Name="LoadingAnimation" 
+                               HorizontalOptions="CenterAndExpand"
+                               VerticalOptions="CenterAndExpand"
+                               Color="Black" 
+                               IsEnabled="False"
+                               IsVisible="False" />
+            <StackLayout x:Name="LoginLayout" Orientation="Vertical">
+                <Label Text="Please Login to Continue"
                     FontSize="Large"
                     FontAttributes="Bold"
                     VerticalOptions="Start"
                     HorizontalOptions="CenterAndExpand" />
-            <Button x:Name="GoogleLogin"
+                <Button x:Name="GoogleLogin"
                     Text="Login with Google"
                     WidthRequest="250"
                     StyleClass="Info"
                     HorizontalOptions="CenterAndExpand"
                     VerticalOptions="CenterAndExpand" />
+            </StackLayout>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

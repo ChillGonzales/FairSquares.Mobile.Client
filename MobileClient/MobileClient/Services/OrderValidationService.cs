@@ -49,8 +49,9 @@ namespace MobileClient.Services
                 var activeSubOrderCount = orders.Where(x => x.DateReceived >= sub.StartDateTime && x.DateReceived <= sub.EndDateTime)
                                                 .Count();
 
-                if ((sub.SubscriptionType == SubscriptionType.Basic && activeSubOrderCount > SubscriptionUtilities.BasicOrderCount) ||
-                    (sub.SubscriptionType == SubscriptionType.Premium && activeSubOrderCount > SubscriptionUtilities.PremiumOrderCount))
+                if ((sub.SubscriptionType == SubscriptionType.Basic && activeSubOrderCount >= SubscriptionUtilities.BasicOrderCount) ||
+                    (sub.SubscriptionType == SubscriptionType.Premium && activeSubOrderCount >= SubscriptionUtilities.PremiumOrderCount) ||
+                    (sub.SubscriptionType == SubscriptionType.Enterprise && activeSubOrderCount >= SubscriptionUtilities.EnterpriseOrderCount))
                 {
                     return new ValidationResponse()
                     {
@@ -64,7 +65,8 @@ namespace MobileClient.Services
                 else
                 {
                     var remainingCount = sub.SubscriptionType == SubscriptionType.Basic ? SubscriptionUtilities.BasicOrderCount - activeSubOrderCount :
-                        (sub.SubscriptionType == SubscriptionType.Premium ? SubscriptionUtilities.PremiumOrderCount - activeSubOrderCount : -1);
+                                        (sub.SubscriptionType == SubscriptionType.Premium ? SubscriptionUtilities.PremiumOrderCount - activeSubOrderCount :
+                                        SubscriptionUtilities.EnterpriseOrderCount - activeSubOrderCount);
                     return new ValidationResponse()
                     {
                         Success = true,

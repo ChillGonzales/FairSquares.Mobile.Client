@@ -21,9 +21,9 @@
                     <RowDefinition x:Name="PremiumCol" Height="*"/>
                     <RowDefinition x:Name="PremButtonCol" Height="*"/>
                     <RowDefinition x:Name="Pad3" Height="15"/>
-                    <RowDefinition x:Name="UnlHeaderCol" Height="*"/>
-                    <RowDefinition x:Name="UnlCol" Height="*"/>
-                    <RowDefinition x:Name="UnlButtonCol" Height="*"/>
+                    <RowDefinition x:Name="EntHeaderCol" Height="*"/>
+                    <RowDefinition x:Name="EntCol" Height="*"/>
+                    <RowDefinition x:Name="EntButtonCol" Height="*"/>
                     <RowDefinition x:Name="ErrorCol" Height="25"/>
                 </Grid.RowDefinitions>
                 <Label Text="Choose Your Plan. Cancel Anytime."
@@ -94,21 +94,21 @@
                     Grid.Column="0"
                     WidthRequest="250" />
 
-                <Label Text="Unlimited"
+                <Label Text="Enterprise"
                    Font="Medium"
                    FontAttributes="Bold"
                    HorizontalOptions="Start"
                    VerticalOptions="Start"
                    Grid.Row="11"
                    Grid.Column="0" />
-                <Label Text="Unlimited Reports Per Month. $99.99/month"
+                <Label Text="20 Reports Per Month. $99.99/month"
                    Font="Info"
                    HorizontalOptions="CenterAndExpand"
                    VerticalOptions="Start"
                    Grid.Row="12"
                    Grid.Column="0" />
-                <Button Text="Purchase Unlimited"
-                    x:Name="UnlimitedButton"
+                <Button Text="Purchase Enterprise"
+                    x:Name="EnterpriseButton"
                     StyleClass="Info"
                     HorizontalOptions="CenterAndExpand"
                     VerticalOptions="Start"

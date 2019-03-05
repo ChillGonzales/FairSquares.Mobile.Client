@@ -43,7 +43,7 @@
                         Text="Sign Out"
                         Grid.Row="2"
                         Grid.Column="0"
-                        WidthRequest="150"
+                        WidthRequest="250"
                         StyleClass="Danger"
                         VerticalOptions="Start"
                         HorizontalOptions="CenterAndExpand" />
@@ -66,7 +66,7 @@
                        Text="Purchase"
                        Grid.Row="6"
                        Grid.Column="0"
-                       WidthRequest="150"
+                       WidthRequest="250"
                        StyleClass="Success"
                        VerticalOptions="Start"
                        HorizontalOptions="CenterAndExpand" />
@@ -83,7 +83,7 @@
                     Grid.Row="9"
                     Grid.Column="0"
                     StyleClass="Info"
-                    WidthRequest="150"
+                    WidthRequest="250"
                     HorizontalOptions="CenterAndExpand"
                     VerticalOptions="Start" />
             </Grid>

@@ -23,6 +23,9 @@ namespace MobileClient.Views
 
         private void GoogleLogin_Clicked(object sender, EventArgs e)
         {
+            LoadingAnimation.IsVisible = true;
+            LoadingAnimation.IsRunning = true;
+            LoginLayout.IsVisible = false;
             var presenter = new Xamarin.Auth.Presenters.OAuthLoginPresenter();
             presenter.Login(_auth);
         }

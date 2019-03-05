@@ -49,7 +49,7 @@ namespace MobileClient.Views
             };
             BasicButton.Clicked += (s, e) => { PurchaseSubscription(SubscriptionType.Basic); };
             PremiumButton.Clicked += (s, e) => { PurchaseSubscription(SubscriptionType.Premium); };
-            UnlimitedButton.Clicked += (s, e) => { PurchaseSubscription(SubscriptionType.Unlimited); };
+            EnterpriseButton.Clicked += (s, e) => { PurchaseSubscription(SubscriptionType.Enterprise); };
             SetFreeReportButton(_showFreeReportButton);
         }
         private async void PurchaseSubscription(SubscriptionType subType)
@@ -66,8 +66,8 @@ namespace MobileClient.Views
                     case SubscriptionType.Premium:
                         subCode = SubscriptionUtilities.SUB_NAME_PREMIUM;
                         break;
-                    case SubscriptionType.Unlimited:
-                        subCode = SubscriptionUtilities.SUB_NAME_UNLIMITED;
+                    case SubscriptionType.Enterprise:
+                        subCode = SubscriptionUtilities.SUB_NAME_ENTERPRISE;
                         break;
                 }
 #if RELEASE
@@ -121,12 +121,5 @@ namespace MobileClient.Views
                 FreeReportButtonCol.Height = GridLength.Star;
             }
         }
-    }
-
-    enum SubscriptionType
-    {
-        Basic = 0,
-        Premium = 1,
-        Unlimited = 2
     }
 }

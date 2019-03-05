@@ -21,6 +21,6 @@ namespace MobileClient.Models
     {
         Basic = 0,
         Premium = 1,
-        Unlimited = 2
+        Enterprise = 2
     }
 }

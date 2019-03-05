@@ -11,9 +11,10 @@ namespace MobileClient.Utilities
     {
         public const string SUB_NAME_PREMIUM = "premium_subscription_monthly";
         public const string SUB_NAME_BASIC = "basic_subscription_monthly";
-        public const string SUB_NAME_UNLIMITED = "unlimited_subscription_monthly";
+        public const string SUB_NAME_ENTERPRISE = "enterprise_subscription_monthly";
         public const int BasicOrderCount = 3;
         public const int PremiumOrderCount = 8;
+        public const int EnterpriseOrderCount = 25;
 
         public static bool SubscriptionActive(SubscriptionModel model)
         {
@@ -55,8 +56,8 @@ namespace MobileClient.Utilities
                     return SubscriptionType.Basic;
                 case SUB_NAME_PREMIUM:
                     return SubscriptionType.Premium;
-                case SUB_NAME_UNLIMITED:
-                    return SubscriptionType.Unlimited;
+                case SUB_NAME_ENTERPRISE:
+                    return SubscriptionType.Enterprise;
                 default:
                     return SubscriptionType.Basic;
             }
