@@ -9,6 +9,7 @@ namespace MobileClient.Utilities
     {
         private readonly ILogger<CacheRefresher> _logger;
         private readonly Func<string, Task> _refreshFunc;
+        public bool IsRefreshing { get; private set; }
 
         public CacheRefresher(ILogger<CacheRefresher> logger, Func<string, Task> refreshFunc)
         {
@@ -19,7 +20,12 @@ namespace MobileClient.Utilities
         {
             try
             {
-                _refreshFunc(userId);
+                Task.Run(async () =>
+                {
+                    IsRefreshing = true;
+                    await _refreshFunc(userId);
+                    IsRefreshing = false;
+                });
             }
             catch (Exception ex)
             {

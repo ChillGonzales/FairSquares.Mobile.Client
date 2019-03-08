@@ -20,7 +20,7 @@
                 </Grid.ColumnDefinitions>
                 <Label x:Name="SubscriptionTypeLabel"
                     Text="Subscription Type: "
-                    FontSize="Small"
+                    FontSize="Medium"
                     Grid.Row="0"
                     Grid.Column="0"
                     Grid.ColumnSpan="2"

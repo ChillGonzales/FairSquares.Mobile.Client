@@ -101,7 +101,7 @@
                    VerticalOptions="Start"
                    Grid.Row="11"
                    Grid.Column="0" />
-                <Label Text="20 Reports Per Month. $99.99/month"
+                <Label Text="25 Reports Per Month. $99.99/month"
                    Font="Info"
                    HorizontalOptions="CenterAndExpand"
                    VerticalOptions="Start"

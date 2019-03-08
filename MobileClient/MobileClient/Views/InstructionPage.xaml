@@ -11,7 +11,7 @@
                     <RowDefinition Height="50" />
                     <RowDefinition Height="50" />
                     <RowDefinition Height="50" />
-                    <RowDefinition Height="125" />
+                    <RowDefinition Height="75" />
                     <RowDefinition Height="50" />
                     <RowDefinition Height="50" />
                     <RowDefinition Height="50" />
@@ -61,21 +61,6 @@
                     <Label.FormattedText>
                         <FormattedString>
                             <Span Text="- Submitted orders will be completed in ONE business day." FontSize="Medium" FontAttributes="Bold"/>
-                        </FormattedString>
-                    </Label.FormattedText>
-                </Label>
-                <Label 
-                Grid.Row="4"
-                Grid.Column="0"
-                VerticalOptions="Center" 
-                HorizontalOptions="CenterAndExpand">
-                    <Label.FormattedText>
-                        <FormattedString>
-                            <Span Text= "-This app is still in beta and is subject to change. Please use the " FontSize="Medium" />
-                            <Span Text = "Send Feedback" FontAttributes="Bold" FontSize="Medium" />
-                            <Span Text = " feature on the " FontSize="Medium" />
-                            <Span Text = "My Account" FontAttributes="Bold" FontSize="Medium" />
-                            <Span Text = " page to send your questions/comments to the developers." FontSize="Medium"/>
                         </FormattedString>
                     </Label.FormattedText>
                 </Label>

@@ -110,7 +110,7 @@ namespace MobileClient
                         var subscriptionTask = Task.Run(async () =>
                         {
                             // TODO: This should be somewhere else, not in the client.
-                            var sub = subService.GetSubscriptions(userId).OrderBy(x => x.StartDateTime).FirstOrDefault();
+                            var sub = subService.GetSubscriptions(userId).OrderByDescending(x => x.StartDateTime).FirstOrDefault();
                             // Check app store purchases to see if they auto-renewed
                             if (sub != null && !SubscriptionUtilities.SubscriptionActive(sub))
                             {
@@ -144,14 +144,16 @@ namespace MobileClient
                         Debug.WriteLine($"Failed to fill caches.\n{ex.ToString()}");
                     }
                 });
+
+                var refresher = new CacheRefresher(new DebugLogger<CacheRefresher>(), RefreshCaches);
                 var user = userService.GetLoggedInAccount();
                 if (user != null)
-                    RefreshCaches(user.UserId);
+                    refresher.RefreshCaches(user.UserId);
 
                 userService.OnLoggedIn += (s, e) =>
                 {
                     ClearCaches();
-                    RefreshCaches(e.Account.UserId);
+                    refresher.RefreshCaches(e.Account.UserId);
                 };
                 userService.OnLoggedOut += (s, e) => ClearCaches();
 
@@ -165,7 +167,7 @@ namespace MobileClient
                 Container.Register<AccountStore>(() => AccountStore.Create(), Lifestyle.Singleton);
                 Container.Register<ICurrentUserService>(() => userService, Lifestyle.Singleton);
                 Container.Register<IPurchasingService>(() => purchaseService);
-                Container.Register<ICacheRefresher>(() => new CacheRefresher(new DebugLogger<CacheRefresher>(), RefreshCaches), Lifestyle.Singleton);
+                Container.Register<ICacheRefresher>(() => refresher, Lifestyle.Singleton);
                 Container.Register<ISubscriptionService>(() => subService, Lifestyle.Singleton);
                 Container.Register<IOrderValidationService, OrderValidationService>();
                 Container.Register<IUserService>(() => new UserService(new HttpClient()

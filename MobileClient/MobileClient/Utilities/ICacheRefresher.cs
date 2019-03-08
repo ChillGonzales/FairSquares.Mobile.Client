@@ -7,5 +7,6 @@ namespace MobileClient.Utilities
     public interface ICacheRefresher
     {
         void RefreshCaches(string userId);
+        bool IsRefreshing { get; }
     }
 }

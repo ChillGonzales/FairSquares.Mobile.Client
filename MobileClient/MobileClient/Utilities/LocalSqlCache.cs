@@ -68,14 +68,8 @@ namespace MobileClient.Utilities
             {
                 var value = _connection.Find<Storable>(kvp.Key);
                 if (value != null)
-                {
-                    value.SerializedValue = JsonConvert.SerializeObject(kvp.Value);
-                    _connection.Update(value);
-                }
-                else
-                {
-                    _connection.Insert(new Storable() { Key = kvp.Key, SerializedValue = JsonConvert.SerializeObject(kvp.Value) });
-                }
+                    this.Delete(kvp.Key);
+                _connection.Insert(new Storable() { Key = kvp.Key, SerializedValue = JsonConvert.SerializeObject(kvp.Value) });
             }
         }
     }

@@ -8,7 +8,16 @@
                      Activated="ToolbarItem_Activated" />
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
-        <StackLayout>
+        <StackLayout Orientation="Vertical">
+            <StackLayout>
+                <ActivityIndicator x:Name="LoadingAnimation"
+                               Color="Black"
+                               HorizontalOptions="CenterAndExpand"
+                               VerticalOptions="CenterAndExpand"
+                               IsVisible="false"
+                               IsRunning="false" />
+            </StackLayout>
+            <StackLayout x:Name="MainLayout">
             <ListView x:Name="OrderListView"
                 IsPullToRefreshEnabled="True"
                 IsGroupingEnabled="True"
@@ -24,6 +33,7 @@
                     </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
+        </StackLayout>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

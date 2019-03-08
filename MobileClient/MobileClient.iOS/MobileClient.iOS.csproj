@@ -34,8 +34,9 @@
     </CodesignProvision>
     <CodesignExtraArgs />
     <CodesignResourceRules />
-    <DeviceSpecificBuild>true</DeviceSpecificBuild>
+    <DeviceSpecificBuild>false</DeviceSpecificBuild>
     <MtouchExtraArgs>--registrar:static</MtouchExtraArgs>
+    <MtouchFloat32>true</MtouchFloat32>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>none</DebugType>
