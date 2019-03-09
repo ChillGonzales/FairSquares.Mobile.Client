@@ -42,7 +42,7 @@ namespace MobileClient.Views
                 _settings.Clear();
                 _settings.Put("", new SettingsModel() { DisplayWelcomeMessage = false });
             }
-            await Navigation.PopModalAsync();
+            await App.Current.MainPage.Navigation.PopModalAsync();
         }
     }
 }

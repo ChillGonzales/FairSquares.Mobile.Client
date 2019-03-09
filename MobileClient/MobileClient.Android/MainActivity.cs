@@ -17,7 +17,7 @@ using Firebase.Messaging;
 
 namespace MobileClient.Droid
 {
-    [Activity(Label = "Fair Squares", Icon = "@mipmap/ic_launcher", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
+    [Activity(Label = "Fair Squares", Icon = "@mipmap/ic_launcher", Theme = "@style/splashscreen", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
         internal static readonly string CHANNEL_ID = "my_notification_channel";
@@ -27,6 +27,8 @@ namespace MobileClient.Droid
         {
             try
             {
+                base.Window.RequestFeature(WindowFeatures.ActionBar);
+                base.SetTheme(Resource.Style.MainTheme);
                 if (Intent.Extras != null)
                 {
                     foreach (var key in Intent.Extras.KeySet())

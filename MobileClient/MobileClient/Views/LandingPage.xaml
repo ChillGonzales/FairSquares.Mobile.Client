@@ -4,14 +4,15 @@
              Title="Please Login to Continue"
              x:Class="MobileClient.Views.LandingPage">
     <ContentPage.Content>
-        <StackLayout Margin="20" Orientation="Vertical">
+        <StackLayout Orientation="Vertical">
             <ActivityIndicator x:Name="LoadingAnimation" 
                                HorizontalOptions="CenterAndExpand"
                                VerticalOptions="CenterAndExpand"
                                Color="Black" 
                                IsEnabled="False"
                                IsVisible="False" />
-            <StackLayout x:Name="LoginLayout" Orientation="Vertical">
+            <StackLayout x:Name="LoginLayout" Orientation="Vertical"
+                         Margin="20">
                 <Label Text="Please Login to Continue"
                     FontSize="Large"
                     FontAttributes="Bold"
