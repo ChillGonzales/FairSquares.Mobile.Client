@@ -8,8 +8,8 @@
                      Activated="ToolbarItem_Activated" />
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
-        <ScrollView Margin="10">
-            <Grid ColumnSpacing="5">
+        <ScrollView>
+            <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
@@ -23,6 +23,7 @@
                     <RowDefinition x:Name="PurchaseButtonRow" Height="*" />
                     <RowDefinition x:Name="Pad2" Height="30" />
                     <RowDefinition x:Name="FeedbackHeaderRow" Height="*" />
+                    <RowDefinition x:Name="FeedbackLabelRow" Height="*" />
                     <RowDefinition x:Name="FeedbackButtonRow" Height="*" />
                 </Grid.RowDefinitions>
                 <Label x:Name="EmailTitleLabel"
@@ -37,8 +38,8 @@
                             FontSize="Small"
                             Grid.Row="1"
                             Grid.Column="0"
-                            VerticalOptions="Center" 
-                            HorizontalOptions="Start" />
+                            VerticalOptions="Start" 
+                            HorizontalOptions="StartAndExpand" />
                 <Button x:Name="LogoutButton"
                         Text="Sign Out"
                         Grid.Row="2"
@@ -78,9 +79,16 @@
                    FontAttributes="Bold"
                    VerticalOptions="End"
                    HorizontalOptions="StartAndExpand" />
+                <Label x:Name="FeedbackInfoLabel"
+                    Text="Send us your feedback"
+                    Grid.Row="9"
+                    Grid.Column="0"
+                    FontSize="Small"
+                    VerticalOptions="Start"
+                    HorizontalOptions="StartAndExpand" />
                 <Button x:Name="FeedbackButton"
                     Text="Send Feedback"
-                    Grid.Row="9"
+                    Grid.Row="10"
                     Grid.Column="0"
                     StyleClass="Info"
                     WidthRequest="250"

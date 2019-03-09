@@ -4,79 +4,86 @@
              x:Class="MobileClient.Views.OrderDetailPage">
     <ContentPage.Content>
         <ScrollView>
-            <StackLayout>
-                <Label x:Name="Address"
-                FontSize="Large"
-                Margin="5"
-                FontAttributes="Bold"
-                VerticalOptions="Center" 
-                HorizontalOptions="CenterAndExpand" />
-                <Image x:Name="TopImage"
-                    Margin="5"
-                    VerticalOptions="Center"
-                    HorizontalOptions="CenterAndExpand" >
-                    <Image.GestureRecognizers>
-                        <TapGestureRecognizer x:Name="ImageGR"
+            <StackLayout Orientation="Vertical">
+                <ActivityIndicator x:Name="LoadingAnimation" 
+                                   HorizontalOptions="CenterAndExpand"
+                                   VerticalOptions="CenterAndExpand"
+                                   Color="Black"
+                                   IsEnabled="False" 
+                                   IsVisible="False" />
+                <StackLayout x:Name="MainLayout" Orientation="Vertical">
+                    <Label x:Name="Address"
+                        FontSize="Large"
+                        Margin="5"
+                        FontAttributes="Bold"
+                        VerticalOptions="Center" 
+                        HorizontalOptions="CenterAndExpand" />
+                    <Image x:Name="TopImage"
+                        Margin="5"
+                        VerticalOptions="Center"
+                        HorizontalOptions="CenterAndExpand" >
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer x:Name="ImageGR"
                             NumberOfTapsRequired="1" />
-                    </Image.GestureRecognizers>
-                </Image>
-                <Label x:Name="Squares"
-                    FontAttributes="Bold"
-                    FontSize="Large"
-                    Margin="10"
-                    VerticalOptions="Center" 
-                    HorizontalOptions="CenterAndExpand" />
-                <StackLayout
-                    Orientation="Horizontal">
-                    <Label x:Name="Pitch"
-                       Margin="5"
-                       Text="Predominant Pitch: "
-                       VerticalOptions="Center"
-                       HorizontalOptions="Start" />
-                    <ImageButton Source="ic_action_keyboard_arrow_down.png"
-                        Margin="2"
-                        x:Name="DownButton"
-                        HeightRequest="40"
-                        WidthRequest="40"
-                        HorizontalOptions="Center"
-                        VerticalOptions="Center" />
-                    <ImageButton Source="ic_action_keyboard_arrow_up.png"
-                        Margin="2"
-                        x:Name="UpButton"
-                        HeightRequest="40"
-                        WidthRequest="40"
-                        HorizontalOptions="Center"
-                        VerticalOptions="Center" />
-                </StackLayout>
-                <Label x:Name="Area"
-                    Margin="5"
-                    VerticalOptions="Center" 
-                    HorizontalOptions="Start" />
-                <Label x:Name="OrderId"
-                    Margin="5"
-                    VerticalOptions="Center" 
-                    HorizontalOptions="Start" />
-                <Label Text="Safety Stock Calculations"
-                    x:Name="SafetyStockLabel"
-                    FontAttributes="Bold"
-                    VerticalOptions="Center" 
-                    Margin="10"
-                    HorizontalOptions="Start" />
-                <ListView x:Name="SafetyStockTable"
-                    Margin="5"
-                    IsGroupingEnabled="True"
-                    GroupDisplayBinding="{Binding Title}"
-                    VerticalOptions="End"
-                    HorizontalOptions="Center">
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <TextCell Text="{Binding Text}"
+                        </Image.GestureRecognizers>
+                    </Image>
+                    <Label x:Name="Squares"
+                        FontAttributes="Bold"
+                        FontSize="Large"
+                        Margin="10"
+                        VerticalOptions="Center" 
+                        HorizontalOptions="CenterAndExpand" />
+                    <StackLayout Orientation="Horizontal">
+                        <Label x:Name="Pitch"
+                           Margin="5"
+                           Text="Predominant Pitch: "
+                           VerticalOptions="Center"
+                           HorizontalOptions="Start" />
+                        <ImageButton Source="ic_action_keyboard_arrow_down.png"
+                            Margin="2"
+                            x:Name="DownButton"
+                            HeightRequest="40"
+                            WidthRequest="40"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center" />
+                        <ImageButton Source="ic_action_keyboard_arrow_up.png"
+                            Margin="2"
+                            x:Name="UpButton"
+                            HeightRequest="40"
+                            WidthRequest="40"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center" />
+                    </StackLayout>
+                    <Label x:Name="Area"
+                        Margin="5"
+                        VerticalOptions="Center" 
+                        HorizontalOptions="Start" />
+                    <Label x:Name="OrderId"
+                        Margin="5"
+                        VerticalOptions="Center" 
+                        HorizontalOptions="Start" />
+                    <Label Text="Safety Stock Calculations"
+                        x:Name="SafetyStockLabel"
+                        FontAttributes="Bold"
+                        VerticalOptions="Center" 
+                        Margin="10"
+                        HorizontalOptions="Start" />
+                    <ListView x:Name="SafetyStockTable"
+                        Margin="5"
+                        IsGroupingEnabled="True"
+                        GroupDisplayBinding="{Binding Title}"
+                        VerticalOptions="End"
+                        HorizontalOptions="Center">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <TextCell Text="{Binding Text}"
                                   Detail="{Binding Detail}"
                                   TextColor= "Black"
                                   DetailColor="{Binding DetailColor}" />
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </StackLayout>
             </StackLayout>
         </ScrollView>
     </ContentPage.Content>

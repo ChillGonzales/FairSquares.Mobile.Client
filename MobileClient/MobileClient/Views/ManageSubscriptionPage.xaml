@@ -5,19 +5,7 @@
              x:Class="MobileClient.Views.ManageSubscriptionPage">
     <ContentPage.Content>
         <ScrollView>
-            <Grid Margin="10" RowSpacing="5">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="25" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+            <StackLayout Margin="10">
                 <Label x:Name="SubscriptionTypeLabel"
                     Text="Subscription Type: "
                     FontSize="Medium"
@@ -58,7 +46,7 @@
                     Grid.ColumnSpan="2"
                     VerticalOptions="CenterAndExpand"
                     HorizontalOptions="CenterAndExpand" />
-            </Grid>
+            </StackLayout>
         </ScrollView>
     </ContentPage.Content>
 </ContentPage>

@@ -109,11 +109,5 @@ namespace MobileClient.iOS
         {
             base.OnActivated(uiApplication);
         }
-
-        private void debugAlert(string title, string message)
-        {
-            var alert = new UIAlertView(title ?? "Title", message ?? "Message", null, "Cancel", "OK");
-            alert.Show();
-        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using FairSquares.Measurement.Core.Models;
 using FairSquares.Measurement.Core.Utilities;
 using MobileClient.Models;
+using MobileClient.Services;
 using MobileClient.Utilities;
 using MobileClient.ViewModels;
 using System;
@@ -22,6 +23,8 @@ namespace MobileClient.Views
         private PropertyModel _property;
         private ICache<PropertyModel> _propertyCache;
         private ICache<ImageModel> _imageCache;
+        private IPropertyService _propertyService;
+        private IAlertService _alertService;
         private RecalculatedPropertyModel _recalculated;
         private readonly ILogger<OrderDetailPage> _logger;
 
@@ -37,21 +40,46 @@ namespace MobileClient.Views
             _logger = App.Container.GetInstance<ILogger<OrderDetailPage>>();
             _propertyCache = App.Container.GetInstance<ICache<PropertyModel>>();
             _imageCache = App.Container.GetInstance<ICache<ImageModel>>();
+            _propertyService = App.Container.GetInstance<IPropertyService>();
+            _alertService = DependencyService.Get<IAlertService>();
 
             _order = order;
             var prop = _propertyCache.Get(order.OrderId);
-            if (prop == null)
+            // Display message if order isn't fulfilled yet.
+            if (prop == null || !order.Fulfilled)
             {
-
                 Pitch.Text = $"Your order has been submitted and is in the process of being measured.";
                 DownButton.IsVisible = false;
                 UpButton.IsVisible = false;
                 SafetyStockLabel.IsVisible = false;
                 SafetyStockTable.IsVisible = false;
-                // TODO: Handle error of no property found
-                _logger.LogError($"Property with order id '{order.OrderId}' was not found in cache.");
                 return;
             }
+
+            if (prop == null && order.Fulfilled)
+            {
+                // Try to download measurements when order is marked as fulfilled but measurements aren't found.
+                MainLayout.IsVisible = false;
+                LoadingAnimation.IsVisible = true;
+                LoadingAnimation.IsRunning = true;
+                PropertyModel newModel = null;
+                try
+                {
+                    newModel = Task.Run(async () => await _propertyService.GetProperties(new List<string>() { order.OrderId })).Result?.First().Value;
+                }
+                catch { }
+                if (newModel == null || string.IsNullOrWhiteSpace(newModel.OrderId))
+                {
+                    _alertService.LongAlert($"Your order is marked as completed but the measurements cannot be found. Please check your internet connection and try again.");
+                    return;
+                }
+                _propertyCache.Put(newModel.OrderId, newModel);
+                prop = newModel;
+                MainLayout.IsVisible = true;
+                LoadingAnimation.IsVisible = false;
+                LoadingAnimation.IsRunning = false;
+            }
+
             _property = prop;
 
             // Recalculate roof totals for current property
