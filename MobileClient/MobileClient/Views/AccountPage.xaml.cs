@@ -84,7 +84,7 @@ namespace MobileClient.Views
 
         private async void ToolbarItem_Activated(object sender, EventArgs e)
         {
-            await this.Navigation.PushAsync(new InstructionPage());
+            await this.Navigation.PushAsync(new InstructionPage(null, false));
         }
 
         private void SetUIToAccount(AccountModel account)

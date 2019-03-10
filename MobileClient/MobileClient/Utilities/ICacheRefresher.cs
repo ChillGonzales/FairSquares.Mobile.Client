@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace MobileClient.Utilities
 {
     public interface ICacheRefresher
     {
-        void RefreshCaches(string userId);
+        Task RefreshCaches(string userId);
         bool IsRefreshing { get; }
     }
 }

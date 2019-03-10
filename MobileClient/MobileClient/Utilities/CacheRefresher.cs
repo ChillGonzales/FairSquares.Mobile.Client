@@ -16,16 +16,13 @@ namespace MobileClient.Utilities
             _logger = logger;
             _refreshFunc = refreshFunc;
         }
-        public void RefreshCaches(string userId)
+        public async Task RefreshCaches(string userId)
         {
             try
             {
-                Task.Run(async () =>
-                {
-                    IsRefreshing = true;
-                    await _refreshFunc(userId);
-                    IsRefreshing = false;
-                });
+                IsRefreshing = true;
+                await _refreshFunc(userId);
+                IsRefreshing = false;
             }
             catch (Exception ex)
             {

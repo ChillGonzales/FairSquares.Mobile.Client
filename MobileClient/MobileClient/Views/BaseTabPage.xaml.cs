@@ -22,15 +22,16 @@ namespace MobileClient.Views
         {
             InitializeComponent();
             _settings = App.Container.GetInstance<ICache<SettingsModel>>();
+            NavigateFromMenu(PageType.MyOrders);
         }
 
-        protected override void OnAppearing()
+        protected async override void OnAppearing()
         {
             base.OnAppearing();
             if (!_dialogShown && (!_settings.GetAll().Any() || _settings.Get("").DisplayWelcomeMessage))
             {
                 _dialogShown = true;
-                this.Navigation.PushModalAsync(new InstructionPage(true));
+                await CurrentPage.Navigation.PushAsync(new InstructionPage(() => CurrentPage.Navigation.PopAsync(), true));
             }
         }
 

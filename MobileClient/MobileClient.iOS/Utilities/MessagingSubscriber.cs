@@ -19,7 +19,7 @@ namespace MobileClient.iOS.Utilities
                 return;
             Console.WriteLine("FCM Token: " + Messaging.SharedInstance.FcmToken);
             foreach (var topic in topics)
-                Messaging.SharedInstance.Subscribe($"/topics/{topic}");
+                Messaging.SharedInstance.Subscribe($"{topic}");
         }
 
         public void Unsubscribe(List<string> topics)
@@ -27,7 +27,7 @@ namespace MobileClient.iOS.Utilities
             if (topics == null || !topics.Any())
                 return;
             foreach (var topic in topics)
-                Messaging.SharedInstance.Unsubscribe($"/topics/{topic}");
+                Messaging.SharedInstance.Unsubscribe($"{topic}");
         }
     }
 }

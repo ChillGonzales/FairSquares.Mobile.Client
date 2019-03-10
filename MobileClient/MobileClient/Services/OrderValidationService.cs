@@ -34,7 +34,7 @@ namespace MobileClient.Services
                     {
                         Success = false,
                         UserHasSubscription = false,
-                        Message = "User does not have a subscription and has used their free report."
+                        Message = "User does not have a subscription and has used their free month."
                     };
                 }
                 if (!SubscriptionUtilities.SubscriptionActive(sub) && !orders.Any())
@@ -43,7 +43,7 @@ namespace MobileClient.Services
                     {
                         Success = true,
                         UserHasSubscription = false,
-                        Message = "User can use their free report."
+                        Message = "User can use their free month."
                     };
                 }
                 var activeSubOrderCount = orders.Where(x => x.DateReceived >= sub.StartDateTime && x.DateReceived <= sub.EndDateTime)

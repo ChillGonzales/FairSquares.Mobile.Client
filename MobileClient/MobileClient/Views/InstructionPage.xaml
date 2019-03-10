@@ -76,7 +76,7 @@
                     <Label Text="Don't show this message again." HorizontalOptions="StartAndExpand" VerticalOptions="Center" />
                 </StackLayout>
                 <Button x:Name="DismissButton"
-                StyleClass="Info"
+                StyleClass="Success"
                 Text="Got It, Thanks"
                 WidthRequest="250"
                 HorizontalOptions="CenterAndExpand"

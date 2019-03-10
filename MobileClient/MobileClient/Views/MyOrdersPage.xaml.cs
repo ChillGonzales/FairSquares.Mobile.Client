@@ -36,7 +36,7 @@ namespace MobileClient.Views
                 _cacheRefresher = App.Container.GetInstance<ICacheRefresher>();
                 SetListViewSource(_orderCache.GetAll().Select(x => x.Value).ToList());
 
-                Action refreshAction = () =>
+                Action refreshAction = async () =>
                 {
                     try
                     {
@@ -44,7 +44,7 @@ namespace MobileClient.Views
                         var user = _userService.GetLoggedInAccount();
                         if (user == null)
                             return;
-                        _cacheRefresher.RefreshCaches(user.UserId);
+                        await _cacheRefresher.RefreshCaches(user.UserId);
                         SetListViewSource(_orderCache.GetAll().Select(x => x.Value).ToList());
                         OrderListView.IsRefreshing = false;
                     }
@@ -73,9 +73,7 @@ namespace MobileClient.Views
         protected override void OnAppearing()
         {
             base.OnAppearing();
-            OrderListView.IsRefreshing = true;
             SetListViewSource(_orderCache.GetAll().Select(x => x.Value).ToList());
-            OrderListView.IsRefreshing = false;
         }
 
         private void SetListViewSource(List<Order> orders)
@@ -100,7 +98,7 @@ namespace MobileClient.Views
 
         private async void ToolbarItem_Activated(object sender, EventArgs e)
         {
-            await this.Navigation.PushAsync(new InstructionPage());
+            await this.Navigation.PushAsync(new InstructionPage(null, false));
         }
     }
 

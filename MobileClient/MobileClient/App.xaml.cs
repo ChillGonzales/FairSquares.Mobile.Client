@@ -125,7 +125,10 @@ namespace MobileClient
                                 {
                                     var newSub = SubscriptionUtilities.GetModelFromIAP(mostRecent, userId, sub);
                                     if (newSub != null)
+                                    {
                                         sub = newSub;
+                                        subService.AddSubscription(newSub);
+                                    }
                                 }
                             }
                             if (sub == null)

@@ -41,6 +41,34 @@ namespace MobileClient.Views
             OptionPicker.ItemsSource = Options.Select(x => x.Text).ToList();
             OptionPicker.SelectedIndex = 0;
             SubmitButton.Clicked += async (s, e) => await HandleSubmitClick(s, e);
+            SetVisualStateForValidation();
+        }
+
+        protected async override void OnAppearing()
+        {
+            base.OnAppearing();
+            await SetVisualStateForValidation();
+        }
+
+        private async Task SetVisualStateForValidation()
+        {
+            var validation = await _orderValidator.ValidateOrderRequest(_userService.GetLoggedInAccount());
+            if (!validation.Success && validation.UserHasSubscription)
+            {
+                MainLayout.IsVisible = false;
+                CannotSubmitLabel.Text = $"Sorry, you have used all of your reports for this month.";
+                CannotSubmitLayout.IsVisible = true;
+                return;
+            }
+            if (!validation.Success && !validation.UserHasSubscription)
+            {
+                MainLayout.IsVisible = false;
+                CannotSubmitLabel.Text = $"Please purchase a subscription before continuing.";
+                CannotSubmitLayout.IsVisible = true;
+                return;
+            }
+            MainLayout.IsVisible = true;
+            CannotSubmitLayout.IsVisible = false;
         }
 
         private async Task HandleSubmitClick(object sender, EventArgs e)
@@ -124,7 +152,7 @@ namespace MobileClient.Views
 
         private async void ToolbarItem_Activated(object sender, EventArgs e)
         {
-            await this.Navigation.PushAsync(new InstructionPage());
+            await this.Navigation.PushAsync(new InstructionPage(null, false));
         }
 
         private readonly List<OptionViewModel> Options = new List<OptionViewModel>()

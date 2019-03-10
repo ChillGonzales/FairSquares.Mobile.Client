@@ -17,11 +17,13 @@ namespace MobileClient.Views
         private const int _dismissButtonCol = 7;
         private const int _switchCol = 6;
         private const int _titleCol = 0;
+        private Func<Task> _popAction;
         private readonly ICache<SettingsModel> _settings;
 
-        public InstructionPage(bool? showDismissButton = false)
+        public InstructionPage(Func<Task> popAction, bool? showDismissButton = false)
         {
             InitializeComponent();
+            _popAction = popAction;
             _settings = App.Container.GetInstance<ICache<SettingsModel>>();
             if (!showDismissButton ?? false)
             {
@@ -42,7 +44,7 @@ namespace MobileClient.Views
                 _settings.Clear();
                 _settings.Put("", new SettingsModel() { DisplayWelcomeMessage = false });
             }
-            await App.Current.MainPage.Navigation.PopModalAsync();
+            await _popAction();
         }
     }
 }

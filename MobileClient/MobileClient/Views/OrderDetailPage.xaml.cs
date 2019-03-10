@@ -24,6 +24,7 @@ namespace MobileClient.Views
         private ICache<PropertyModel> _propertyCache;
         private ICache<ImageModel> _imageCache;
         private IPropertyService _propertyService;
+        private IImageService _imageService;
         private IAlertService _alertService;
         private RecalculatedPropertyModel _recalculated;
         private readonly ILogger<OrderDetailPage> _logger;
@@ -41,10 +42,12 @@ namespace MobileClient.Views
             _propertyCache = App.Container.GetInstance<ICache<PropertyModel>>();
             _imageCache = App.Container.GetInstance<ICache<ImageModel>>();
             _propertyService = App.Container.GetInstance<IPropertyService>();
+            _imageService = App.Container.GetInstance<IImageService>();
             _alertService = DependencyService.Get<IAlertService>();
 
             _order = order;
             var prop = _propertyCache.Get(order.OrderId);
+            var img = _imageCache.Get(prop.OrderId);
             // Display message if order isn't fulfilled yet.
             if (prop == null || !order.Fulfilled)
             {
@@ -56,25 +59,46 @@ namespace MobileClient.Views
                 return;
             }
 
-            if (prop == null && order.Fulfilled)
+            if ((prop == null || img == null) && order.Fulfilled)
             {
                 // Try to download measurements when order is marked as fulfilled but measurements aren't found.
                 MainLayout.IsVisible = false;
                 LoadingAnimation.IsVisible = true;
                 LoadingAnimation.IsRunning = true;
-                PropertyModel newModel = null;
-                try
+                if (prop == null)
                 {
-                    newModel = Task.Run(async () => await _propertyService.GetProperties(new List<string>() { order.OrderId })).Result?.First().Value;
+                    PropertyModel newModel = null;
+                    try
+                    {
+                        newModel = Task.Run(async () => await _propertyService.GetProperties(new List<string>() { order.OrderId })).Result?.First().Value;
+                    }
+                    catch { }
+                    if (newModel == null || string.IsNullOrWhiteSpace(newModel.OrderId))
+                    {
+                        _alertService.LongAlert($"Your order is marked as completed but the measurements cannot be found. Please check your internet connection and try again.");
+                        return;
+                    }
+                    _propertyCache.Put(newModel.OrderId, newModel);
+                    prop = newModel;
                 }
-                catch { }
-                if (newModel == null || string.IsNullOrWhiteSpace(newModel.OrderId))
+                if (img == null)
                 {
-                    _alertService.LongAlert($"Your order is marked as completed but the measurements cannot be found. Please check your internet connection and try again.");
-                    return;
+                    ImageModel image = null;
+                    try
+                    {
+                        image = Task.Run(() => _imageService.GetImages(new List<string>() { order.OrderId })).Result?.First().Value;
+                    }
+                    catch { }
+                    if (image == null)
+                    {
+                        _alertService.LongAlert($"Your order is marked as completed but the image cannot be found. Please check your internet connection.");
+                    }
+                    else
+                    {
+                        _imageCache.Put(order.OrderId, image);
+                        img = image;
+                    }
                 }
-                _propertyCache.Put(newModel.OrderId, newModel);
-                prop = newModel;
                 MainLayout.IsVisible = true;
                 LoadingAnimation.IsVisible = false;
                 LoadingAnimation.IsRunning = false;
@@ -94,8 +118,6 @@ namespace MobileClient.Views
             ImageGR.Tapped += OnImageTapped;
             DownButton.Clicked += (s, e) => OnPitchValueChanged(_recalculated.CurrentPitch, _recalculated.CurrentPitch - 1);
             UpButton.Clicked += (s, e) => OnPitchValueChanged(_recalculated.CurrentPitch, _recalculated.CurrentPitch + 1);
-
-            var img = _imageCache.Get(prop.OrderId);
             var stream = new StreamImageSource();
             stream.Stream = (x) =>
             {
