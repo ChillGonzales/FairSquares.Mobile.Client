@@ -47,7 +47,7 @@ namespace MobileClient.Views
 
             _order = order;
             var prop = _propertyCache.Get(order.OrderId);
-            var img = _imageCache.Get(prop.OrderId);
+            var img = prop != null ? _imageCache.Get(prop.OrderId) : null;
             // Display message if order isn't fulfilled yet.
             if (prop == null || !order.Fulfilled)
             {

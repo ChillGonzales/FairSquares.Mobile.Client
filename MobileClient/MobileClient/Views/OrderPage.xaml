@@ -10,7 +10,7 @@
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
         <StackLayout Orientation="Vertical">
-            <StackLayout x:Name="CannotSubmitLayout" Orientation="Vertical" IsVisible="False">
+            <StackLayout x:Name="CannotSubmitLayout" Orientation="Vertical" IsVisible="False" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand">
                 <Label x:Name="CannotSubmitLabel"
                        FontSize="Medium"
                        FontAttributes="Bold"

@@ -47,16 +47,21 @@ namespace MobileClient.Views
             {
                 RootPage.NavigateFromMenu(ViewModels.PageType.Order);
             };
-            BasicButton.Clicked += (s, e) => { PurchaseSubscription(SubscriptionType.Basic); };
-            PremiumButton.Clicked += (s, e) => { PurchaseSubscription(SubscriptionType.Premium); };
-            EnterpriseButton.Clicked += (s, e) => { PurchaseSubscription(SubscriptionType.Enterprise); };
+            BasicButton.Clicked += (s, e) => { PurchaseSubscription(s as Button, SubscriptionType.Basic); };
+            PremiumButton.Clicked += (s, e) => { PurchaseSubscription(s as Button, SubscriptionType.Premium); };
+            EnterpriseButton.Clicked += (s, e) => { PurchaseSubscription(s as Button, SubscriptionType.Enterprise); };
             SetFreeReportButton(_showFreeReportButton);
         }
-        private async void PurchaseSubscription(SubscriptionType subType)
+        private async void PurchaseSubscription(Button sender, SubscriptionType subType)
         {
             try
             {
                 ErrorCol.Height = 0;
+                var buttons = new[] { BasicButton, PremiumButton, EnterpriseButton, TryForFreeButton };
+                foreach (var btn in buttons)
+                    btn.IsEnabled = false;
+                var oldStyle = sender.StyleClass;
+                sender.StyleClass = new List<string>() { "Primary" };
                 var subCode = SubscriptionUtilities.SUB_NAME_BASIC;
                 switch (subType)
                 {
@@ -95,6 +100,9 @@ namespace MobileClient.Views
 #if RELEASE
                 _subService.AddSubscription(model);
 #endif
+                foreach (var btn in buttons)
+                    btn.IsEnabled = true;
+                sender.StyleClass = oldStyle;
                 _alertService.LongAlert($"Thank you for your purchase!");
                 RootPage.NavigateFromMenu(ViewModels.PageType.Order);
                 Device.BeginInvokeOnMainThread(async () => await Navigation.PopAsync());

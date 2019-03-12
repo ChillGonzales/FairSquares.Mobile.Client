@@ -69,4 +69,6 @@
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
   </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties example_3report_1json__JSONSchema="http://json.schemastore.org/global" /></VisualStudio></ProjectExtensions>
 </Project>

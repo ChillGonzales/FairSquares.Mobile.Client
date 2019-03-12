@@ -36,8 +36,8 @@
 
                 <Label Text="Try a Free Report On Us."
                    Font="Medium"
-                   HorizontalOptions="CenterAndExpand"
-                   VerticalOptions="CenterAndExpand"
+                   HorizontalOptions="Start"
+                   VerticalOptions="End"
                    Grid.Row="1"
                    Grid.Column="0" />
                 <Button Text="Try For Free"

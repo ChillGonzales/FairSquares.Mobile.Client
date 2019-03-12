@@ -53,14 +53,14 @@ namespace MobileClient.Views
         private async Task SetVisualStateForValidation()
         {
             var validation = await _orderValidator.ValidateOrderRequest(_userService.GetLoggedInAccount());
-            if (!validation.Success && validation.UserHasSubscription)
+            if (validation.State == ValidationState.NoReportsLeftInPeriod)
             {
                 MainLayout.IsVisible = false;
                 CannotSubmitLabel.Text = $"Sorry, you have used all of your reports for this month.";
                 CannotSubmitLayout.IsVisible = true;
                 return;
             }
-            if (!validation.Success && !validation.UserHasSubscription)
+            if (validation.State == ValidationState.NoSubscriptionAndFreeReportUsed)
             {
                 MainLayout.IsVisible = false;
                 CannotSubmitLabel.Text = $"Please purchase a subscription before continuing.";
@@ -98,19 +98,11 @@ namespace MobileClient.Views
 
                 var validation = await _orderValidator.ValidateOrderRequest(_userService.GetLoggedInAccount());
                 // Show purchase page once for very first order or every time if they don't have a subscription
-                if ((validation.Success && !validation.UserHasSubscription && _puchasePage == null) ||
-                    (!validation.Success) && !validation.UserHasSubscription)
+                if (validation.State == ValidationState.FreeReportValid && _puchasePage == null)
                 {
                     SubmitButton.IsEnabled = true;
-                    _puchasePage = new PurchasePage(validation.Success);
+                    _puchasePage = new PurchasePage(true);
                     await Navigation.PushAsync(_puchasePage);
-                    return;
-                }
-                if (!validation.Success && validation.UserHasSubscription)
-                {
-                    SubmitButton.IsEnabled = true;
-                    Grid.RowDefinitions[_errorIndex].Height = GridLength.Star;
-                    ErrorMessage.Text = "You have used all of the orders you purchased in your subscription. Please upgrade your subscription for more orders.";
                     return;
                 }
 
@@ -129,6 +121,7 @@ namespace MobileClient.Views
                 DependencyService.Get<IMessagingSubscriber>().Subscribe(new List<string>() { newOrder.OrderId });
                 _orderCache.Put(newOrder.OrderId, newOrder);
                 _toast.ShortAlert($"Your address has been submitted!");
+
                 // Clear all fields
                 AddressLine1.Text = "";
                 AddressLine2.Text = "";

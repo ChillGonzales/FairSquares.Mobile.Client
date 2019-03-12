@@ -32,18 +32,16 @@ namespace MobileClient.Services
                 {
                     return new ValidationResponse()
                     {
-                        Success = false,
-                        UserHasSubscription = false,
-                        Message = "User does not have a subscription and has used their free month."
+                        State = ValidationState.NoSubscriptionAndFreeReportUsed,
+                        Message = "User does not have a subscription and has used their free report."
                     };
                 }
                 if (!SubscriptionUtilities.SubscriptionActive(sub) && !orders.Any())
                 {
                     return new ValidationResponse()
                     {
-                        Success = true,
-                        UserHasSubscription = false,
-                        Message = "User can use their free month."
+                        State = ValidationState.FreeReportValid,
+                        Message = "User can use their free report."
                     };
                 }
                 var activeSubOrderCount = orders.Where(x => x.DateReceived >= sub.StartDateTime && x.DateReceived <= sub.EndDateTime)
@@ -55,8 +53,7 @@ namespace MobileClient.Services
                 {
                     return new ValidationResponse()
                     {
-                        Success = false,
-                        UserHasSubscription = true,
+                        State = ValidationState.NoReportsLeftInPeriod,
                         RemainingOrders = 0,
                         Subscription = sub,
                         Message = "User has used all of their orders for this subscription period."
@@ -69,31 +66,32 @@ namespace MobileClient.Services
                                         SubscriptionUtilities.EnterpriseOrderCount - activeSubOrderCount);
                     return new ValidationResponse()
                     {
-                        Success = true,
+                        State = ValidationState.SubscriptionReportValid,
                         Subscription = sub,
                         RemainingOrders = remainingCount,
-                        UserHasSubscription = true
                     };
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Failed to validate user's order.", ex);
-                // Would rather default to allowing an order than not.
-                return new ValidationResponse()
-                {
-                    Success = true
-                };
+                throw ex;
             }
         }
     }
 
     public class ValidationResponse
     {
-        public bool Success { get; set; }
+        public ValidationState State { get; set; }
         public string Message { get; set; }
-        public bool UserHasSubscription { get; set; }
         public int RemainingOrders { get; set; }
         public SubscriptionModel Subscription { get; set; }
+    }
+    public enum ValidationState
+    {
+        NoSubscriptionAndFreeReportUsed,
+        FreeReportValid,
+        SubscriptionReportValid,
+        NoReportsLeftInPeriod
     }
 }

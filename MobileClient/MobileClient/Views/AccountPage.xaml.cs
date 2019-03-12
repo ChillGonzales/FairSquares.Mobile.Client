@@ -56,11 +56,7 @@ namespace MobileClient.Views
             try
             {
                 var validation = await _orderValidator.ValidateOrderRequest(_userCache.GetLoggedInAccount());
-                if (!validation.UserHasSubscription)
-                {
-                    await Navigation.PushAsync(new PurchasePage(validation.Success));
-                }
-                else
+                if (new[] { ValidationState.SubscriptionReportValid, ValidationState.NoReportsLeftInPeriod }.Contains(validation.State))
                 {
                     await Navigation.PushAsync(new ManageSubscriptionPage(new ViewModels.ManageSubscriptionViewModel()
                     {
@@ -68,6 +64,10 @@ namespace MobileClient.Views
                         SubscriptionType = validation.Subscription.SubscriptionType,
                         EndDateTime = validation.Subscription.EndDateTime
                     }));
+                }
+                else
+                {
+                    await Navigation.PushAsync(new PurchasePage(validation.State == ValidationState.FreeReportValid));
                 }
             }
             catch (Exception ex)
@@ -106,9 +106,9 @@ namespace MobileClient.Views
         private void SetSubUI()
         {
             var valid = Task.Run(async () => await _orderValidator.ValidateOrderRequest(_user)).Result;
-            if (valid.UserHasSubscription)
+            if (valid.State == ValidationState.NoReportsLeftInPeriod || valid.State == ValidationState.SubscriptionReportValid)
             {
-                SubscriptionLabel.Text = $"Reports remaining this period: {(valid.RemainingOrders == -1 ? "Unlimited" : valid.RemainingOrders.ToString())}";
+                SubscriptionLabel.Text = $"Reports remaining this period: {valid.RemainingOrders.ToString()}";
                 SubscribeButton.StyleClass.Clear();
                 SubscribeButton.StyleClass.Add("Info");
                 SubscribeButton.Text = "Manage";

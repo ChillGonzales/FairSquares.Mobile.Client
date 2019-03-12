@@ -55,6 +55,7 @@
                             HorizontalOptions="Center"
                             VerticalOptions="Center" />
                     </StackLayout>
+                    <Label />
                     <Label x:Name="Area"
                         Margin="5"
                         VerticalOptions="Center" 

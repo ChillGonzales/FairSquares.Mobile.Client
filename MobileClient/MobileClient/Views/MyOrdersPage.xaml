@@ -8,14 +8,19 @@
                      Activated="ToolbarItem_Activated" />
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
-        <StackLayout Orientation="Vertical">
-            <StackLayout>
-                <ActivityIndicator x:Name="LoadingAnimation"
-                               Color="Black"
-                               HorizontalOptions="CenterAndExpand"
-                               VerticalOptions="CenterAndExpand"
-                               IsVisible="false"
-                               IsRunning="false" />
+        <StackLayout Orientation="Vertical" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand">
+            <StackLayout x:Name="NoOrderLayout" IsVisible="False" Margin="10">
+                <Label Text="It looks like you don't have any orders yet. Click below to see an example report."
+                   FontSize="Medium"
+                   HorizontalOptions="CenterAndExpand"
+                   VerticalOptions="CenterAndExpand" />
+                <Label/>
+                <Button x:Name="ExampleReportButton"
+                        Text="View Example"
+                        HorizontalOptions="CenterAndExpand"
+                        VerticalOptions="CenterAndExpand"
+                        WidthRequest="250"
+                        StyleClass="Info" />
             </StackLayout>
             <StackLayout x:Name="MainLayout">
             <ListView x:Name="OrderListView"

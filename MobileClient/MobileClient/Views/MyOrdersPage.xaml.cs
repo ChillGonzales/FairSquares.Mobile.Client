@@ -1,10 +1,13 @@
-﻿using MobileClient.Authentication;
+﻿using FairSquares.Measurement.Core.Models;
+using MobileClient.Authentication;
 using MobileClient.Models;
 using MobileClient.Services;
 using MobileClient.Utilities;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,6 +22,8 @@ namespace MobileClient.Views
     {
         private readonly IOrderService _orderService;
         private readonly ICache<Order> _orderCache;
+        private readonly ICache<PropertyModel> _propertyCache;
+        private readonly ICache<ImageModel> _imageCache;
         private readonly ILogger<MyOrdersPage> _logger;
         private readonly ICacheRefresher _cacheRefresher;
         private readonly ICurrentUserService _userService;
@@ -32,10 +37,29 @@ namespace MobileClient.Views
                 _userService = App.Container.GetInstance<ICurrentUserService>();
                 _orderService = App.Container.GetInstance<IOrderService>();
                 _orderCache = App.Container.GetInstance<ICache<Order>>();
+                _propertyCache = App.Container.GetInstance<ICache<PropertyModel>>();
+                _imageCache = App.Container.GetInstance<ICache<ImageModel>>();
                 _logger = App.Container.GetInstance<ILogger<MyOrdersPage>>();
                 _cacheRefresher = App.Container.GetInstance<ICacheRefresher>();
-                SetListViewSource(_orderCache.GetAll().Select(x => x.Value).ToList());
-
+                SetViewState();
+                ExampleReportButton.Clicked += async (s, e) =>
+                {
+                    try
+                    {
+                        var order = JsonConvert.DeserializeObject<Order>(Examples.ExampleOrder);
+                        _imageCache.Put(order.OrderId, new ImageModel()
+                        {
+                            OrderId = order.OrderId,
+                            Image = Convert.FromBase64String(Examples.ExampleImage)
+                        });
+                        _propertyCache.Put(order.OrderId, JsonConvert.DeserializeObject<PropertyModel>(Examples.ExampleProperty));
+                        await Navigation.PushAsync(new OrderDetailPage(order));
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError($"An error occurred while trying to open example order.", ex);
+                    }
+                };
                 Action refreshAction = async () =>
                 {
                     try
@@ -73,7 +97,16 @@ namespace MobileClient.Views
         protected override void OnAppearing()
         {
             base.OnAppearing();
-            SetListViewSource(_orderCache.GetAll().Select(x => x.Value).ToList());
+            SetViewState();
+        }
+
+        private void SetViewState()
+        {
+            var orders = _orderCache.GetAll().Select(x => x.Value).ToList();
+            var anyOrders = orders.Any();
+            MainLayout.IsVisible = anyOrders;
+            NoOrderLayout.IsVisible = !anyOrders;
+            SetListViewSource(orders);
         }
 
         private void SetListViewSource(List<Order> orders)
