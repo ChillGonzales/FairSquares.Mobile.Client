@@ -11,9 +11,14 @@
     <ContentPage.Content>
         <StackLayout Orientation="Vertical">
             <StackLayout x:Name="CannotSubmitLayout" Orientation="Vertical" IsVisible="False" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand">
-                <Label x:Name="CannotSubmitLabel"
+                <Label x:Name="CannotSubmitHeader"
                        FontSize="Medium"
                        FontAttributes="Bold"
+                       VerticalOptions="CenterAndExpand"
+                       HorizontalOptions="CenterAndExpand" />
+                <Label />
+                <Label x:Name="CannotSubmitLabel"
+                       FontSize="Small"
                        VerticalOptions="CenterAndExpand"
                        HorizontalOptions="CenterAndExpand" />
             </StackLayout>
@@ -27,8 +32,8 @@
                         <RowDefinition x:Name="ZipRow" Height="40" />
                         <RowDefinition x:Name="OptionRow" Height="40" />
                         <RowDefinition x:Name="CommentsRow" Height="40" />
-                        <RowDefinition x:Name="PaddingRow" Height="60" />
-                        <RowDefinition x:Name="ErrorMessageRow" Height="40" />
+                        <RowDefinition x:Name="PaddingRow" Height="15" />
+                        <RowDefinition x:Name="ErrorMessageRow" Height="25" />
                         <RowDefinition x:Name="SubmitRow" Height="40" />
                         <RowDefinition x:Name="PaddingBottomRow" Height="*" />
                     </Grid.RowDefinitions>

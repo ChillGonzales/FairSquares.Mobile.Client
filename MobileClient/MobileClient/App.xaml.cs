@@ -99,11 +99,21 @@ namespace MobileClient
                         });
                         var propTask = Task.Run(async () =>
                         {
+                            if (!orders.Any())
+                            {
+                                propertyCache.Clear();
+                                return;
+                            }
                             var properties = await propertyService.GetProperties(orders.Select(x => x.OrderId).ToList());
                             propertyCache.Update(properties);
                         });
                         var imgTask = Task.Run(() =>
                         {
+                            if (!orders.Any())
+                            {
+                                imageCache.Clear();
+                                return;
+                            }
                             var images = imageService.GetImages(orders.Select(x => x.OrderId).ToList());
                             imageCache.Update(images);
                         });

@@ -12,12 +12,15 @@
                                IsEnabled="False"
                                IsVisible="False" />
             <StackLayout x:Name="LoginLayout" Orientation="Vertical"
-                         Margin="20">
+                        HorizontalOptions="CenterAndExpand"
+                        VerticalOptions="CenterAndExpand"
+                        Margin="20">
                 <Label Text="Please Login to Continue"
-                    FontSize="Large"
+                    FontSize="Medium"
                     FontAttributes="Bold"
                     VerticalOptions="Start"
                     HorizontalOptions="CenterAndExpand" />
+                <Label />
                 <Button x:Name="GoogleLogin"
                     Text="Login with Google"
                     WidthRequest="250"

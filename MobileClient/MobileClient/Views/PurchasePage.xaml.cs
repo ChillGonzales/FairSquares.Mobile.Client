@@ -43,8 +43,9 @@ namespace MobileClient.Views
             _alertService = DependencyService.Get<IAlertService>();
             _subCache = App.Container.GetInstance<ICache<SubscriptionModel>>();
             ErrorCol.Height = 0;
-            TryForFreeButton.Clicked += (s, e) => 
+            TryForFreeButton.Clicked += async (s, e) => 
             {
+                await this.Navigation.PopAsync();
                 RootPage.NavigateFromMenu(ViewModels.PageType.Order);
             };
             BasicButton.Clicked += (s, e) => { PurchaseSubscription(s as Button, SubscriptionType.Basic); };
@@ -121,6 +122,7 @@ namespace MobileClient.Views
             {
                 FreeReportCol.Height = 0;
                 FreeReportButtonCol.Height = 0;
+                Pad1.Height = 0;
                 BasicButton.StyleClass = new List<string>() { "Success" };
             }
             else
@@ -128,6 +130,9 @@ namespace MobileClient.Views
                 FreeReportCol.Height = GridLength.Star;
                 FreeReportButtonCol.Height = GridLength.Star;
             }
+            BasicButton.IsEnabled = !showButton;
+            PremiumButton.IsEnabled = !showButton;
+            EnterpriseButton.IsEnabled = !showButton;
         }
     }
 }

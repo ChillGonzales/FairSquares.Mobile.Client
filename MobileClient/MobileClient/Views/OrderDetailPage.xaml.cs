@@ -52,6 +52,7 @@ namespace MobileClient.Views
             if (prop == null || !order.Fulfilled)
             {
                 Pitch.Text = $"Your order has been submitted and is in the process of being measured.";
+                PitchLabel.IsVisible = false;
                 DownButton.IsVisible = false;
                 UpButton.IsVisible = false;
                 SafetyStockLabel.IsVisible = false;
@@ -114,7 +115,7 @@ namespace MobileClient.Views
 
             // Set GUI and event handlers
             OrderId.Text = $"Order ID: {order.OrderId}";
-            Pitch.Text = $"Predominant Pitch: {_recalculated.CurrentPitch}:12";
+            Pitch.Text = $"{_recalculated.CurrentPitch}:12";
             ImageGR.Tapped += OnImageTapped;
             DownButton.Clicked += (s, e) => OnPitchValueChanged(_recalculated.CurrentPitch, _recalculated.CurrentPitch - 1);
             UpButton.Clicked += (s, e) => OnPitchValueChanged(_recalculated.CurrentPitch, _recalculated.CurrentPitch + 1);
@@ -157,7 +158,7 @@ namespace MobileClient.Views
             {
                 if (newValue > 25 || newValue < 0)
                     return;
-                Pitch.Text = $"Predominant Pitch: {newValue}:12";
+                Pitch.Text = $"{newValue}:12";
                 _recalculated.CurrentPitch = newValue;
                 foreach (var section in _recalculated.RecalculatedSections)
                 {

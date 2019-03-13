@@ -80,7 +80,7 @@
                    VerticalOptions="End"
                    HorizontalOptions="StartAndExpand" />
                 <Label x:Name="FeedbackInfoLabel"
-                    Text="Send us your feedback"
+                    Text="We're always happy to answer your questions."
                     Grid.Row="9"
                     Grid.Column="0"
                     FontSize="Small"

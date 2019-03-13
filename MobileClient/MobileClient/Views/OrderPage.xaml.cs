@@ -26,7 +26,7 @@ namespace MobileClient.Views
         private readonly IOrderService _orderService;
         private readonly IAlertService _toast;
         private readonly ICache<Order> _orderCache;
-        private PurchasePage _puchasePage;
+        private PurchasePage _purchasePage;
 
         public OrderPage()
         {
@@ -47,6 +47,12 @@ namespace MobileClient.Views
         protected async override void OnAppearing()
         {
             base.OnAppearing();
+            // TODO: Find better way to do this.
+            if (_purchasePage != null)
+            {
+                _purchasePage = null;
+                await SubmitOrder(_userService.GetLoggedInAccount());
+            }
             await SetVisualStateForValidation();
         }
 
@@ -56,6 +62,7 @@ namespace MobileClient.Views
             if (validation.State == ValidationState.NoReportsLeftInPeriod)
             {
                 MainLayout.IsVisible = false;
+                CannotSubmitHeader.Text = "You've been busy!";
                 CannotSubmitLabel.Text = $"Sorry, you have used all of your reports for this month.";
                 CannotSubmitLayout.IsVisible = true;
                 return;
@@ -63,7 +70,8 @@ namespace MobileClient.Views
             if (validation.State == ValidationState.NoSubscriptionAndFreeReportUsed)
             {
                 MainLayout.IsVisible = false;
-                CannotSubmitLabel.Text = $"Please purchase a subscription before continuing.";
+                CannotSubmitHeader.Text = "Thanks for trying Fair Squares!";
+                CannotSubmitLabel.Text = $"Please purchase a subscription from the Account Tab before continuing.";
                 CannotSubmitLayout.IsVisible = true;
                 return;
             }
@@ -98,41 +106,14 @@ namespace MobileClient.Views
 
                 var validation = await _orderValidator.ValidateOrderRequest(_userService.GetLoggedInAccount());
                 // Show purchase page once for very first order or every time if they don't have a subscription
-                if (validation.State == ValidationState.FreeReportValid && _puchasePage == null)
+                if (validation.State == ValidationState.FreeReportValid && _purchasePage == null)
                 {
                     SubmitButton.IsEnabled = true;
-                    _puchasePage = new PurchasePage(true);
-                    await Navigation.PushAsync(_puchasePage);
+                    _purchasePage = new PurchasePage(true);
+                    await Navigation.PushAsync(_purchasePage);
                     return;
                 }
-
-                // Submit order
-                var newOrder = new Models.Order()
-                {
-                    StreetAddress = $"{AddressLine1.Text}\n{(string.IsNullOrWhiteSpace(AddressLine2.Text) ? "" : AddressLine2.Text + "\n")}\n" +
-                                    $"{City.Text}, {States[StatePicker.SelectedIndex].Code} {Zip.Text}",
-                    ReportType = ReportType.Basic,
-                    MemberId = user.UserId,
-                    MemberEmail = user.Email,
-                    RoofOption = Options[OptionPicker.SelectedIndex].RoofOption,
-                    Comments = Comments.Text
-                };
-                newOrder.OrderId = await _orderService.AddOrder(newOrder);
-                DependencyService.Get<IMessagingSubscriber>().Subscribe(new List<string>() { newOrder.OrderId });
-                _orderCache.Put(newOrder.OrderId, newOrder);
-                _toast.ShortAlert($"Your address has been submitted!");
-
-                // Clear all fields
-                AddressLine1.Text = "";
-                AddressLine2.Text = "";
-                City.Text = "";
-                Grid.RowDefinitions[_errorIndex].Height = 0;
-                StatePicker.SelectedIndex = -1;
-                OptionPicker.SelectedIndex = 0;
-                Zip.Text = "";
-                SubmitButton.IsEnabled = true;
-                Comments.Text = "";
-                RootPage.NavigateFromMenu(PageType.MyOrders);
+                await SubmitOrder(user);
             }
             catch (Exception ex)
             {
@@ -141,6 +122,36 @@ namespace MobileClient.Views
                 ErrorMessage.Text = $"Failed to submit order with error {ex.ToString()}";
                 Debug.WriteLine("Failed to submit order with error '" + ex.ToString() + "'");
             }
+        }
+
+        private async Task SubmitOrder(AccountModel user)
+        {
+            var newOrder = new Models.Order()
+            {
+                StreetAddress = $"{AddressLine1.Text}\n{(string.IsNullOrWhiteSpace(AddressLine2.Text) ? "" : AddressLine2.Text + "\n")}\n" +
+                                $"{City.Text}, {States[StatePicker.SelectedIndex].Code} {Zip.Text}",
+                ReportType = ReportType.Basic,
+                MemberId = user.UserId,
+                MemberEmail = user.Email,
+                RoofOption = Options[OptionPicker.SelectedIndex].RoofOption,
+                Comments = Comments.Text
+            };
+            newOrder.OrderId = await _orderService.AddOrder(newOrder);
+            DependencyService.Get<IMessagingSubscriber>().Subscribe(new List<string>() { newOrder.OrderId });
+            _orderCache.Put(newOrder.OrderId, newOrder);
+            _toast.ShortAlert($"Your address has been submitted!");
+
+            // Clear all fields
+            AddressLine1.Text = "";
+            AddressLine2.Text = "";
+            City.Text = "";
+            Grid.RowDefinitions[_errorIndex].Height = 0;
+            StatePicker.SelectedIndex = -1;
+            OptionPicker.SelectedIndex = 0;
+            Zip.Text = "";
+            SubmitButton.IsEnabled = true;
+            Comments.Text = "";
+            RootPage.NavigateFromMenu(PageType.MyOrders);
         }
 
         private async void ToolbarItem_Activated(object sender, EventArgs e)

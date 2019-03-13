@@ -18,11 +18,11 @@
                     <RowDefinition x:Name="BasicButtonCol" Height="*"/>
                     <RowDefinition x:Name="Pad2" Height="15"/>
                     <RowDefinition x:Name="PremiumHeaderCol" Height="*"/>
-                    <RowDefinition x:Name="PremiumCol" Height="*"/>
+                    <RowDefinition x:Name="PremiumCol" Height="25"/>
                     <RowDefinition x:Name="PremButtonCol" Height="*"/>
                     <RowDefinition x:Name="Pad3" Height="15"/>
                     <RowDefinition x:Name="EntHeaderCol" Height="*"/>
-                    <RowDefinition x:Name="EntCol" Height="*"/>
+                    <RowDefinition x:Name="EntCol" Height="25"/>
                     <RowDefinition x:Name="EntButtonCol" Height="*"/>
                     <RowDefinition x:Name="ErrorCol" Height="25"/>
                 </Grid.RowDefinitions>
@@ -36,6 +36,7 @@
 
                 <Label Text="Try a Free Report On Us."
                    Font="Medium"
+                   FontAttributes="Bold"
                    HorizontalOptions="Start"
                    VerticalOptions="End"
                    Grid.Row="1"
@@ -53,14 +54,14 @@
                    Font="Medium"
                    FontAttributes="Bold"
                    HorizontalOptions="Start"
-                   VerticalOptions="Start"
-                   Grid.Row="3"
+                   VerticalOptions="End"
+                   Grid.Row="4"
                    Grid.Column="0" />
                 <Label Text="3 Reports Per Month. First month is FREE! $24.99/month after trial ends."
                    Font="Info"
                    HorizontalOptions="CenterAndExpand"
                    VerticalOptions="Start"
-                   Grid.Row="4"
+                   Grid.Row="5"
                    Grid.Column="0">
                 </Label>
                 <Button Text="Start Your Free Trial"
@@ -68,7 +69,7 @@
                     StyleClass="Info"
                     HorizontalOptions="CenterAndExpand"
                     VerticalOptions="Start"
-                    Grid.Row="5"
+                    Grid.Row="6"
                     Grid.Column="0"
                     WidthRequest="250" />
 
@@ -76,21 +77,21 @@
                    Font="Medium"
                    FontAttributes="Bold"
                    HorizontalOptions="Start"
-                   VerticalOptions="Start"
-                   Grid.Row="7"
+                   VerticalOptions="End"
+                   Grid.Row="8"
                    Grid.Column="0" />
                 <Label Text="8 Reports Per Month. $49.99/month"
                    Font="Info"
                    HorizontalOptions="CenterAndExpand"
                    VerticalOptions="Start"
-                   Grid.Row="8"
+                   Grid.Row="9"
                    Grid.Column="0" />
                 <Button Text="Purchase Premium"
                     x:Name="PremiumButton"
                     StyleClass="Info"
                     HorizontalOptions="CenterAndExpand"
                     VerticalOptions="Start"
-                    Grid.Row="9"
+                    Grid.Row="10"
                     Grid.Column="0"
                     WidthRequest="250" />
 
@@ -98,27 +99,27 @@
                    Font="Medium"
                    FontAttributes="Bold"
                    HorizontalOptions="Start"
-                   VerticalOptions="Start"
-                   Grid.Row="11"
+                   VerticalOptions="End"
+                   Grid.Row="12"
                    Grid.Column="0" />
                 <Label Text="25 Reports Per Month. $99.99/month"
                    Font="Info"
                    HorizontalOptions="CenterAndExpand"
                    VerticalOptions="Start"
-                   Grid.Row="12"
+                   Grid.Row="13"
                    Grid.Column="0" />
                 <Button Text="Purchase Enterprise"
                     x:Name="EnterpriseButton"
                     StyleClass="Info"
                     HorizontalOptions="CenterAndExpand"
                     VerticalOptions="Start"
-                    Grid.Row="13"
+                    Grid.Row="14"
                     Grid.Column="0"
                     WidthRequest="250" />
 
                 <Label x:Name="ErrorLabel"
                    TextColor="Red"
-                   Grid.Row="14"
+                   Grid.Row="15"
                    Grid.Column="0"
                    VerticalOptions="CenterAndExpand"
                    HorizontalOptions="CenterAndExpand" />
