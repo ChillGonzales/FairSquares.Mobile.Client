@@ -128,6 +128,7 @@ namespace MobileClient.Views
             else
             {
                 FreeReportCol.Height = GridLength.Star;
+                Pad1.Height = GridLength.Star;
                 FreeReportButtonCol.Height = GridLength.Star;
             }
             BasicButton.IsEnabled = !showButton;

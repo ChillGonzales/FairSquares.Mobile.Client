@@ -4,7 +4,7 @@
              Title="View Details"
              x:Class="MobileClient.Views.OrderDetailPage">
     <ContentPage.Content>
-        <ScrollView>
+        <ScrollView Margin="5">
             <StackLayout Orientation="Vertical">
                 <ActivityIndicator x:Name="LoadingAnimation" 
                                    HorizontalOptions="CenterAndExpand"
@@ -15,12 +15,10 @@
                 <StackLayout x:Name="MainLayout" Orientation="Vertical">
                     <Label x:Name="Address"
                         FontSize="Large"
-                        Margin="5"
                         FontAttributes="Bold"
                         VerticalOptions="Center" 
                         HorizontalOptions="CenterAndExpand" />
                     <Image x:Name="TopImage"
-                        Margin="5"
                         VerticalOptions="Center"
                         HorizontalOptions="CenterAndExpand" >
                         <Image.GestureRecognizers>
@@ -34,56 +32,74 @@
                         Margin="10"
                         VerticalOptions="Center" 
                         HorizontalOptions="CenterAndExpand" />
-                    <Label />
-                    <Label Margin="5"
-                       FontAttributes="Bold"
-                       FontSize="Medium"
-                       x:Name="PitchLabel"
-                       Text="Predominant Pitch"
-                       VerticalOptions="Center"
-                       HorizontalOptions="Center" />
-                    <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand" VerticalOptions="Center">
-                        <ImageButton Source="ic_action_keyboard_arrow_down.png"
-                            Margin="2"
-                            x:Name="DownButton"
-                            HeightRequest="40"
-                            WidthRequest="40"
-                            HorizontalOptions="Center"
-                            VerticalOptions="Center" />
-                        <Label x:Name="Pitch"
-                           Margin="5"
-                           FontAttributes="Bold"
-                           FontSize="Medium"
-                           Text="Predominant Pitch"
+                    <Label HeightRequest="10" />
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                    <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand">
+                        <Label WidthRequest="15" />
+                        <StackLayout Orientation="Vertical" HorizontalOptions="Start" VerticalOptions="Start">
+                            <Label FontAttributes="Bold"
+                               FontSize="Medium"
+                               x:Name="PitchLabel"
+                               Text="Predominant Pitch"
+                               VerticalOptions="Start"
+                               HorizontalOptions="Center" />
+                            <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand" VerticalOptions="Center">
+                                <ImageButton Source="ic_action_keyboard_arrow_down.png"
+                                    x:Name="DownButton"
+                                    HeightRequest="40"
+                                    WidthRequest="40"
+                                    HorizontalOptions="Center"
+                                    VerticalOptions="Center" />
+                                <Label x:Name="Pitch"
+                                   FontSize="Medium"
+                                   Text="Predominant Pitch"
+                                   VerticalOptions="Center"
+                                   HorizontalOptions="Center" />
+                                <ImageButton Source="ic_action_keyboard_arrow_up.png"
+                                    x:Name="UpButton"
+                                    HeightRequest="40"
+                                    WidthRequest="40"
+                                    HorizontalOptions="Center"
+                                    VerticalOptions="Center" />
+                            </StackLayout>
+                        </StackLayout>
+                        <StackLayout Orientation="Vertical" HorizontalOptions="End" VerticalOptions="Start">
+                            <Label FontAttributes="Bold"
+                               FontSize="Medium"
+                               x:Name="AreaLabel"
+                               Text="Total Area"
+                               VerticalOptions="Start"
+                               HorizontalOptions="Center" />
+                            <Label x:Name="Area"
+                                FontSize="Medium"
+                                VerticalOptions="Center" 
+                                HorizontalOptions="Center" />
+                        </StackLayout>
+                        <Label WidthRequest="15" />
+                    </StackLayout>
+                    <Label HeightRequest="15" />
+                    <Label x:Name="OrderId"
+                        VerticalOptions="Center" 
+                        HorizontalOptions="Start" />
+                    <Label x:Name="NumberOfRoofs"
                            VerticalOptions="Center"
-                           HorizontalOptions="Center" />
-                        <ImageButton Source="ic_action_keyboard_arrow_up.png"
-                            Margin="2"
-                            x:Name="UpButton"
-                            HeightRequest="40"
-                            WidthRequest="40"
-                            HorizontalOptions="Center"
-                            VerticalOptions="Center" />
-                    </StackLayout>
-                    <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand" VerticalOptions="Center">
-                        <Label x:Name="OrderId"
-                            Margin="5"
-                            VerticalOptions="Center" 
-                            HorizontalOptions="End" />
-                        <Label x:Name="Area"
-                            Margin="5"
-                            VerticalOptions="Center" 
-                            HorizontalOptions="Start" />
-                    </StackLayout>
-                    <Label />
+                           HorizontalOptions="Start" />
+                    <Label HeightRequest="15" />
                     <Label Text="Safety Stock Calculations"
                         x:Name="SafetyStockLabel"
                         FontAttributes="Bold"
                         VerticalOptions="Center" 
-                        Margin="10"
                         HorizontalOptions="Start" />
                     <ListView x:Name="SafetyStockTable"
-                        Margin="5"
                         IsGroupingEnabled="True"
                         GroupDisplayBinding="{Binding Title}"
                         VerticalOptions="End"

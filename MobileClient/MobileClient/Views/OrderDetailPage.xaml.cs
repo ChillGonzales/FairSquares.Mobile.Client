@@ -52,7 +52,9 @@ namespace MobileClient.Views
             if (prop == null || !order.Fulfilled)
             {
                 Pitch.Text = $"Your order has been submitted and is in the process of being measured.";
+                AreaLabel.IsVisible = false;
                 PitchLabel.IsVisible = false;
+                NumberOfRoofs.IsVisible = false;
                 DownButton.IsVisible = false;
                 UpButton.IsVisible = false;
                 SafetyStockLabel.IsVisible = false;
@@ -116,6 +118,7 @@ namespace MobileClient.Views
             // Set GUI and event handlers
             OrderId.Text = $"Order ID: {order.OrderId}";
             Pitch.Text = $"{_recalculated.CurrentPitch}:12";
+            NumberOfRoofs.Text = $"Number of Roofs Measured: {_recalculated.Roofs.Count()}";
             ImageGR.Tapped += OnImageTapped;
             DownButton.Clicked += (s, e) => OnPitchValueChanged(_recalculated.CurrentPitch, _recalculated.CurrentPitch - 1);
             UpButton.Clicked += (s, e) => OnPitchValueChanged(_recalculated.CurrentPitch, _recalculated.CurrentPitch + 1);
@@ -125,8 +128,8 @@ namespace MobileClient.Views
                 return Task.FromResult<Stream>(new MemoryStream(img.Image));
             };
             TopImage.Source = stream;
-            Address.Text = $"{Regex.Replace(_property.Address, @"\r\n", @" ")}";
-            Area.Text = $"Total Area: {_property.Roofs.Sum(x => x.TotalArea).ToString()} sq. ft.";
+            Address.Text = $"{Regex.Replace(_property.Address, @"\r\n", @"")}";
+            Area.Text = $"{Convert.ToInt64(_property.Roofs.Sum(x => x.TotalArea)).ToString()} sq. ft.";
             Squares.Text = $"Total Squares: {_property.Roofs.Sum(x => x.TotalSquares).ToString()} squares";
             RefreshTableView(_property.Roofs.Sum(x => x.TotalArea));
         }
@@ -184,7 +187,7 @@ namespace MobileClient.Views
                     roof.TotalSquares = totals.TotalSquaresCount;
                     roof.PredominantPitchRise = RoofUtilities.GetPredominantPitchFromSections(roof.Sections);
                 }
-                Area.Text = $"Total Area: {Math.Round(_recalculated.Roofs.Sum(x => x.TotalArea), 2).ToString()} sq. ft.";
+                Area.Text = $"{Convert.ToInt64(_recalculated.Roofs.Sum(x => x.TotalArea)).ToString()} sq. ft.";
                 Squares.Text = $"Total Squares: {Math.Ceiling(_recalculated.Roofs.Sum(x => x.TotalSquares)).ToString()} squares";
                 RefreshTableView(_recalculated.Roofs.Sum(x => x.TotalArea));
             }
@@ -195,7 +198,9 @@ namespace MobileClient.Views
         }
         private async void OnImageTapped(object sender, EventArgs e)
         {
-            await Navigation.PushAsync(new ImagePopup((StreamImageSource)TopImage.Source));
+            TopImage.IsEnabled = false;
+            await Navigation.PushModalAsync(new ImagePopup((StreamImageSource)TopImage.Source));
+            TopImage.IsEnabled = true;
         }
         private void RefreshTableView(double totalArea)
         {

@@ -22,9 +22,9 @@ namespace MobileClient.Views
             InitializeComponent();
             _purchaseService = App.Container.GetInstance<IPurchasingService>();
             _model = model;
-            SubscriptionTypeLabel.Text += _model.SubscriptionType.ToString();
-            RemainingOrdersLabel.Text += _model.RemainingOrders.ToString();
-            EndDateLabel.Text += _model.EndDateTime.ToString("dddd, dd MMMM yyyy");
+            SubscriptionTypeLabel.Text = "   " + _model.SubscriptionType.ToString();
+            RemainingOrdersLabel.Text = "   " + _model.RemainingOrders.ToString();
+            EndDateLabel.Text = "   " + _model.EndDateTime.ToString("dddd, dd MMMM yyyy");
             var compName = Device.RuntimePlatform == Device.Android ? "Google" : "Apple";
             var supportUri = Device.RuntimePlatform == Device.Android ? "https://support.google.com/googleplay/answer/7018481" :
                                 "https://support.apple.com/en-us/HT202039#subscriptions";
