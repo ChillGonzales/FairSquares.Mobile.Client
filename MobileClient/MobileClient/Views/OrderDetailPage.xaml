@@ -42,17 +42,19 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                    </Grid>
-                    <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand">
-                        <Label WidthRequest="15" />
-                        <StackLayout Orientation="Vertical" HorizontalOptions="Start" VerticalOptions="Start">
                             <Label FontAttributes="Bold"
                                FontSize="Medium"
+                               Grid.Row="0"
+                               Grid.Column="0"
                                x:Name="PitchLabel"
                                Text="Predominant Pitch"
                                VerticalOptions="Start"
                                HorizontalOptions="Center" />
-                            <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand" VerticalOptions="Center">
+                            <StackLayout Orientation="Horizontal" 
+                                         Grid.Row="1"
+                                         Grid.Column="0"
+                                         HorizontalOptions="CenterAndExpand" 
+                                         VerticalOptions="Center">
                                 <ImageButton Source="ic_action_keyboard_arrow_down.png"
                                     x:Name="DownButton"
                                     HeightRequest="40"
@@ -71,21 +73,21 @@
                                     HorizontalOptions="Center"
                                     VerticalOptions="Center" />
                             </StackLayout>
-                        </StackLayout>
-                        <StackLayout Orientation="Vertical" HorizontalOptions="End" VerticalOptions="Start">
-                            <Label FontAttributes="Bold"
-                               FontSize="Medium"
-                               x:Name="AreaLabel"
-                               Text="Total Area"
-                               VerticalOptions="Start"
-                               HorizontalOptions="Center" />
-                            <Label x:Name="Area"
-                                FontSize="Medium"
-                                VerticalOptions="Center" 
-                                HorizontalOptions="Center" />
-                        </StackLayout>
-                        <Label WidthRequest="15" />
-                    </StackLayout>
+                        <Label FontAttributes="Bold"
+                           FontSize="Medium"
+                           Grid.Row="0"
+                           Grid.Column="1"
+                           x:Name="AreaLabel"
+                           Text="Total Area"
+                           VerticalOptions="Start"
+                           HorizontalOptions="Center" />
+                        <Label x:Name="Area"
+                            FontSize="Medium"
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            VerticalOptions="Center" 
+                            HorizontalOptions="Center" />
+                    </Grid>
                     <Label HeightRequest="15" />
                     <Label x:Name="OrderId"
                         VerticalOptions="Center" 

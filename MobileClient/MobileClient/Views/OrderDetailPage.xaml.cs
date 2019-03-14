@@ -128,7 +128,7 @@ namespace MobileClient.Views
                 return Task.FromResult<Stream>(new MemoryStream(img.Image));
             };
             TopImage.Source = stream;
-            Address.Text = $"{Regex.Replace(_property.Address, @"\r\n", @"")}";
+            Address.Text = $"{Regex.Replace(_property.Address, @"\r\n", @" ")}";
             Area.Text = $"{Convert.ToInt64(_property.Roofs.Sum(x => x.TotalArea)).ToString()} sq. ft.";
             Squares.Text = $"Total Squares: {_property.Roofs.Sum(x => x.TotalSquares).ToString()} squares";
             RefreshTableView(_property.Roofs.Sum(x => x.TotalArea));
