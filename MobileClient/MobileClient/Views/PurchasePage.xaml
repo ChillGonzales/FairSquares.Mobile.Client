@@ -64,14 +64,18 @@
                    Grid.Row="5"
                    Grid.Column="0">
                 </Label>
-                <Button Text="Start Your Free Trial"
-                    x:Name="BasicButton"
-                    StyleClass="Info"
-                    HorizontalOptions="CenterAndExpand"
-                    VerticalOptions="Start"
-                    Grid.Row="6"
-                    Grid.Column="0"
-                    WidthRequest="250" />
+                <AbsoluteLayout Grid.Row="6" Grid.Column="0" HorizontalOptions="Fill" VerticalOptions="Fill">
+                    <Button Text="Start Your Free Trial"
+                        x:Name="BasicButton"
+                        StyleClass="Info"
+                        AbsoluteLayout.LayoutFlags="PositionProportional"
+                        AbsoluteLayout.LayoutBounds="0.5, 0.5, 250, 50" />
+                    <ActivityIndicator x:Name="BasicLoader"
+                                       Color="White"
+                                       AbsoluteLayout.LayoutFlags="PositionProportional"
+                                       AbsoluteLayout.LayoutBounds="0.5,0.5,-1,-1"
+                                       IsVisible="False" />
+                </AbsoluteLayout>
 
                 <Label Text="Premium"
                    Font="Medium"
@@ -86,14 +90,18 @@
                    VerticalOptions="Start"
                    Grid.Row="9"
                    Grid.Column="0" />
-                <Button Text="Purchase Premium"
-                    x:Name="PremiumButton"
-                    StyleClass="Info"
-                    HorizontalOptions="CenterAndExpand"
-                    VerticalOptions="Start"
-                    Grid.Row="10"
-                    Grid.Column="0"
-                    WidthRequest="250" />
+                <AbsoluteLayout Grid.Row="10" Grid.Column="0" HorizontalOptions="Fill" VerticalOptions="Fill">
+                    <Button Text="Purchase Premium"
+                        x:Name="PremiumButton"
+                        StyleClass="Info"
+                        AbsoluteLayout.LayoutFlags="PositionProportional"
+                        AbsoluteLayout.LayoutBounds="0.5, 0.5, 250, 50" />
+                    <ActivityIndicator x:Name="PremiumLoader"
+                                       Color="White"
+                                       AbsoluteLayout.LayoutFlags="PositionProportional"
+                                       AbsoluteLayout.LayoutBounds="0.5,0.5,-1,-1"
+                                       IsVisible="False" />
+                </AbsoluteLayout>
 
                 <Label Text="Enterprise"
                    Font="Medium"
@@ -108,14 +116,18 @@
                    VerticalOptions="Start"
                    Grid.Row="13"
                    Grid.Column="0" />
-                <Button Text="Purchase Enterprise"
-                    x:Name="EnterpriseButton"
-                    StyleClass="Info"
-                    HorizontalOptions="CenterAndExpand"
-                    VerticalOptions="Start"
-                    Grid.Row="14"
-                    Grid.Column="0"
-                    WidthRequest="250" />
+                <AbsoluteLayout Grid.Row="14" Grid.Column="0" HorizontalOptions="Fill" VerticalOptions="Fill">
+                    <Button Text="Purchase Enterprise"
+                        x:Name="EnterpriseButton"
+                        StyleClass="Info"
+                        AbsoluteLayout.LayoutFlags="PositionProportional"
+                        AbsoluteLayout.LayoutBounds="0.5, 0.5, 250, 50" />
+                    <ActivityIndicator x:Name="EnterpriseLoader"
+                                       Color="White"
+                                       AbsoluteLayout.LayoutFlags="PositionProportional"
+                                       AbsoluteLayout.LayoutBounds="0.5,0.5,-1,-1"
+                                       IsVisible="False" />
+                </AbsoluteLayout>
 
                 <Label x:Name="ErrorLabel"
                    TextColor="Red"

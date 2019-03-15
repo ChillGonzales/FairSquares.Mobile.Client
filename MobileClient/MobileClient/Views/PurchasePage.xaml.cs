@@ -43,7 +43,7 @@ namespace MobileClient.Views
             _alertService = DependencyService.Get<IAlertService>();
             _subCache = App.Container.GetInstance<ICache<SubscriptionModel>>();
             ErrorCol.Height = 0;
-            TryForFreeButton.Clicked += async (s, e) => 
+            TryForFreeButton.Clicked += async (s, e) =>
             {
                 await this.Navigation.PopAsync();
                 RootPage.NavigateFromMenu(ViewModels.PageType.Order);
@@ -55,14 +55,25 @@ namespace MobileClient.Views
         }
         private async void PurchaseSubscription(Button sender, SubscriptionType subType)
         {
+            var selectable = new[]
+            {
+                new { Button = BasicButton, Loader = BasicLoader, Selected = sender == BasicButton },
+                new { Button = PremiumButton, Loader = PremiumLoader, Selected = sender == PremiumButton },
+                new { Button = EnterpriseButton, Loader = EnterpriseLoader, Selected = sender == EnterpriseButton },
+                new { Button = TryForFreeButton, Loader = null as ActivityIndicator, Selected = sender == TryForFreeButton }
+            };
             try
             {
                 ErrorCol.Height = 0;
-                var buttons = new[] { BasicButton, PremiumButton, EnterpriseButton, TryForFreeButton };
-                foreach (var btn in buttons)
-                    btn.IsEnabled = false;
-                var oldStyle = sender.StyleClass;
-                sender.StyleClass = new List<string>() { "Primary" };
+                foreach (var obj in selectable)
+                    obj.Button.IsEnabled = false;
+                var selected = selectable.First(x => x.Selected);
+                if (selected.Loader != null)
+                {
+                    selected.Loader.IsVisible = true;
+                    selected.Loader.IsRunning = true;
+                }
+
                 var subCode = SubscriptionUtilities.SUB_NAME_BASIC;
                 switch (subType)
                 {
@@ -85,6 +96,7 @@ namespace MobileClient.Views
                     ProductId = subCode,
                     Id = "12345"
                 };
+                await Task.Delay(5000);
 #endif
                 var model = new Models.SubscriptionModel()
                 {
@@ -101,17 +113,26 @@ namespace MobileClient.Views
 #if RELEASE
                 _subService.AddSubscription(model);
 #endif
-                foreach (var btn in buttons)
-                    btn.IsEnabled = true;
-                sender.StyleClass = oldStyle;
+                Device.BeginInvokeOnMainThread(async () => await Navigation.PopAsync());
                 _alertService.LongAlert($"Thank you for your purchase!");
                 RootPage.NavigateFromMenu(ViewModels.PageType.Order);
-                Device.BeginInvokeOnMainThread(async () => await Navigation.PopAsync());
             }
             catch (Exception ex)
             {
                 ErrorCol.Height = 50;
                 ErrorLabel.Text = ex.Message;
+            }
+            finally
+            {
+                foreach (var obj in selectable)
+                {
+                    obj.Button.IsEnabled = true;
+                    if (obj.Loader != null)
+                    {
+                        obj.Loader.IsVisible = false;
+                        obj.Loader.IsRunning = false;
+                    }
+                }
             }
         }
 

@@ -13,6 +13,12 @@
                                    IsEnabled="False" 
                                    IsVisible="False" />
                 <StackLayout x:Name="MainLayout" Orientation="Vertical">
+                    <Label x:Name="StatusMessage" 
+                           FontSize="Medium"
+                           Text="Your order has been submitted and is in the process of being measured."
+                           IsVisible="False"
+                           VerticalOptions="Center"
+                           HorizontalOptions="CenterAndExpand" />
                     <Label x:Name="Address"
                         FontSize="Large"
                         FontAttributes="Bold"

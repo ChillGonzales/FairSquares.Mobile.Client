@@ -51,7 +51,8 @@ namespace MobileClient.Views
             // Display message if order isn't fulfilled yet.
             if (prop == null || !order.Fulfilled)
             {
-                Pitch.Text = $"Your order has been submitted and is in the process of being measured.";
+                StatusMessage.IsVisible = true;
+                Pitch.IsVisible = false;
                 AreaLabel.IsVisible = false;
                 PitchLabel.IsVisible = false;
                 NumberOfRoofs.IsVisible = false;
@@ -199,7 +200,7 @@ namespace MobileClient.Views
         private async void OnImageTapped(object sender, EventArgs e)
         {
             TopImage.IsEnabled = false;
-            await Navigation.PushModalAsync(new ImagePopup((StreamImageSource)TopImage.Source));
+            await Navigation.PushAsync(new ImagePopup((StreamImageSource)TopImage.Source));
             TopImage.IsEnabled = true;
         }
         private void RefreshTableView(double totalArea)

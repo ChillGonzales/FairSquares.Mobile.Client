@@ -34,7 +34,7 @@ namespace MobileClient.Views
 
         private async void OnImageTapped(object sender, EventArgs e)
         {
-            await Navigation.PopModalAsync();
+            await Navigation.PopAsync();
         }
     }
 }

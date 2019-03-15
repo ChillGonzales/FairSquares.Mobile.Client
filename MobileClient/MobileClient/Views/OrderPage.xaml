@@ -33,7 +33,7 @@
                         <RowDefinition x:Name="OptionRow" Height="40" />
                         <RowDefinition x:Name="CommentsRow" Height="40" />
                         <RowDefinition x:Name="PaddingRow" Height="15" />
-                        <RowDefinition x:Name="ErrorMessageRow" Height="25" />
+                        <RowDefinition x:Name="ErrorMessageRow" Height="50" />
                         <RowDefinition x:Name="SubmitRow" Height="40" />
                         <RowDefinition x:Name="PaddingBottomRow" Height="*" />
                     </Grid.RowDefinitions>
