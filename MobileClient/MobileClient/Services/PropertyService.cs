@@ -28,7 +28,7 @@ namespace MobileClient.Services
             try
             {
                 if (orderIds == null || !orderIds.Any())
-                    return null;
+                    return new Dictionary<string, PropertyModel>();
                 var response = await _http.PostAsync(_baseUrl, new StringContent(JsonConvert.SerializeObject(orderIds), Encoding.UTF8, "application/json"));
                 if (!response.IsSuccessStatusCode)
                     throw new Exception($"HTTP call returned an error code of '{response.StatusCode}' and message '{response.Content.ReadAsStringAsync().Result}'.");

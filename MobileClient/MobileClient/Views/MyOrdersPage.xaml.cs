@@ -6,13 +6,8 @@ using MobileClient.Utilities;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
-
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -21,13 +16,13 @@ namespace MobileClient.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class MyOrdersPage : ContentPage
     {
-        private readonly IOrderService _orderService;
-        private readonly ICache<Order> _orderCache;
-        private readonly ICache<PropertyModel> _propertyCache;
-        private readonly ICache<ImageModel> _imageCache;
-        private readonly ILogger<MyOrdersPage> _logger;
-        private readonly ICacheRefresher _cacheRefresher;
-        private readonly ICurrentUserService _userService;
+        private IOrderService _orderService;
+        private ICache<Order> _orderCache;
+        private ICache<PropertyModel> _propertyCache;
+        private ICache<ImageModel> _imageCache;
+        private ILogger<MyOrdersPage> _logger;
+        private ICacheRefresher _cacheRefresher;
+        private ICurrentUserService _userService;
         public static IList<OrderGroup> All { private set; get; }
 
         public MyOrdersPage()
@@ -42,7 +37,6 @@ namespace MobileClient.Views
                 _imageCache = App.Container.GetInstance<ICache<ImageModel>>();
                 _logger = App.Container.GetInstance<ILogger<MyOrdersPage>>();
                 _cacheRefresher = App.Container.GetInstance<ICacheRefresher>();
-                SetViewState();
                 ExampleReportButton.Clicked += async (s, e) =>
                 {
                     try
@@ -78,7 +72,6 @@ namespace MobileClient.Views
                         _logger.LogError($"Failed to refresh order list. \n{ex.ToString()}");
                     }
                 };
-                _userService.OnLoggedIn += (s, e) => refreshAction();
                 OrderListView.RefreshCommand = new Command(refreshAction);
                 OrderListView.ItemSelected += async (s, e) =>
                 {
@@ -88,6 +81,7 @@ namespace MobileClient.Views
                     await Navigation.PushAsync(new OrderDetailPage(_orderCache.Get(id)));
                     OrderListView.SelectedItem = null;
                 };
+                Task.Run(async () => await SetViewState()).Wait();
             }
             catch (Exception ex)
             {
@@ -95,15 +89,28 @@ namespace MobileClient.Views
             }
         }
 
-        protected override void OnAppearing()
+        protected async override void OnAppearing()
         {
             base.OnAppearing();
-            SetViewState();
+            await SetViewState();
         }
 
-        private void SetViewState()
+        private async Task SetViewState()
         {
-            var orders = _orderCache.GetAll().Select(x => x.Value).ToList();
+            List<Order> orders = new List<Order>();
+            if (_cacheRefresher.Invalidated)
+            {
+                MainLayout.IsVisible = false;
+                LoadingLayout.IsVisible = true;
+                LoadingAnimation.IsRunning = true;
+                var fresh = await _orderService.GetMemberOrders(_userService.GetLoggedInAccount().UserId);
+                _orderCache.Update(fresh.ToDictionary(x => x.OrderId, x => x));
+                MainLayout.IsVisible = true;
+                LoadingLayout.IsVisible = false;
+                LoadingAnimation.IsRunning = false;
+                _cacheRefresher.Revalidate();
+            }
+            orders = _orderCache.GetAll().Select(x => x.Value).ToList();
             var anyOrders = orders.Any();
             MainLayout.IsVisible = anyOrders;
             NoOrderLayout.IsVisible = !anyOrders;
@@ -113,14 +120,14 @@ namespace MobileClient.Views
         private void SetListViewSource(List<Order> orders)
         {
             var fulGroup = new OrderGroup() { Title = "Completed" };
-            fulGroup.AddRange(_orderCache.GetAll().Select(x => x.Value).Where(x => x.Fulfilled).Select(x => new OrderViewCell()
+            fulGroup.AddRange(orders.Where(x => x.Fulfilled).Select(x => new OrderViewCell()
             {
                 Text = x.StreetAddress.Split('\n')[0],
                 TextColor = Color.Black,
                 OrderId = x.OrderId
             }));
             var penGroup = new OrderGroup() { Title = "Pending" };
-            penGroup.AddRange(_orderCache.GetAll().Select(x => x.Value).Where(x => !x.Fulfilled).Select(x => new OrderViewCell()
+            penGroup.AddRange(orders.Where(x => !x.Fulfilled).Select(x => new OrderViewCell()
             {
                 Text = x.StreetAddress.Split('\n')[0],
                 TextColor = Color.Black,

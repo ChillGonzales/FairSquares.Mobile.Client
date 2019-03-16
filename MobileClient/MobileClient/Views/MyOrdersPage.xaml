@@ -9,6 +9,9 @@
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
         <StackLayout Orientation="Vertical" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand">
+            <StackLayout x:Name="LoadingLayout" IsVisible="False">
+                <ActivityIndicator x:Name="LoadingAnimation" Color="Black" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" />
+            </StackLayout>
             <StackLayout x:Name="NoOrderLayout" IsVisible="False" Margin="10">
                 <Label Text="It looks like you don't have any orders yet. Click below to see an example report."
                    FontSize="Medium"

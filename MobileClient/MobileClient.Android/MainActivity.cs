@@ -14,13 +14,15 @@ using Android.Gms.Common;
 using Android.Util;
 using Firebase.Iid;
 using Firebase.Messaging;
+using MobileClient.Models;
+using MobileClient.Droid.PushNotifications;
 
 namespace MobileClient.Droid
 {
-    [Activity(Label = "Fair Squares", Icon = "@mipmap/ic_launcher", Theme = "@style/splashscreen", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
+    [Activity(Label = "Fair Squares", Icon = "@mipmap/ic_launcher", Theme = "@style/splashscreen", Exported = true, LaunchMode = LaunchMode.SingleTop, MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
-        internal static readonly string CHANNEL_ID = "my_notification_channel";
+        internal static readonly string CHANNEL_ID = "push_notification_channel";
         internal static readonly int NOTIFICATION_ID = 100;
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -34,7 +36,8 @@ namespace MobileClient.Droid
                     foreach (var key in Intent.Extras.KeySet())
                     {
                         var value = Intent.Extras.GetString(key);
-                        Log.Debug("DEBUG", $"Key: '{key}' Value: '{value}'");
+                        //if (key == "from")
+                        //    pushModel = new LaunchedFromPushModel() { Topic = value };
                     }
                 }
                 TabLayoutResource = Resource.Layout.Tabbar;
@@ -42,8 +45,8 @@ namespace MobileClient.Droid
 
                 base.OnCreate(savedInstanceState);
 
-                CreateNotificationChannel();
                 IsPlayServicesAvailable();
+                CreateNotificationChannel();
                 global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
                 global::Xamarin.Auth.Presenters.XamarinAndroid.AuthenticationConfiguration.Init(this, savedInstanceState);
                 global::Xamarin.Auth.CustomTabsConfiguration.CustomTabsClosingMessage = null;
@@ -62,7 +65,7 @@ namespace MobileClient.Droid
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
         {
             base.OnActivityResult(requestCode, resultCode, data);
-            //InAppBillingImplementation.HandleActivityResult(requestCode, resultCode, data);
+            InAppBillingImplementation.HandleActivityResult(requestCode, resultCode, data);
         }
 
         private void CreateNotificationChannel()
@@ -75,9 +78,9 @@ namespace MobileClient.Droid
                 return;
             }
 
-            var channel = new NotificationChannel(CHANNEL_ID, "FCM Notifications", NotificationImportance.Default)
+            var channel = new NotificationChannel(CHANNEL_ID, "Order Complete Notifications", NotificationImportance.Default)
             {
-                Description = "Firebase Cloud Messages appear in this channel"
+                Description = "Order Completion notifications show in this channel."
             };
 
             var notificationManager = (NotificationManager)GetSystemService(NotificationService);

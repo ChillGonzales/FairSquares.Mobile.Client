@@ -27,4 +27,19 @@ namespace MobileClient.Models
         RoofDetachedGarage = 1,
         RoofShedBarn = 2
     }
+    public class OrderEqualityComparer : EqualityComparer<Order>
+    {
+        public override bool Equals(Order x, Order y)
+        {
+            return (x.OrderId == y.OrderId
+                && x.Fulfilled == y.Fulfilled
+                && x.MemberId == y.MemberId);
+        }
+
+        public override int GetHashCode(Order obj)
+        {
+            string hCode = obj.OrderId + obj.Fulfilled.ToString() + obj.MemberId;
+            return hCode.GetHashCode();
+        }
+    }
 }

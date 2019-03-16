@@ -100,7 +100,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BorderlessEntryRenderer.cs" />
-    <Compile Include="PushNotifications\FirebaseNotificationService.cs" />
     <Compile Include="PushNotifications\FirebaseRegistrationService.cs" />
     <Compile Include="GoogleAuthInterceptor.cs" />
     <Compile Include="MainActivity.cs" />

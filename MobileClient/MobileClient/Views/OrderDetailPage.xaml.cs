@@ -21,6 +21,7 @@ namespace MobileClient.Views
     {
         private Order _order;
         private PropertyModel _property;
+        private ImageModel _image;
         private ICache<PropertyModel> _propertyCache;
         private ICache<ImageModel> _imageCache;
         private IPropertyService _propertyService;
@@ -46,10 +47,8 @@ namespace MobileClient.Views
             _alertService = DependencyService.Get<IAlertService>();
 
             _order = order;
-            var prop = _propertyCache.Get(order.OrderId);
-            var img = prop != null ? _imageCache.Get(prop.OrderId) : null;
             // Display message if order isn't fulfilled yet.
-            if (prop == null || !order.Fulfilled)
+            if (!order.Fulfilled)
             {
                 StatusMessage.IsVisible = true;
                 Pitch.IsVisible = false;
@@ -62,19 +61,69 @@ namespace MobileClient.Views
                 SafetyStockTable.IsVisible = false;
                 return;
             }
+            _property = _propertyCache.Get(order.OrderId);
+            _image = _property != null ? _imageCache.Get(_property.OrderId) : null;
 
-            if ((prop == null || img == null) && order.Fulfilled)
+            if ((_property == null || _image == null) && _order.Fulfilled)
+            {
+                MainLayout.IsVisible = false;
+                LoadingAnimation.IsVisible = true;
+                LoadingAnimation.IsRunning = true;
+            }
+            else
+            {
+                SetUIMeasurements();
+            }
+        }
+
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
+            await Task.Delay(50);
+            await LoadPropertyAndImage();
+        }
+
+        private void SetUIMeasurements()
+        {
+            // Recalculate roof totals for current property
+            CalculateCurrentTotals(_property);
+
+            // Materialize view
+            _recalculated = GetViewModelFromProperty(_property);
+
+            // Set GUI and event handlers
+            ImageGR.Tapped += OnImageTapped;
+            DownButton.Clicked += (s, e) => OnPitchValueChanged(_recalculated.CurrentPitch, _recalculated.CurrentPitch - 1);
+            UpButton.Clicked += (s, e) => OnPitchValueChanged(_recalculated.CurrentPitch, _recalculated.CurrentPitch + 1);
+            var stream = new StreamImageSource();
+            stream.Stream = (x) =>
+            {
+                return Task.FromResult<Stream>(new MemoryStream(_image.Image));
+            };
+            OrderId.Text = $"Order ID: {_order.OrderId}";
+            Pitch.Text = $"{_recalculated.CurrentPitch}:12";
+            NumberOfRoofs.Text = $"Number of Roofs Measured: {_recalculated.Roofs.Count()}";
+            TopImage.Source = stream;
+            Address.Text = $"{Regex.Replace(_property.Address, @"\r\n", @" ")}";
+            Area.Text = $"{Convert.ToInt64(_property.Roofs.Sum(x => x.TotalArea)).ToString()} sq. ft.";
+            Squares.Text = $"Total Squares: {_property.Roofs.Sum(x => x.TotalSquares).ToString()} squares";
+            RefreshTableView(_property.Roofs.Sum(x => x.TotalArea));
+        }
+
+        private async Task LoadPropertyAndImage()
+        {
+            if ((_property == null || _image == null) && _order.Fulfilled)
             {
                 // Try to download measurements when order is marked as fulfilled but measurements aren't found.
                 MainLayout.IsVisible = false;
                 LoadingAnimation.IsVisible = true;
                 LoadingAnimation.IsRunning = true;
-                if (prop == null)
+                if (_property == null)
                 {
                     PropertyModel newModel = null;
                     try
                     {
-                        newModel = Task.Run(async () => await _propertyService.GetProperties(new List<string>() { order.OrderId })).Result?.First().Value;
+                        newModel = (await _propertyService.GetProperties(new List<string>() { _order.OrderId })).First().Value;
                     }
                     catch { }
                     if (newModel == null || string.IsNullOrWhiteSpace(newModel.OrderId))
@@ -83,14 +132,14 @@ namespace MobileClient.Views
                         return;
                     }
                     _propertyCache.Put(newModel.OrderId, newModel);
-                    prop = newModel;
+                    _property = newModel;
                 }
-                if (img == null)
+                if (_image == null)
                 {
                     ImageModel image = null;
                     try
                     {
-                        image = Task.Run(() => _imageService.GetImages(new List<string>() { order.OrderId })).Result?.First().Value;
+                        image = _imageService.GetImages(new List<string>() { _order.OrderId }).First().Value;
                     }
                     catch { }
                     if (image == null)
@@ -99,40 +148,15 @@ namespace MobileClient.Views
                     }
                     else
                     {
-                        _imageCache.Put(order.OrderId, image);
-                        img = image;
+                        _imageCache.Put(_order.OrderId, image);
+                        _image = image;
                     }
                 }
-                MainLayout.IsVisible = true;
                 LoadingAnimation.IsVisible = false;
                 LoadingAnimation.IsRunning = false;
+                MainLayout.IsVisible = true;
+                SetUIMeasurements();
             }
-
-            _property = prop;
-
-            // Recalculate roof totals for current property
-            CalculateCurrentTotals(_property);
-
-            // Materialize view
-            _recalculated = GetViewModelFromProperty(_property);
-
-            // Set GUI and event handlers
-            OrderId.Text = $"Order ID: {order.OrderId}";
-            Pitch.Text = $"{_recalculated.CurrentPitch}:12";
-            NumberOfRoofs.Text = $"Number of Roofs Measured: {_recalculated.Roofs.Count()}";
-            ImageGR.Tapped += OnImageTapped;
-            DownButton.Clicked += (s, e) => OnPitchValueChanged(_recalculated.CurrentPitch, _recalculated.CurrentPitch - 1);
-            UpButton.Clicked += (s, e) => OnPitchValueChanged(_recalculated.CurrentPitch, _recalculated.CurrentPitch + 1);
-            var stream = new StreamImageSource();
-            stream.Stream = (x) =>
-            {
-                return Task.FromResult<Stream>(new MemoryStream(img.Image));
-            };
-            TopImage.Source = stream;
-            Address.Text = $"{Regex.Replace(_property.Address, @"\r\n", @" ")}";
-            Area.Text = $"{Convert.ToInt64(_property.Roofs.Sum(x => x.TotalArea)).ToString()} sq. ft.";
-            Squares.Text = $"Total Squares: {_property.Roofs.Sum(x => x.TotalSquares).ToString()} squares";
-            RefreshTableView(_property.Roofs.Sum(x => x.TotalArea));
         }
 
         private void CalculateCurrentTotals(PropertyModel property)
@@ -146,6 +170,7 @@ namespace MobileClient.Views
                 roof.PredominantPitchRise = rise;
             }
         }
+
         private RecalculatedPropertyModel GetViewModelFromProperty(PropertyModel property)
         {
             var overallPitch = RoofUtilities.GetPredominantPitchFromSections(_property.Roofs.SelectMany(x => x.Sections).ToList());
@@ -156,11 +181,12 @@ namespace MobileClient.Views
                 OriginalPitch = overallPitch
             };
         }
+
         private void OnPitchValueChanged(int oldValue, int newValue)
         {
             try
             {
-                if (newValue > 25 || newValue < 0)
+                if (newValue > 35 || newValue < 0)
                     return;
                 Pitch.Text = $"{newValue}:12";
                 _recalculated.CurrentPitch = newValue;
@@ -197,12 +223,14 @@ namespace MobileClient.Views
                 _logger.LogError("Failed to calculate pitch. " + ex.ToString());
             }
         }
+
         private async void OnImageTapped(object sender, EventArgs e)
         {
             TopImage.IsEnabled = false;
             await Navigation.PushAsync(new ImagePopup((StreamImageSource)TopImage.Source));
             TopImage.IsEnabled = true;
         }
+
         private void RefreshTableView(double totalArea)
         {
             SafetyStockTable.ItemsSource = null;
@@ -221,13 +249,13 @@ namespace MobileClient.Views
             SafetyStockTable.ItemsSource = groups;
         }
     }
+
     class WasteViewModel
     {
         public string Text { get; set; }
         public Color TextColor { get; set; }
         public string Detail { get; set; }
         public Color DetailColor { get; set; }
-
     }
 
     class WasteGroup : List<WasteViewModel>

@@ -24,7 +24,7 @@ namespace MobileClient.Services
         public Dictionary<string, ImageModel> GetImages(List<string> orderIds)
         {
             if (orderIds == null || !orderIds.Any())
-                return null;
+                return new Dictionary<string, ImageModel>();
             var tasks = orderIds.Select(x => new
             {
                 Order = x,

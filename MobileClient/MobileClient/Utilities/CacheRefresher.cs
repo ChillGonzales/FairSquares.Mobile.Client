@@ -9,25 +9,35 @@ namespace MobileClient.Utilities
     {
         private readonly ILogger<CacheRefresher> _logger;
         private readonly Func<string, Task> _refreshFunc;
-        public bool IsRefreshing { get; private set; }
+        public bool Invalidated { get; private set; }
 
         public CacheRefresher(ILogger<CacheRefresher> logger, Func<string, Task> refreshFunc)
         {
             _logger = logger;
             _refreshFunc = refreshFunc;
         }
+
         public async Task RefreshCaches(string userId)
         {
             try
             {
-                IsRefreshing = true;
                 await _refreshFunc(userId);
-                IsRefreshing = false;
+                Invalidated = false;
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Failed to refresh caches.{ex.ToString()}");
             }
+        }
+
+        public void Invalidate()
+        {
+            Invalidated = true;
+        }
+
+        public void Revalidate()
+        {
+            Invalidated = false;
         }
     }
 }

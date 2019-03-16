@@ -98,6 +98,9 @@ namespace MobileClient.Views
                 };
                 await Task.Delay(5000);
 #endif
+                if (sub == null)
+                    throw new InvalidOperationException($"Something went wrong when attempting to purchase. Please try again.");
+
                 var model = new Models.SubscriptionModel()
                 {
                     PurchaseId = sub.Id,

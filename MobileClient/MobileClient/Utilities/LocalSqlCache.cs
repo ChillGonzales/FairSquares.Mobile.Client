@@ -43,33 +43,54 @@ namespace MobileClient.Utilities
         }
         public void Put(string key, T value)
         {
-            this.Delete(key);
-            _connection.Insert(new Storable()
+            try
             {
-                Key = key,
-                SerializedValue = JsonConvert.SerializeObject(value)
-            });
+                this.Delete(key);
+                _connection.Insert(new Storable()
+                {
+                    Key = key,
+                    SerializedValue = JsonConvert.SerializeObject(value)
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Exception occurred while putting local cache.", ex);
+            }
         }
         public void Put(Dictionary<string, T> keyValuePairs)
         {
-            _connection.DeleteAll<T>();
-            foreach (var kvp in keyValuePairs)
+            try
             {
-                _connection.Insert(new Storable()
+                _connection.DeleteAll<T>();
+                foreach (var kvp in keyValuePairs)
                 {
-                    Key = kvp.Key,
-                    SerializedValue = JsonConvert.SerializeObject(kvp.Value)
-                });
+                    _connection.Insert(new Storable()
+                    {
+                        Key = kvp.Key,
+                        SerializedValue = JsonConvert.SerializeObject(kvp.Value)
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Exception occurred while putting local cache.", ex);
             }
         }
         public void Update(Dictionary<string, T> keyValuePairs)
         {
-            foreach (var kvp in keyValuePairs)
+            try
             {
-                var value = _connection.Find<Storable>(kvp.Key);
-                if (value != null)
-                    this.Delete(kvp.Key);
-                _connection.Insert(new Storable() { Key = kvp.Key, SerializedValue = JsonConvert.SerializeObject(kvp.Value) });
+                foreach (var kvp in keyValuePairs)
+                {
+                    var value = _connection.Find<Storable>(kvp.Key);
+                    if (value != null)
+                        this.Delete(kvp.Key);
+                    _connection.Insert(new Storable() { Key = kvp.Key, SerializedValue = JsonConvert.SerializeObject(kvp.Value) });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Exception occurred while updating local cache.", ex);
             }
         }
     }

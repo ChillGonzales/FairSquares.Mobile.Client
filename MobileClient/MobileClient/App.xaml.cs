@@ -88,6 +88,7 @@ namespace MobileClient
                     try
                     {
                         var orders = await orderService.GetMemberOrders(userId);
+                        var unCached = orders.Except(orderCache.GetAll().Select(x => x.Value).ToList(), new OrderEqualityComparer()).ToList();
                         orderCache.Update(orders.ToDictionary(x => x.OrderId, x => x));
                         var subTask = Task.Run(() =>
                         {
@@ -104,7 +105,7 @@ namespace MobileClient
                                 propertyCache.Clear();
                                 return;
                             }
-                            var properties = await propertyService.GetProperties(orders.Select(x => x.OrderId).ToList());
+                            var properties = await propertyService.GetProperties(unCached.Select(x => x.OrderId).ToList());
                             propertyCache.Update(properties);
                         });
                         var imgTask = Task.Run(() =>
@@ -114,7 +115,7 @@ namespace MobileClient
                                 imageCache.Clear();
                                 return;
                             }
-                            var images = imageService.GetImages(orders.Select(x => x.OrderId).ToList());
+                            var images = imageService.GetImages(unCached.Select(x => x.OrderId).ToList());
                             imageCache.Update(images);
                         });
                         var subscriptionTask = Task.Run(async () =>
@@ -129,8 +130,11 @@ namespace MobileClient
                                 {
                                     purchases = (await purchaseService.GetPurchases()).ToList();
                                 }
-                                catch { }
-                                var mostRecent = purchases?.OrderByDescending(x => x.TransactionDateUtc)?.FirstOrDefault();
+                                catch (Exception ex)
+                                {
+                                    emailLogger.LogError($"Error occurred while getting purchases. {ex.ToString()}");
+                                }
+                                var mostRecent = purchases.OrderByDescending(x => x.TransactionDateUtc)?.FirstOrDefault();
                                 if (mostRecent != null)
                                 {
                                     var newSub = SubscriptionUtilities.GetModelFromIAP(mostRecent, userId, sub);
@@ -211,9 +215,13 @@ namespace MobileClient
             userService.OnLoggedOut += (s, e) => Device.BeginInvokeOnMainThread(() => MainPage = new LandingPage());
 
             if (userService.GetLoggedInAccount() == null)
+            {
                 MainPage = new LandingPage();
+            }
             else
+            {
                 MainPage = new BaseTabPage();
+            }
         }
 
         protected override void OnStart()
@@ -229,6 +237,13 @@ namespace MobileClient
         protected override void OnResume()
         {
             // Handle when your app resumes
+            // Invalidate cache so views know they need to refresh orders
+            try
+            {
+                var refresher = Container.GetInstance<ICacheRefresher>();
+                refresher.Invalidate();
+            }
+            catch { }
         }
     }
 }

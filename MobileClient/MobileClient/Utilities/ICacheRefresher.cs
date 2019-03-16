@@ -8,6 +8,8 @@ namespace MobileClient.Utilities
     public interface ICacheRefresher
     {
         Task RefreshCaches(string userId);
-        bool IsRefreshing { get; }
+        void Invalidate();
+        void Revalidate();
+        bool Invalidated { get; }
     }
 }
