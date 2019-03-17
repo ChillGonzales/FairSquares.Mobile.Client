@@ -122,8 +122,7 @@ namespace MobileClient.Views
             }
             catch (Exception ex)
             {
-                ErrorCol.Height = 50;
-                ErrorLabel.Text = ex.Message;
+                _alertService.LongAlert(ex.Message);
             }
             finally
             {

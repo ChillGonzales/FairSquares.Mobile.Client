@@ -37,6 +37,7 @@ namespace MobileClient.Views
                 _imageCache = App.Container.GetInstance<ICache<ImageModel>>();
                 _logger = App.Container.GetInstance<ILogger<MyOrdersPage>>();
                 _cacheRefresher = App.Container.GetInstance<ICacheRefresher>();
+                MessagingCenter.Subscribe<App>(this, "CacheInvalidated", async x => await this.SetViewState());
                 ExampleReportButton.Clicked += async (s, e) =>
                 {
                     try

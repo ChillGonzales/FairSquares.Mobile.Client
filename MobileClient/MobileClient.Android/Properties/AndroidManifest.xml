@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.FairSquares.MobileClient" android:installLocation="auto" android:versionCode="27" android:versionName="1.0.27">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.FairSquares.MobileClient" android:installLocation="auto" android:versionCode="28" android:versionName="1.0.28">
 	<uses-sdk android:minSdkVersion="23" android:targetSdkVersion="28" />
 	<application android:label="Fair Squares">
 		<receiver android:name="com.google.firebase.iid.FirebaseInstanceIdInternalReceiver" android:exported="false" />
@@ -10,8 +10,6 @@
 				<category android:name="${applicationId}" />
 			</intent-filter>
 		</receiver>
-    <meta-data
-      android:name="com.google.firebase.messaging.default_notification_icon"
-      android:resource="@drawable/ic_stat_web_hi_res_512" />
+		<meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@drawable/ic_stat_web_hi_res_512" />
 	</application>
 </manifest>

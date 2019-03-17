@@ -34,7 +34,7 @@
     </CodesignProvision>
     <CodesignExtraArgs />
     <CodesignResourceRules />
-    <DeviceSpecificBuild>false</DeviceSpecificBuild>
+    <DeviceSpecificBuild>true</DeviceSpecificBuild>
     <MtouchExtraArgs>--registrar:static</MtouchExtraArgs>
     <MtouchFloat32>true</MtouchFloat32>
   </PropertyGroup>
