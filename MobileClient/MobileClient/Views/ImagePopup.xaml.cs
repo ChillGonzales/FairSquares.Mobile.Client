@@ -24,17 +24,6 @@ namespace MobileClient.Views
             InitializeComponent();
             _imgSource = image;
             FullscreenImage.Source = image;
-            var singleTap = new TapGestureRecognizer()
-            {
-                NumberOfTapsRequired = 1
-            };
-            singleTap.Tapped += OnImageTapped;
-            FullscreenImage.GestureRecognizers.Add(singleTap);
-        }
-
-        private async void OnImageTapped(object sender, EventArgs e)
-        {
-            await Navigation.PopAsync();
         }
     }
 }

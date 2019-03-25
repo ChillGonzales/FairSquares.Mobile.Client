@@ -26,7 +26,7 @@
                     FontSize="Medium"
                     VerticalOptions="Start"
                     HorizontalOptions="Start" />
-                <Label Text="Subscription Renews On"
+                <Label Text="Current Period Ends On"
                     FontSize="Medium"
                     FontAttributes="Bold"
                     VerticalOptions="Start"
