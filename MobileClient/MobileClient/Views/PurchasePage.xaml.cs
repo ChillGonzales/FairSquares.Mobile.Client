@@ -25,6 +25,10 @@ namespace MobileClient.Views
         private IOrderService _orderService;
         private IAlertService _alertService;
         private bool _showFreeReportButton;
+        private bool _paymentConfirmationShown = false;
+        private string _selectedSubCode;
+        private List<LoadingButtonsModel> _loadingButtons;
+        private bool _paymentConfirmed = false;
 
         public PurchasePage(bool showFreeReportButton)
         {
@@ -53,21 +57,58 @@ namespace MobileClient.Views
             EnterpriseButton.Clicked += (s, e) => { PurchaseSubscription(s as Button, SubscriptionType.Enterprise); };
             SetFreeReportButton(_showFreeReportButton);
         }
+
+        protected async override void OnAppearing()
+        {
+            base.OnAppearing();
+            if (_paymentConfirmationShown)
+            {
+                try
+                {
+                    _paymentConfirmationShown = false;
+                    if (_paymentConfirmed)
+                    {
+                        _paymentConfirmed = false;
+                        await PurchaseSubscription(_selectedSubCode);
+                        Device.BeginInvokeOnMainThread(async () => await Navigation.PopAsync());
+                        _alertService.LongAlert($"Thank you for your purchase!");
+                        RootPage.NavigateFromMenu(ViewModels.PageType.Order);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _alertService.LongAlert($"Failed to purchase subscription. Error: {ex.Message}");
+                }
+                finally
+                {
+                    foreach (var obj in _loadingButtons)
+                    {
+                        obj.Button.IsEnabled = true;
+                        if (obj.Loader != null)
+                        {
+                            obj.Loader.IsVisible = false;
+                            obj.Loader.IsRunning = false;
+                        }
+                    }
+                }
+            }
+        }
+
         private async void PurchaseSubscription(Button sender, SubscriptionType subType)
         {
-            var selectable = new[]
+            _loadingButtons = new List<LoadingButtonsModel>()
             {
-                new { Button = BasicButton, Loader = BasicLoader, Selected = sender == BasicButton },
-                new { Button = PremiumButton, Loader = PremiumLoader, Selected = sender == PremiumButton },
-                new { Button = EnterpriseButton, Loader = EnterpriseLoader, Selected = sender == EnterpriseButton },
-                new { Button = TryForFreeButton, Loader = null as ActivityIndicator, Selected = sender == TryForFreeButton }
+                new LoadingButtonsModel() { Button = BasicButton, Loader = BasicLoader, Selected = sender == BasicButton },
+                new LoadingButtonsModel() { Button = PremiumButton, Loader = PremiumLoader, Selected = sender == PremiumButton },
+                new LoadingButtonsModel() { Button = EnterpriseButton, Loader = EnterpriseLoader, Selected = sender == EnterpriseButton },
+                new LoadingButtonsModel() { Button = TryForFreeButton, Loader = null as ActivityIndicator, Selected = sender == TryForFreeButton }
             };
             try
             {
                 ErrorCol.Height = 0;
-                foreach (var obj in selectable)
+                foreach (var obj in _loadingButtons)
                     obj.Button.IsEnabled = false;
-                var selected = selectable.First(x => x.Selected);
+                var selected = _loadingButtons.First(x => x.Selected);
                 if (selected.Loader != null)
                 {
                     selected.Loader.IsVisible = true;
@@ -87,55 +128,47 @@ namespace MobileClient.Views
                         subCode = SubscriptionUtilities.SUB_NAME_ENTERPRISE;
                         break;
                 }
-#if RELEASE
-                var sub = await _purchaseService.PurchaseSubscription(subCode, "payload");
-#else
-                var sub = new InAppBillingPurchase()
-                {
-                    PurchaseToken = "PurchaseToken",
-                    ProductId = subCode,
-                    Id = "12345"
-                };
-                await Task.Delay(5000);
-#endif
-                if (sub == null)
-                    throw new InvalidOperationException($"Something went wrong when attempting to purchase. Please try again.");
-
-                var model = new Models.SubscriptionModel()
-                {
-                    PurchaseId = sub.Id,
-                    PurchaseToken = sub.PurchaseToken,
-                    SubscriptionType = SubscriptionUtilities.GetTypeFromProductId(sub.ProductId),
-                    StartDateTime = DateTimeOffset.Now,
-                    PurchasedDateTime = DateTimeOffset.Now,
-                    EndDateTime = DateTimeOffset.Now.AddMonths(1),
-                    PurchaseSource = Device.RuntimePlatform == Device.Android ? Models.PurchaseSource.GooglePlay : Models.PurchaseSource.AppStore,
-                    UserId = _userCache.GetLoggedInAccount().UserId
-                };
-                _subCache.Put(_userCache.GetLoggedInAccount().UserId, model);
-#if RELEASE
-                _subService.AddSubscription(model);
-#endif
-                Device.BeginInvokeOnMainThread(async () => await Navigation.PopAsync());
-                _alertService.LongAlert($"Thank you for your purchase!");
-                RootPage.NavigateFromMenu(ViewModels.PageType.Order);
+                _selectedSubCode = subCode;
+                _paymentConfirmationShown = true;
+                await Navigation.PushAsync(new PaymentConfirmationPage(() => _paymentConfirmed = true));
             }
             catch (Exception ex)
             {
                 _alertService.LongAlert(ex.Message);
             }
-            finally
+        }
+
+        private async Task PurchaseSubscription(string subCode)
+        {
+#if RELEASE
+            var sub = await _purchaseService.PurchaseSubscription(subCode, "payload");
+#else
+            var sub = new InAppBillingPurchase()
             {
-                foreach (var obj in selectable)
-                {
-                    obj.Button.IsEnabled = true;
-                    if (obj.Loader != null)
-                    {
-                        obj.Loader.IsVisible = false;
-                        obj.Loader.IsRunning = false;
-                    }
-                }
-            }
+                PurchaseToken = "PurchaseToken",
+                ProductId = subCode,
+                Id = "12345"
+            };
+            await Task.Delay(5000);
+#endif
+            if (sub == null)
+                throw new InvalidOperationException($"Something went wrong when attempting to purchase. Please try again.");
+
+            var model = new Models.SubscriptionModel()
+            {
+                PurchaseId = sub.Id,
+                PurchaseToken = sub.PurchaseToken,
+                SubscriptionType = SubscriptionUtilities.GetTypeFromProductId(sub.ProductId),
+                StartDateTime = DateTimeOffset.Now,
+                PurchasedDateTime = DateTimeOffset.Now,
+                EndDateTime = DateTimeOffset.Now.AddMonths(1),
+                PurchaseSource = Device.RuntimePlatform == Device.Android ? Models.PurchaseSource.GooglePlay : Models.PurchaseSource.AppStore,
+                UserId = _userCache.GetLoggedInAccount().UserId
+            };
+            _subCache.Put(_userCache.GetLoggedInAccount().UserId, model);
+#if RELEASE
+                _subService.AddSubscription(model);
+#endif
         }
 
         private void SetFreeReportButton(bool showButton)
@@ -158,5 +191,12 @@ namespace MobileClient.Views
             PremiumButton.IsEnabled = !showButton;
             EnterpriseButton.IsEnabled = !showButton;
         }
+    }
+
+    internal class LoadingButtonsModel
+    {
+        public Button Button { get; set; }
+        public ActivityIndicator Loader { get; set; }
+        public bool Selected { get; set; }
     }
 }
