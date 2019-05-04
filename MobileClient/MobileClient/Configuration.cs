@@ -11,5 +11,6 @@ namespace MobileClient
         public const string RedirectNoPath = "com.googleusercontent.apps.81761642488-ovc2vh5394h1ebd1d6jusqv7q2jefbs2";
         public const string RedirectPath = "/oauth2redirect";
         public const string AppName = "MobileClient";
+        public const string PrivacyPolicyUrl = "https://www.fairsquarestech.com/terms-and-conditions";
     }
 }

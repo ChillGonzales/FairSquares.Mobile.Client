@@ -26,7 +26,6 @@ namespace MobileClient.Views
         private readonly IOrderService _orderService;
         private readonly IAlertService _toast;
         private readonly ICache<Order> _orderCache;
-        private PurchasePage _purchasePage;
 
         public OrderPage()
         {
@@ -47,12 +46,6 @@ namespace MobileClient.Views
         protected async override void OnAppearing()
         {
             base.OnAppearing();
-            // TODO: Find better way to do this.
-            if (_purchasePage != null)
-            {
-                _purchasePage = null;
-                await SubmitOrder(_userService.GetLoggedInAccount());
-            }
             await SetVisualStateForValidation();
         }
 
@@ -105,13 +98,14 @@ namespace MobileClient.Views
                 }
 
                 var validation = await _orderValidator.ValidateOrderRequest(_userService.GetLoggedInAccount());
-                // Show purchase page once for very first order or every time if they don't have a subscription
-                if (validation.State == ValidationState.FreeReportValid && _purchasePage == null)
+                if (validation.State == ValidationState.FreeReportValid)
                 {
-                    SubmitButton.IsEnabled = true;
-                    _purchasePage = new PurchasePage(true);
-                    await Navigation.PushAsync(_purchasePage);
-                    return;
+                    var answer = await DisplayAlert("Free Report Usage", "You are about to use up your free report. Are you sure you'd like to continue?", "Ok", "Cancel");
+                    if (!answer)
+                    {
+                        SubmitButton.IsEnabled = true;
+                        return;
+                    }
                 }
                 await SubmitOrder(user);
             }
