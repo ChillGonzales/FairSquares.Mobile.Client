@@ -67,7 +67,12 @@ namespace MobileClient.Views
                 }
                 else
                 {
-                    await Navigation.PushAsync(new PurchasePage(validation.State == ValidationState.FreeReportValid));
+                    await Navigation.PushAsync(new PurchasePageRefactored(DependencyService.Get<IAlertService>(),
+                                                                          App.Container.GetInstance<IPurchasingService>(),
+                                                                          App.Container.GetInstance<ICache<SubscriptionModel>>(),
+                                                                          App.Container.GetInstance<ISubscriptionService>(),
+                                                                          App.Container.GetInstance<ICurrentUserService>(),
+                                                                          validation));
                 }
             }
             catch (Exception ex)

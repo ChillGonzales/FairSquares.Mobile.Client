@@ -15,6 +15,9 @@ namespace MobileClient.Utilities
         public const int BasicOrderCount = 3;
         public const int PremiumOrderCount = 8;
         public const int EnterpriseOrderCount = 25;
+        public const double BasicPrice = 24.99;
+        public const double PremiumPrice = 49.99;
+        public const double EnterprisePrice = 99.99;
 
         public static bool SubscriptionActive(SubscriptionModel model)
         {

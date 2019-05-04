@@ -28,12 +28,23 @@ namespace MobileClient.Services
             {
                 var sub = _subService.GetSubscriptions(user.UserId).OrderBy(x => x.StartDateTime).LastOrDefault();
                 var orders = await _orderService.GetMemberOrders(user.UserId);
+
                 if (!SubscriptionUtilities.SubscriptionActive(sub) && orders.Any())
                 {
+                    // This case means they've never had a subscription before, and are eligible for a trial month.
+                    if (sub == null)
+                    {
+                        return new ValidationResponse()
+                        {
+                            State = ValidationState.NoSubscriptionAndTrialValid,
+                            Message = "User has used their free report, but is eligible for a free trial period."
+                        };
+                    }
+
                     return new ValidationResponse()
                     {
-                        State = ValidationState.NoSubscriptionAndFreeReportUsed,
-                        Message = "User does not have a subscription and has used their free report."
+                        State = ValidationState.NoSubscriptionAndTrialAlreadyUsed,
+                        Message = "User does not have a subscription and has used their free report and trial period."
                     };
                 }
                 if (!SubscriptionUtilities.SubscriptionActive(sub) && !orders.Any())
@@ -87,9 +98,11 @@ namespace MobileClient.Services
         public int RemainingOrders { get; set; }
         public SubscriptionModel Subscription { get; set; }
     }
+
     public enum ValidationState
     {
-        NoSubscriptionAndFreeReportUsed,
+        NoSubscriptionAndTrialAlreadyUsed,
+        NoSubscriptionAndTrialValid,
         FreeReportValid,
         SubscriptionReportValid,
         NoReportsLeftInPeriod

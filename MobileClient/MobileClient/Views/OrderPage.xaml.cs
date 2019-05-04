@@ -60,7 +60,15 @@ namespace MobileClient.Views
                 CannotSubmitLayout.IsVisible = true;
                 return;
             }
-            if (validation.State == ValidationState.NoSubscriptionAndFreeReportUsed)
+            if (validation.State == ValidationState.NoSubscriptionAndTrialValid)
+            {
+                MainLayout.IsVisible = false;
+                CannotSubmitHeader.Text = "Thanks for trying Fair Squares!";
+                CannotSubmitLabel.Text = $"Please go to the Account Tab to claim your free one month trial before continuing.";
+                CannotSubmitLayout.IsVisible = true;
+                return;
+            }
+            if (validation.State == ValidationState.NoSubscriptionAndTrialAlreadyUsed)
             {
                 MainLayout.IsVisible = false;
                 CannotSubmitHeader.Text = "Thanks for trying Fair Squares!";

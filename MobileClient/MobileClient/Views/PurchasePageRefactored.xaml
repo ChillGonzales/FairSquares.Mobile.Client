@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MobileClient.Views.PurchasePageRefactored">
+    <ContentPage.Content>
+        <StackLayout Orientation="Vertical" Margin="5">
+            <Label Text="Choose Your Plan. Cancel Anytime."
+                   FontSize="Large"
+                   FontAttributes="Bold"
+                   HorizontalOptions="CenterAndExpand"
+                   HeightRequest="50"
+                   VerticalOptions="Center" />
+
+            <!--Subscription Dropdown-->
+            <Picker x:Name="SubscriptionPicker"
+                    FontSize="Medium"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Center"
+                    WidthRequest="200" />
+            <Label x:Name="MarketingDesc" 
+                   FontSize="Medium"
+                   FontAttributes="Bold"
+                   VerticalOptions="Start"
+                   HorizontalOptions="CenterAndExpand" />
+            <Label x:Name="ReportsDesc" 
+                   FontSize="Medium"
+                   VerticalOptions="Start"
+                   HorizontalOptions="CenterAndExpand" />
+            <Label x:Name="CostDesc" 
+                   FontSize="Medium"
+                   VerticalOptions="Start"
+                   HorizontalOptions="CenterAndExpand" />
+            <Label HeightRequest="25" />
+            <AbsoluteLayout HorizontalOptions="Fill" VerticalOptions="Fill">
+                <Button x:Name="PurchaseButton"
+                        StyleClass="Success"
+                        AbsoluteLayout.LayoutFlags="PositionProportional"
+                        AbsoluteLayout.LayoutBounds="0.5, 0.5, 250, 50" />
+                <ActivityIndicator x:Name="LoadAnimation"
+                                   Color="White"
+                                   AbsoluteLayout.LayoutFlags="PositionProportional"
+                                   AbsoluteLayout.LayoutBounds="0.5,0.5,-1,-1"
+                                   IsVisible="False" />
+            </AbsoluteLayout>
+            <Label HeightRequest="10"/>
+
+            <!--Stupid Apple Legalese-->
+            <Label VerticalOptions="Center"
+                   HorizontalOptions="Center">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span x:Name="LegalText" FontSize="Small" FontAttributes="Italic" />
+                        <Span Text = "here." TextDecorations="Underline" FontSize="Small" FontAttributes="Italic">
+                            <Span.GestureRecognizers>
+                                <TapGestureRecognizer x:Name="LinkTapGesture" NumberOfTapsRequired="1" />
+                            </Span.GestureRecognizers>
+                        </Span>
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>
