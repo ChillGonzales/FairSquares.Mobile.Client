@@ -6,9 +6,7 @@ using Plugin.InAppBilling.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -45,7 +43,7 @@ namespace MobileClient.Views
             _subService = subService;
             _userCache = userCache;
 
-            SubscriptionPicker.ItemsSource = _subscriptionSource.Select(x => x.ToString() + " Plan").ToList();
+            SubscriptionPicker.ItemsSource = _subscriptionSource.Select(x => x.ToString() + " Subscription").ToList();
             SubscriptionPicker.SelectedIndex = 0;
             SubscriptionPicker.SelectedIndexChanged += SelectedSubscriptionChanged;
             LinkTapGesture.Command = new Command(() => Device.OpenUri(new Uri(Configuration.PrivacyPolicyUrl)));
@@ -79,27 +77,30 @@ namespace MobileClient.Views
                     MarketingDesc.IsVisible = true;
                     MarketingDesc.Text = $"A 25% Cost Savings!";
                     ReportsDesc.Text = $"{SubscriptionUtilities.PremiumOrderCount} reports per month";
-                    CostDesc.Text = $"Price: ${SubscriptionUtilities.PremiumPrice} per month";
+                    CostDesc.Text = $"${SubscriptionUtilities.PremiumPrice} per month";
+                    AvgCostDesc.Text = $"Value of $6.25 per report";
                     break;
                 case SubscriptionType.Enterprise:
                     MarketingDesc.IsVisible = true;
                     MarketingDesc.Text = $"Over 50% in Cost Savings!";
                     ReportsDesc.Text = $"{SubscriptionUtilities.EnterpriseOrderCount} reports per month";
-                    CostDesc.Text = $"Price: ${SubscriptionUtilities.EnterprisePrice} per month";
+                    CostDesc.Text = $"${SubscriptionUtilities.EnterprisePrice} per month";
+                    AvgCostDesc.Text = $"Value of $4.00 per report";
                     break;
                 default:
                     if (new[] { ValidationState.NoSubscriptionAndTrialValid, ValidationState.FreeReportValid }.Contains(validation.State))
                     {
                         MarketingDesc.IsVisible = true;
                         MarketingDesc.Text = $"One month free trial!";
-                        CostDesc.Text = $"Price: ${SubscriptionUtilities.BasicPrice} per month after trial period ends";
+                        CostDesc.Text = $"${SubscriptionUtilities.BasicPrice} per month after trial period ends";
                     }
                     else
                     {
                         MarketingDesc.IsVisible = false;
-                        CostDesc.Text = $"Price: ${SubscriptionUtilities.BasicPrice} per month";
+                        CostDesc.Text = $"${SubscriptionUtilities.BasicPrice} per month";
                     }
                     ReportsDesc.Text = $"{SubscriptionUtilities.BasicOrderCount} reports per month";
+                    AvgCostDesc.Text = $"Value of $8.33 per report";
                     break;
             }
         }

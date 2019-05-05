@@ -11,14 +11,12 @@ namespace MobileClient.Authentication
 {
     public class CurrentUserService : ICurrentUserService
     {
-        private readonly AccountStore _store;
         private AccountModel _loggedIn;
         public event EventHandler<LoggedInEventArgs> OnLoggedIn;
         public event EventHandler OnLoggedOut;
 
-        public CurrentUserService(AccountStore store)
+        public CurrentUserService()
         {
-            _store = store;
             _loggedIn = GetLoggedInAccount();
         }
 
@@ -27,7 +25,7 @@ namespace MobileClient.Authentication
             if (_loggedIn != null)
                 return _loggedIn;
 
-            var token = _store.FindAccountsForService(Configuration.AppName).FirstOrDefault();
+            var token = SecureStorageStore.FindAccountsForServiceAsync(Configuration.GoogleServiceName).Result.FirstOrDefault();
             var model = GetModelFromAccount(token);
             _loggedIn = model;
             return model;
@@ -36,7 +34,7 @@ namespace MobileClient.Authentication
         public void LogIn(Account user)
         {
             _loggedIn = GetModelFromAccount(user);
-            _store.Save(user, Configuration.AppName);
+            SecureStorageStore.SaveAsync(user, Configuration.GoogleServiceName).Wait();
             OnLoggedIn?.Invoke(this, new LoggedInEventArgs() { Account = _loggedIn });
         }
 
@@ -44,8 +42,8 @@ namespace MobileClient.Authentication
         {
             try
             {
-                var acct = _store.FindAccountsForService(Configuration.AppName).FirstOrDefault();
-                _store.Delete(acct, Configuration.AppName);
+                var acct = SecureStorageStore.FindAccountsForServiceAsync(Configuration.GoogleServiceName).Result.FirstOrDefault();
+                SecureStorageStore.SaveAsync(null, Configuration.GoogleServiceName).Wait();
                 _loggedIn = null;
             } 
             catch { }
@@ -78,7 +76,7 @@ namespace MobileClient.Authentication
             var response = http.PostAsync($"https://www.googleapis.com/oauth2/v4/token", new StringContent(JsonConvert.SerializeObject(content))).Result;
             var dict = JsonConvert.DeserializeObject<Dictionary<string, string>>(response.Content.ReadAsStringAsync().Result);
             currentAccount.Properties["access_token"] = dict["access_token"];
-            _store.Save(currentAccount, Configuration.AppName);
+            SecureStorageStore.SaveAsync(currentAccount, Configuration.GoogleServiceName).Wait();
         }
     }
     public class LoggedInEventArgs : EventArgs

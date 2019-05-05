@@ -22,6 +22,7 @@ namespace MobileClient.Views
         private ICache<ImageModel> _imageCache;
         private ILogger<MyOrdersPage> _logger;
         private ICacheRefresher _cacheRefresher;
+        private IOrderValidationService _validationService;
         private ICurrentUserService _userService;
         public static IList<OrderGroup> All { private set; get; }
 
@@ -37,7 +38,9 @@ namespace MobileClient.Views
                 _imageCache = App.Container.GetInstance<ICache<ImageModel>>();
                 _logger = App.Container.GetInstance<ILogger<MyOrdersPage>>();
                 _cacheRefresher = App.Container.GetInstance<ICacheRefresher>();
+                _validationService = App.Container.GetInstance<IOrderValidationService>();
                 MessagingCenter.Subscribe<App>(this, "CacheInvalidated", async x => await this.SetViewState());
+                FreeReportButton.Clicked += (s, e) => (Application.Current.MainPage as BaseTabPage).NavigateFromMenu(ViewModels.PageType.Order);
                 ExampleReportButton.Clicked += async (s, e) =>
                 {
                     try
@@ -115,6 +118,8 @@ namespace MobileClient.Views
             var anyOrders = orders.Any();
             MainLayout.IsVisible = anyOrders;
             NoOrderLayout.IsVisible = !anyOrders;
+            var validation = await _validationService.ValidateOrderRequest(_userService.GetLoggedInAccount());
+            FreeReportLayout.IsVisible = validation.State == ValidationState.FreeReportValid;
             SetListViewSource(orders);
         }
 

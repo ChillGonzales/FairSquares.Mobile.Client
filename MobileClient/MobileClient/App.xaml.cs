@@ -51,7 +51,7 @@ namespace MobileClient
                                                             new Uri(GoogleAccessTokenUrl),
                                                             null,
                                                             true);
-                var userService = new CurrentUserService(AccountStore.Create());
+                var userService = new CurrentUserService();
                 var notifyService = new NotificationService(new HttpClient(), _notifyEndpoint, _apiKey);
                 var emailLogger = new EmailLogger<PurchasingService>(notifyService, userService);
                 var purchaseService = new PurchasingService(emailLogger);

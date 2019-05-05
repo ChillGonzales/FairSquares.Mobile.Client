@@ -12,36 +12,56 @@
             <StackLayout x:Name="LoadingLayout" IsVisible="False">
                 <ActivityIndicator x:Name="LoadingAnimation" Color="Black" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" />
             </StackLayout>
-            <StackLayout x:Name="NoOrderLayout" IsVisible="False" Margin="10">
-                <Label Text="It looks like you don't have any orders yet. Click below to see an example report."
-                   FontSize="Medium"
-                   HorizontalOptions="CenterAndExpand"
-                   VerticalOptions="CenterAndExpand" />
-                <Label/>
-                <Button x:Name="ExampleReportButton"
-                        Text="View Example"
-                        HorizontalOptions="CenterAndExpand"
-                        VerticalOptions="CenterAndExpand"
-                        WidthRequest="250"
-                        StyleClass="Info" />
+            <StackLayout x:Name="NoOrderLayout" IsVisible="False" Margin="10" Orientation="Vertical">
+                <Frame x:Name="FreeReportLayout" IsVisible="False" OutlineColor="Black">
+                    <StackLayout Orientation="Vertical">
+                        <Label Text="You have a free report to use! Click below to try Fair Squares for free."
+                               FontSize="Medium"
+                               HorizontalOptions="CenterAndExpand"
+                               VerticalOptions="CenterAndExpand" />
+                        <Label HeightRequest="10" VerticalOptions="Fill"/>
+                        <Button x:Name="FreeReportButton"
+                                Text="Try For Free"
+                                HorizontalOptions="CenterAndExpand"
+                                VerticalOptions="CenterAndExpand"
+                                WidthRequest="250"
+                                StyleClass="Success" />
+                    </StackLayout>
+                </Frame>
+                <Label HeightRequest="40" VerticalOptions="Fill"/>
+                <Frame OutlineColor="Black">
+                    <StackLayout Orientation="Vertical" >
+                        <Label Text="It looks like you don't have any orders yet. Click below to see an example report."
+                           FontSize="Medium"
+                           HorizontalOptions="CenterAndExpand"
+                           VerticalOptions="CenterAndExpand" />
+                        <Label HeightRequest="10" VerticalOptions="Fill"/>
+                        <Button x:Name="ExampleReportButton"
+                            Text="View Example"
+                            HorizontalOptions="CenterAndExpand"
+                            VerticalOptions="CenterAndExpand"
+                            WidthRequest="250"
+                            StyleClass="Info" />
+                    </StackLayout>
+                </Frame>
             </StackLayout>
             <StackLayout x:Name="MainLayout">
-            <ListView x:Name="OrderListView"
+                <ListView x:Name="OrderListView"
                 IsPullToRefreshEnabled="True"
                 IsGroupingEnabled="True"
                 GroupDisplayBinding="{Binding Title}"
                 VerticalOptions="CenterAndExpand"
                 HorizontalOptions="CenterAndExpand">
-            <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <TextCell Text="{Binding Text}"
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <TextCell Text="{Binding Text}"
                                   Detail="{Binding Detail}"
                                   TextColor= "Black"
                                   DetailColor="{Binding DetailColor}" />
-                    </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
-        </StackLayout>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </StackLayout>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>
