@@ -29,7 +29,7 @@ namespace MobileClient.Services
                 var sub = _subService.GetSubscriptions(user.UserId).OrderBy(x => x.StartDateTime).LastOrDefault();
                 var orders = await _orderService.GetMemberOrders(user.UserId);
 
-                if (!SubscriptionUtilities.SubscriptionActive(sub) && orders.Any())
+                if (!SubscriptionUtility.SubscriptionActive(sub) && orders.Any())
                 {
                     // This case means they've never had a subscription before, and are eligible for a trial month.
                     if (sub == null)
@@ -47,7 +47,7 @@ namespace MobileClient.Services
                         Message = "User does not have a subscription and has used their free report and trial period."
                     };
                 }
-                if (!SubscriptionUtilities.SubscriptionActive(sub) && !orders.Any())
+                if (!SubscriptionUtility.SubscriptionActive(sub) && !orders.Any())
                 {
                     return new ValidationResponse()
                     {
@@ -58,9 +58,9 @@ namespace MobileClient.Services
                 var activeSubOrderCount = orders.Where(x => x.DateReceived >= sub.StartDateTime && x.DateReceived <= sub.EndDateTime)
                                                 .Count();
 
-                if ((sub.SubscriptionType == SubscriptionType.Basic && activeSubOrderCount >= SubscriptionUtilities.BasicOrderCount) ||
-                    (sub.SubscriptionType == SubscriptionType.Premium && activeSubOrderCount >= SubscriptionUtilities.PremiumOrderCount) ||
-                    (sub.SubscriptionType == SubscriptionType.Enterprise && activeSubOrderCount >= SubscriptionUtilities.EnterpriseOrderCount))
+                if ((sub.SubscriptionType == SubscriptionType.Basic && activeSubOrderCount >= SubscriptionUtility.BasicOrderCount) ||
+                    (sub.SubscriptionType == SubscriptionType.Premium && activeSubOrderCount >= SubscriptionUtility.PremiumOrderCount) ||
+                    (sub.SubscriptionType == SubscriptionType.Enterprise && activeSubOrderCount >= SubscriptionUtility.EnterpriseOrderCount))
                 {
                     return new ValidationResponse()
                     {
@@ -72,9 +72,9 @@ namespace MobileClient.Services
                 }
                 else
                 {
-                    var remainingCount = sub.SubscriptionType == SubscriptionType.Basic ? SubscriptionUtilities.BasicOrderCount - activeSubOrderCount :
-                                        (sub.SubscriptionType == SubscriptionType.Premium ? SubscriptionUtilities.PremiumOrderCount - activeSubOrderCount :
-                                        SubscriptionUtilities.EnterpriseOrderCount - activeSubOrderCount);
+                    var remainingCount = sub.SubscriptionType == SubscriptionType.Basic ? SubscriptionUtility.BasicOrderCount - activeSubOrderCount :
+                                        (sub.SubscriptionType == SubscriptionType.Premium ? SubscriptionUtility.PremiumOrderCount - activeSubOrderCount :
+                                        SubscriptionUtility.EnterpriseOrderCount - activeSubOrderCount);
                     return new ValidationResponse()
                     {
                         State = ValidationState.SubscriptionReportValid,

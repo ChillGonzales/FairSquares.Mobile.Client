@@ -28,7 +28,6 @@ namespace MobileClient
         private static string _orderEndpoint = @"https://fairsquares-order-management-api.azurewebsites.net/api/orders";
         private static string _notifyEndpoint = @"https://fairsquares-order-management-api.azurewebsites.net/api/notification";
         private static string _subEndpoint = @"https://fairsquares-order-management-api.azurewebsites.net/api/subscriptions";
-        private static string _userEndpoint = @"https://fairsquares-order-management-api.azurewebsites.net/api/users";
         private static string _propertyEndpoint = @"https://property-measurements.azurewebsites.net/api/properties";
         private static string _blobEndpoint = @"https://fairsquaresapplogging.blob.core.windows.net/roof-images";
         private const string GoogleAuthorizeUrl = "https://accounts.google.com/o/oauth2/v2/auth";
@@ -39,10 +38,10 @@ namespace MobileClient
             try
             {
                 Container = new Container();
-                var orderService = new AzureOrderService(_orderEndpoint, _apiKey);
-                var propertyService = new PropertyService(_propertyEndpoint, new DebugLogger<PropertyService>());
-                var imageService = new BlobImageService(_blobEndpoint, new DebugLogger<BlobImageService>());
-                var subService = new SubscriptionService(_subEndpoint, new DebugLogger<SubscriptionService>());
+                var orderService = new AzureOrderService(new HttpClient(), _orderEndpoint, _apiKey);
+                var propertyService = new PropertyService(new HttpClient(), _propertyEndpoint, new DebugLogger<PropertyService>());
+                var imageService = new BlobImageService(new HttpClient(), _blobEndpoint, new DebugLogger<BlobImageService>());
+                var subService = new SubscriptionService(new HttpClient(), _subEndpoint, new DebugLogger<SubscriptionService>());
                 var authenticator = new OAuth2Authenticator(Configuration.ClientId,
                                                             null,
                                                             Configuration.Scope,
@@ -123,7 +122,7 @@ namespace MobileClient
                             // TODO: This should be somewhere else, not in the client.
                             var sub = subService.GetSubscriptions(userId).OrderByDescending(x => x.StartDateTime).FirstOrDefault();
                             // Check app store purchases to see if they auto-renewed
-                            if (sub != null && !SubscriptionUtilities.SubscriptionActive(sub))
+                            if (sub != null && !SubscriptionUtility.SubscriptionActive(sub))
                             {
                                 var purchases = new List<InAppBillingPurchase>();
                                 try
@@ -137,7 +136,7 @@ namespace MobileClient
                                 var mostRecent = purchases.OrderByDescending(x => x.TransactionDateUtc)?.FirstOrDefault();
                                 if (mostRecent != null)
                                 {
-                                    var newSub = SubscriptionUtilities.GetModelFromIAP(mostRecent, userId, sub);
+                                    var newSub = SubscriptionUtility.GetModelFromIAP(mostRecent, userId, sub);
                                     if (newSub != null)
                                     {
                                         sub = newSub;
@@ -187,10 +186,6 @@ namespace MobileClient
                 Container.Register<ICacheRefresher>(() => refresher, Lifestyle.Singleton);
                 Container.Register<ISubscriptionService>(() => subService, Lifestyle.Singleton);
                 Container.Register<IOrderValidationService, OrderValidationService>();
-                Container.Register<IUserService>(() => new UserService(new HttpClient()
-                {
-                    BaseAddress = new Uri(_userEndpoint)
-                }, new DebugLogger<UserService>()), Lifestyle.Singleton);
 
                 // Finish registering created caches
                 Container.Register<ICache<PropertyModel>>(() => propertyCache, Lifestyle.Singleton);

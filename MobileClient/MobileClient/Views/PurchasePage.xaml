@@ -4,138 +4,77 @@
              x:Class="MobileClient.Views.PurchasePage">
     <ContentPage.Content>
         <ScrollView>
-            <Grid Margin="5">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="25"/>
-                    <RowDefinition x:Name="FreeReportCol" Height="*"/>
-                    <RowDefinition x:Name="FreeReportButtonCol" Height="*"/>
-                    <RowDefinition x:Name="Pad1" Height="15"/>
-                    <RowDefinition x:Name="BasicHeaderCol" Height="*"/>
-                    <RowDefinition x:Name="BasicLabelCol" Height="50"/>
-                    <RowDefinition x:Name="BasicButtonCol" Height="*"/>
-                    <RowDefinition x:Name="Pad2" Height="15"/>
-                    <RowDefinition x:Name="PremiumHeaderCol" Height="*"/>
-                    <RowDefinition x:Name="PremiumCol" Height="25"/>
-                    <RowDefinition x:Name="PremButtonCol" Height="*"/>
-                    <RowDefinition x:Name="Pad3" Height="15"/>
-                    <RowDefinition x:Name="EntHeaderCol" Height="*"/>
-                    <RowDefinition x:Name="EntCol" Height="25"/>
-                    <RowDefinition x:Name="EntButtonCol" Height="*"/>
-                    <RowDefinition x:Name="ErrorCol" Height="25"/>
-                </Grid.RowDefinitions>
+            <StackLayout Orientation="Vertical" Margin="5">
                 <Label Text="Choose Your Plan. Cancel Anytime."
-                   FontSize="Medium"
+                   FontSize="Large"
                    FontAttributes="Bold"
                    HorizontalOptions="CenterAndExpand"
-                   VerticalOptions="CenterAndExpand"
-                   Grid.Row="0"
-                   Grid.Column="0" />
+                   HeightRequest="50"
+                   VerticalOptions="Center" />
+                <Label HeightRequest="25" />
 
-                <Label Text="Try a Free Report On Us."
-                   Font="Medium"
-                   FontAttributes="Bold"
-                   HorizontalOptions="Start"
-                   VerticalOptions="End"
-                   Grid.Row="1"
-                   Grid.Column="0" />
-                <Button Text="Try For Free"
-                    x:Name="TryForFreeButton"
-                    StyleClass="Success"
-                    HorizontalOptions="CenterAndExpand"
-                    VerticalOptions="Start"
-                    Grid.Row="2"
-                    Grid.Column="0"
-                    WidthRequest="250" />
+                <!--Subscription Dropdown-->
+                <StackLayout Orientation="Horizontal" VerticalOptions="Center" HorizontalOptions="CenterAndExpand">
+                    <Label Text="Choose Your Plan: "
+                           FontSize="Medium"
+                           VerticalOptions="Center"
+                           HorizontalOptions="End" />
+                    <Picker x:Name="SubscriptionPicker"
+                        FontSize="Medium"
+                        VerticalOptions="Center"
+                        HorizontalOptions="Start"
+                        WidthRequest="200" />
+                </StackLayout>
+                <Frame OutlineColor="Black">
+                    <StackLayout>
+                        <Label x:Name="MarketingDesc" 
+                           FontSize="Medium"
+                           FontAttributes="Bold"
+                           VerticalOptions="Start"
+                           HorizontalOptions="CenterAndExpand" />
+                        <Label x:Name="ReportsDesc" 
+                           FontSize="Medium"
+                           VerticalOptions="Start"
+                           HorizontalOptions="CenterAndExpand" />
+                        <Label x:Name="CostDesc" 
+                           FontSize="Medium"
+                           VerticalOptions="Start"
+                           HorizontalOptions="CenterAndExpand" />
+                        <Label x:Name="AvgCostDesc" 
+                           FontSize="Medium"
+                           VerticalOptions="Start"
+                           HorizontalOptions="CenterAndExpand" />
+                        <Label HeightRequest="50" />
+                        <AbsoluteLayout HorizontalOptions="Fill" VerticalOptions="Fill">
+                            <Button x:Name="PurchaseButton"
+                                StyleClass="Success"
+                                AbsoluteLayout.LayoutFlags="PositionProportional"
+                                AbsoluteLayout.LayoutBounds="0.5, 0.5, 250, 50" />
+                            <ActivityIndicator x:Name="LoadAnimation"
+                                           Color="White"
+                                           AbsoluteLayout.LayoutFlags="PositionProportional"
+                                           AbsoluteLayout.LayoutBounds="0.5,0.5,-1,-1"
+                                           IsVisible="False" />
+                        </AbsoluteLayout>
+                    </StackLayout>
+                </Frame>
+                <Label HeightRequest="10"/>
 
-                <Label Text="Basic"
-                   Font="Medium"
-                   FontAttributes="Bold"
-                   HorizontalOptions="Start"
-                   VerticalOptions="End"
-                   Grid.Row="4"
-                   Grid.Column="0" />
-                <Label Text="3 Reports Per Month. First month is FREE! $24.99/month after trial ends."
-                   Font="Info"
-                   HorizontalOptions="CenterAndExpand"
-                   VerticalOptions="Start"
-                   Grid.Row="5"
-                   Grid.Column="0">
+                <!--Stupid Apple Legalese-->
+                <Label VerticalOptions="Center"
+                   HorizontalOptions="Center">
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span x:Name="LegalText" FontSize="Small" FontAttributes="Italic" />
+                            <Span Text = "here." TextDecorations="Underline" FontSize="Small" FontAttributes="Italic">
+                                <Span.GestureRecognizers>
+                                    <TapGestureRecognizer x:Name="LinkTapGesture" NumberOfTapsRequired="1" />
+                                </Span.GestureRecognizers>
+                            </Span>
+                        </FormattedString>
+                    </Label.FormattedText>
                 </Label>
-                <AbsoluteLayout Grid.Row="6" Grid.Column="0" HorizontalOptions="Fill" VerticalOptions="Fill">
-                    <Button Text="Start Your Free Trial"
-                        x:Name="BasicButton"
-                        StyleClass="Info"
-                        AbsoluteLayout.LayoutFlags="PositionProportional"
-                        AbsoluteLayout.LayoutBounds="0.5, 0.5, 250, 50" />
-                    <ActivityIndicator x:Name="BasicLoader"
-                                       Color="White"
-                                       AbsoluteLayout.LayoutFlags="PositionProportional"
-                                       AbsoluteLayout.LayoutBounds="0.5,0.5,-1,-1"
-                                       IsVisible="False" />
-                </AbsoluteLayout>
-
-                <Label Text="Premium"
-                   Font="Medium"
-                   FontAttributes="Bold"
-                   HorizontalOptions="Start"
-                   VerticalOptions="End"
-                   Grid.Row="8"
-                   Grid.Column="0" />
-                <Label Text="8 Reports Per Month. $49.99/month"
-                   Font="Info"
-                   HorizontalOptions="CenterAndExpand"
-                   VerticalOptions="Start"
-                   Grid.Row="9"
-                   Grid.Column="0" />
-                <AbsoluteLayout Grid.Row="10" Grid.Column="0" HorizontalOptions="Fill" VerticalOptions="Fill">
-                    <Button Text="Purchase Premium"
-                        x:Name="PremiumButton"
-                        StyleClass="Info"
-                        AbsoluteLayout.LayoutFlags="PositionProportional"
-                        AbsoluteLayout.LayoutBounds="0.5, 0.5, 250, 50" />
-                    <ActivityIndicator x:Name="PremiumLoader"
-                                       Color="White"
-                                       AbsoluteLayout.LayoutFlags="PositionProportional"
-                                       AbsoluteLayout.LayoutBounds="0.5,0.5,-1,-1"
-                                       IsVisible="False" />
-                </AbsoluteLayout>
-
-                <Label Text="Enterprise"
-                   Font="Medium"
-                   FontAttributes="Bold"
-                   HorizontalOptions="Start"
-                   VerticalOptions="End"
-                   Grid.Row="12"
-                   Grid.Column="0" />
-                <Label Text="25 Reports Per Month. $99.99/month"
-                   Font="Info"
-                   HorizontalOptions="CenterAndExpand"
-                   VerticalOptions="Start"
-                   Grid.Row="13"
-                   Grid.Column="0" />
-                <AbsoluteLayout Grid.Row="14" Grid.Column="0" HorizontalOptions="Fill" VerticalOptions="Fill">
-                    <Button Text="Purchase Enterprise"
-                        x:Name="EnterpriseButton"
-                        StyleClass="Info"
-                        AbsoluteLayout.LayoutFlags="PositionProportional"
-                        AbsoluteLayout.LayoutBounds="0.5, 0.5, 250, 50" />
-                    <ActivityIndicator x:Name="EnterpriseLoader"
-                                       Color="White"
-                                       AbsoluteLayout.LayoutFlags="PositionProportional"
-                                       AbsoluteLayout.LayoutBounds="0.5,0.5,-1,-1"
-                                       IsVisible="False" />
-                </AbsoluteLayout>
-
-                <Label x:Name="ErrorLabel"
-                   TextColor="Red"
-                   Grid.Row="15"
-                   Grid.Column="0"
-                   VerticalOptions="CenterAndExpand"
-                   HorizontalOptions="CenterAndExpand" />
-            </Grid>
+            </StackLayout>
         </ScrollView>
     </ContentPage.Content>
 </ContentPage>

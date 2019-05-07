@@ -6,9 +6,7 @@ using Plugin.InAppBilling.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -17,124 +15,143 @@ namespace MobileClient.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class PurchasePage : ContentPage
     {
-        private BaseTabPage RootPage { get => Application.Current.MainPage as BaseTabPage; }
-        private IPurchasingService _purchaseService;
-        private ICache<SubscriptionModel> _subCache;
-        private ISubscriptionService _subService;
-        private ICurrentUserService _userCache;
-        private IOrderService _orderService;
-        private IAlertService _alertService;
-        private bool _showFreeReportButton;
-        private bool _paymentConfirmationShown = false;
-        private string _selectedSubCode;
-        private List<LoadingButtonsModel> _loadingButtons;
-        private bool _paymentConfirmed = false;
-
-        public PurchasePage(bool showFreeReportButton)
+        private readonly ValidationResponse _validationResponse;
+        private List<SubscriptionType> _subscriptionSource = new List<SubscriptionType>()
         {
-            _showFreeReportButton = showFreeReportButton;
-            Init();
-        }
+            SubscriptionType.Basic,
+            SubscriptionType.Premium,
+            SubscriptionType.Enterprise
+        };
+        private readonly IAlertService _alertService;
+        private readonly IPurchasingService _purchaseService;
+        private readonly ICache<SubscriptionModel> _subCache;
+        private readonly ISubscriptionService _subService;
+        private readonly ICurrentUserService _userCache;
 
-        private void Init()
+        public PurchasePage(IAlertService alertService,
+                                      IPurchasingService purchaseService,
+                                      ICache<SubscriptionModel> subCache,
+                                      ISubscriptionService subService,
+                                      ICurrentUserService userCache,
+                                      ValidationResponse validationResponse)
         {
             InitializeComponent();
+            _validationResponse = validationResponse;
+            _alertService = alertService;
+            _purchaseService = purchaseService;
+            _subCache = subCache;
+            _subService = subService;
+            _userCache = userCache;
 
-            _subService = App.Container.GetInstance<ISubscriptionService>();
-            _purchaseService = App.Container.GetInstance<IPurchasingService>();
-            _userCache = App.Container.GetInstance<ICurrentUserService>();
-            _orderService = App.Container.GetInstance<IOrderService>();
-            _alertService = DependencyService.Get<IAlertService>();
-            _subCache = App.Container.GetInstance<ICache<SubscriptionModel>>();
-            ErrorCol.Height = 0;
-            TryForFreeButton.Clicked += async (s, e) =>
-            {
-                await this.Navigation.PopAsync();
-                RootPage.NavigateFromMenu(ViewModels.PageType.Order);
-            };
-            BasicButton.Clicked += (s, e) => { PurchaseSubscription(s as Button, SubscriptionType.Basic); };
-            PremiumButton.Clicked += (s, e) => { PurchaseSubscription(s as Button, SubscriptionType.Premium); };
-            EnterpriseButton.Clicked += (s, e) => { PurchaseSubscription(s as Button, SubscriptionType.Enterprise); };
-            SetFreeReportButton(_showFreeReportButton);
+            SubscriptionPicker.ItemsSource = _subscriptionSource.Select(x => x.ToString() + " Subscription").ToList();
+            SubscriptionPicker.SelectedIndex = 0;
+            SubscriptionPicker.SelectedIndexChanged += SelectedSubscriptionChanged;
+            LinkTapGesture.Command = new Command(() => Device.OpenUri(new Uri(Configuration.PrivacyPolicyUrl)));
+            PurchaseButton.Clicked += (s, e) => PurchaseButtonClicked();
+
+            SetVisualState(SubscriptionType.Basic, _validationResponse);
         }
 
-        protected async override void OnAppearing()
+        private void SelectedSubscriptionChanged(object sender, EventArgs e)
         {
-            base.OnAppearing();
-            if (_paymentConfirmationShown)
+            var selected = SubscriptionType.Basic;
+            try
             {
+                selected = _subscriptionSource[SubscriptionPicker.SelectedIndex];
+            }
+            catch { }
+            SetVisualState(selected, _validationResponse);
+        }
+
+        private void SetVisualState(SubscriptionType selected, ValidationResponse validation)
+        {
+            try
+            {
+                PurchaseButton.Text = $"Purchase {selected.ToString()} Plan";
+                LegalText.Text = GetLegalJargon(selected, validation);
+            }
+            catch { }
+            switch (selected)
+            {
+                case SubscriptionType.Premium:
+                    MarketingDesc.IsVisible = true;
+                    MarketingDesc.Text = $"A 25% Cost Savings!";
+                    ReportsDesc.Text = $"{SubscriptionUtility.PremiumOrderCount} reports per month";
+                    CostDesc.Text = $"${SubscriptionUtility.PremiumPrice} per month";
+                    AvgCostDesc.Text = $"Value of $6.25 per report";
+                    break;
+                case SubscriptionType.Enterprise:
+                    MarketingDesc.IsVisible = true;
+                    MarketingDesc.Text = $"Over 50% in Cost Savings!";
+                    ReportsDesc.Text = $"{SubscriptionUtility.EnterpriseOrderCount} reports per month";
+                    CostDesc.Text = $"${SubscriptionUtility.EnterprisePrice} per month";
+                    AvgCostDesc.Text = $"Value of $4.00 per report";
+                    break;
+                default:
+                    if (new[] { ValidationState.NoSubscriptionAndTrialValid, ValidationState.FreeReportValid }.Contains(validation.State))
+                    {
+                        MarketingDesc.IsVisible = true;
+                        MarketingDesc.Text = $"One month free trial!";
+                        CostDesc.Text = $"${SubscriptionUtility.BasicPrice} per month after trial period ends";
+                    }
+                    else
+                    {
+                        MarketingDesc.IsVisible = false;
+                        CostDesc.Text = $"${SubscriptionUtility.BasicPrice} per month";
+                    }
+                    ReportsDesc.Text = $"{SubscriptionUtility.BasicOrderCount} reports per month";
+                    AvgCostDesc.Text = $"Value of $8.33 per report";
+                    break;
+            }
+        }
+
+        private async void PurchaseButtonClicked()
+        {
+            LoadAnimation.IsRunning = true;
+            LoadAnimation.IsVisible = true;
+            PurchaseButton.IsEnabled = false;
+            try
+            {
+
+                if (_validationResponse.State == ValidationState.FreeReportValid)
+                {
+                    var result = await DisplayAlert("Are you sure?", "You are still eligible for a free report, are you sure you want to continue?", "Ok", "Cancel");
+                    if (!result)
+                        return;
+                }
+                SubscriptionType selected = SubscriptionType.Basic;
                 try
                 {
-                    _paymentConfirmationShown = false;
-                    if (_paymentConfirmed)
-                    {
-                        _paymentConfirmed = false;
-                        await PurchaseSubscription(_selectedSubCode);
-                        Device.BeginInvokeOnMainThread(async () => await Navigation.PopAsync());
-                        _alertService.LongAlert($"Thank you for your purchase!");
-                        RootPage.NavigateFromMenu(ViewModels.PageType.Order);
-                    }
+                    selected = _subscriptionSource[SubscriptionPicker.SelectedIndex];
+                }
+                catch { }
+
+                var subCode = SubscriptionUtility.GetInfoFromSubType(selected).SubscriptionCode;
+                try
+                {
+                    await PurchaseSubscription(subCode);
+                    Device.BeginInvokeOnMainThread(async () => await Navigation.PopAsync());
+                    _alertService.LongAlert($"Thank you for your purchase!");
+                    (Application.Current.MainPage as BaseTabPage).NavigateFromMenu(ViewModels.PageType.Order);
                 }
                 catch (Exception ex)
                 {
-                    _alertService.LongAlert($"Failed to purchase subscription. Error: {ex.Message}");
+                    _alertService.LongAlert($"Failed to purchase subscription. {ex.Message}");
                 }
-                finally
-                {
-                    foreach (var obj in _loadingButtons)
-                    {
-                        obj.Button.IsEnabled = true;
-                        if (obj.Loader != null)
-                        {
-                            obj.Loader.IsVisible = false;
-                            obj.Loader.IsRunning = false;
-                        }
-                    }
-                }
-            }
-        }
-
-        private async void PurchaseSubscription(Button sender, SubscriptionType subType)
-        {
-            _loadingButtons = new List<LoadingButtonsModel>()
-            {
-                new LoadingButtonsModel() { Button = BasicButton, Loader = BasicLoader, Selected = sender == BasicButton },
-                new LoadingButtonsModel() { Button = PremiumButton, Loader = PremiumLoader, Selected = sender == PremiumButton },
-                new LoadingButtonsModel() { Button = EnterpriseButton, Loader = EnterpriseLoader, Selected = sender == EnterpriseButton },
-                new LoadingButtonsModel() { Button = TryForFreeButton, Loader = null as ActivityIndicator, Selected = sender == TryForFreeButton }
-            };
-            try
-            {
-                ErrorCol.Height = 0;
-                foreach (var obj in _loadingButtons)
-                    obj.Button.IsEnabled = false;
-                var selected = _loadingButtons.First(x => x.Selected);
-                if (selected.Loader != null)
-                {
-                    selected.Loader.IsVisible = true;
-                    selected.Loader.IsRunning = true;
-                }
-
-                var subCode = SubscriptionUtilities.SUB_NAME_BASIC;
-                switch (subType)
-                {
-                    case SubscriptionType.Basic:
-                        subCode = SubscriptionUtilities.SUB_NAME_BASIC;
-                        break;
-                    case SubscriptionType.Premium:
-                        subCode = SubscriptionUtilities.SUB_NAME_PREMIUM;
-                        break;
-                    case SubscriptionType.Enterprise:
-                        subCode = SubscriptionUtilities.SUB_NAME_ENTERPRISE;
-                        break;
-                }
-                _selectedSubCode = subCode;
-                _paymentConfirmationShown = true;
-                await Navigation.PushAsync(new PaymentConfirmationPage(() => _paymentConfirmed = true));
             }
             catch (Exception ex)
             {
-                _alertService.LongAlert(ex.Message);
+                _alertService.LongAlert($"Something went wrong when trying to purchase subscription. {ex.Message}");
+            }
+            finally
+            {
+                try
+                {
+                    PurchaseButton.IsEnabled = true;
+                    LoadAnimation.IsRunning = false;
+                    LoadAnimation.IsVisible = false;
+                }
+                catch { }
             }
         }
 
@@ -158,7 +175,7 @@ namespace MobileClient.Views
             {
                 PurchaseId = sub.Id,
                 PurchaseToken = sub.PurchaseToken,
-                SubscriptionType = SubscriptionUtilities.GetTypeFromProductId(sub.ProductId),
+                SubscriptionType = SubscriptionUtility.GetTypeFromProductId(sub.ProductId),
                 StartDateTime = DateTimeOffset.Now,
                 PurchasedDateTime = DateTimeOffset.Now,
                 EndDateTime = DateTimeOffset.Now.AddMonths(1),
@@ -169,34 +186,34 @@ namespace MobileClient.Views
 #if RELEASE
                 _subService.AddSubscription(model);
 #endif
+
         }
 
-        private void SetFreeReportButton(bool showButton)
+        private static string GetLegalJargon(SubscriptionType selected, ValidationResponse validation)
         {
-            // If they've ordered before, hide free report button.
-            if (!showButton)
+            string costDesc = "";
+            string periodText = (new[] { ValidationState.FreeReportValid, ValidationState.NoSubscriptionAndTrialValid }.Contains(validation.State)
+                                && selected == SubscriptionType.Basic)
+                                ? "at the end of the trial on"
+                                : "upon";
+            string platformText = Device.RuntimePlatform == Device.Android ? "Play Store" : "iTunes";
+            switch (selected)
             {
-                FreeReportCol.Height = 0;
-                FreeReportButtonCol.Height = 0;
-                Pad1.Height = 0;
-                BasicButton.StyleClass = new List<string>() { "Success" };
+                case SubscriptionType.Premium:
+                    costDesc = $"${SubscriptionUtility.PremiumPrice.ToString()} monthly";
+                    break;
+                case SubscriptionType.Enterprise:
+                    costDesc = $"${SubscriptionUtility.EnterprisePrice.ToString()} monthly";
+                    break;
+                default:
+                    costDesc = $"${SubscriptionUtility.BasicPrice.ToString()} monthly";
+                    break;
             }
-            else
-            {
-                FreeReportCol.Height = GridLength.Star;
-                Pad1.Height = GridLength.Star;
-                FreeReportButtonCol.Height = GridLength.Star;
-            }
-            BasicButton.IsEnabled = !showButton;
-            PremiumButton.IsEnabled = !showButton;
-            EnterpriseButton.IsEnabled = !showButton;
+            return $@"A {costDesc} purchase will be applied to your {platformText} account {periodText} confirmation. " +
+                    $@"Subscriptions will automatically renew unless canceled within 24-hours before the end of the current period. " +
+                    $@"You can cancel anytime with your {platformText} account settings. " +
+                    $@"Any unused portion of a free trial will be forfeited if you purchase a subscription. " +
+                    $@"For more information, see our terms and conditions on our website ";
         }
-    }
-
-    internal class LoadingButtonsModel
-    {
-        public Button Button { get; set; }
-        public ActivityIndicator Loader { get; set; }
-        public bool Selected { get; set; }
     }
 }

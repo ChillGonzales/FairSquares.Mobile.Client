@@ -7,7 +7,7 @@ using Xamarin.Forms;
 
 namespace MobileClient.Utilities
 {
-    public static class SubscriptionUtilities
+    public static class SubscriptionUtility
     {
         public const string SUB_NAME_PREMIUM = "premium_subscription_monthly";
         public const string SUB_NAME_BASIC = "basic_subscription_monthly";
@@ -65,5 +65,46 @@ namespace MobileClient.Utilities
                     return SubscriptionType.Basic;
             }
         }
+        public static SubscriptionInfo GetInfoFromSubType(SubscriptionType type)
+        {
+            switch (type)
+            {
+                case SubscriptionType.Basic:
+                    return new SubscriptionInfo()
+                    {
+                        OrderCount = BasicOrderCount,
+                        Price = BasicPrice,
+                        SubscriptionCode = SUB_NAME_BASIC
+                    };
+                case SubscriptionType.Premium:
+                    return new SubscriptionInfo()
+                    {
+                        OrderCount = PremiumOrderCount,
+                        Price = PremiumPrice,
+                        SubscriptionCode = SUB_NAME_PREMIUM
+                    };
+                case SubscriptionType.Enterprise:
+                    return new SubscriptionInfo()
+                    {
+                        OrderCount = EnterpriseOrderCount,
+                        Price = EnterprisePrice,
+                        SubscriptionCode = SUB_NAME_ENTERPRISE
+                    };
+                default:
+                    return new SubscriptionInfo()
+                    {
+                        OrderCount = BasicOrderCount,
+                        Price = BasicPrice,
+                        SubscriptionCode = SUB_NAME_BASIC
+                    };
+            }
+        }
+    }
+
+    public class SubscriptionInfo
+    {
+        public int OrderCount { get; set; }
+        public double Price { get; set; }
+        public string SubscriptionCode { get; set; }
     }
 }

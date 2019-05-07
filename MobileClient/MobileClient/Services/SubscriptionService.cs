@@ -14,9 +14,9 @@ namespace MobileClient.Services
         private readonly string _baseUri;
         private readonly ILogger<SubscriptionService> _logger;
 
-        public SubscriptionService(string baseUri, ILogger<SubscriptionService> logger)
+        public SubscriptionService(HttpClient http, string baseUri, ILogger<SubscriptionService> logger)
         {
-            _http = new HttpClient();
+            _http = http;
             _baseUri = baseUri;
             _logger = logger;
         }

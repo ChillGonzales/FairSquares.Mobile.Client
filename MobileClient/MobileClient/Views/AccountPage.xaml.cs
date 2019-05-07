@@ -67,7 +67,7 @@ namespace MobileClient.Views
                 }
                 else
                 {
-                    await Navigation.PushAsync(new PurchasePageRefactored(DependencyService.Get<IAlertService>(),
+                    await Navigation.PushAsync(new PurchasePage(DependencyService.Get<IAlertService>(),
                                                                           App.Container.GetInstance<IPurchasingService>(),
                                                                           App.Container.GetInstance<ICache<SubscriptionModel>>(),
                                                                           App.Container.GetInstance<ISubscriptionService>(),

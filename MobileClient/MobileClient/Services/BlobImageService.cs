@@ -15,11 +15,11 @@ namespace MobileClient.Services
         private readonly string _baseUrl;
         private readonly HttpClient _http;
 
-        public BlobImageService(string baseUrl, ILogger<BlobImageService> logger)
+        public BlobImageService(HttpClient http, string baseUrl, ILogger<BlobImageService> logger)
         {
             _baseUrl = baseUrl;
             _logger = logger;
-            _http = new HttpClient();
+            _http = http;
         }
         public Dictionary<string, ImageModel> GetImages(List<string> orderIds)
         {
