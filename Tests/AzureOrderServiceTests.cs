@@ -28,7 +28,6 @@ namespace Tests
             return new HttpClient(_handler.Object);
         }
 
-        [Test]
         private async Task WhenAddingOrder_GetsNewOrderId()
         {
             var expectedId = "1234";

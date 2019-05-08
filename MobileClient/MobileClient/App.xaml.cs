@@ -5,6 +5,7 @@ using MobileClient.Services;
 using MobileClient.Utilities;
 using MobileClient.Views;
 using Newtonsoft.Json;
+using Plugin.InAppBilling;
 using Plugin.InAppBilling.Abstractions;
 using SimpleInjector;
 using System;
@@ -53,7 +54,7 @@ namespace MobileClient
                 var userService = new CurrentUserService();
                 var notifyService = new NotificationService(new HttpClient(), _notifyEndpoint, _apiKey);
                 var emailLogger = new EmailLogger<PurchasingService>(notifyService, userService);
-                var purchaseService = new PurchasingService(emailLogger);
+                var purchaseService = new PurchasingService(CrossInAppBilling.Current, emailLogger);
                 authenticator.Completed += (s, e) =>
                 {
                     if (e.IsAuthenticated)
