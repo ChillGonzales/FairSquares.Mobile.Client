@@ -2,6 +2,7 @@
 <TabbedPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:views="clr-namespace:MobileClient.Views"
+             xmlns:account="clr-namespace:MobileClient.Routes.Account"
              xmlns:android="clr-namespace:Xamarin.Forms.PlatformConfiguration.AndroidSpecific;assembly=Xamarin.Forms.Core"
              android:TabbedPage.ToolbarPlacement="Bottom"
              BarBackgroundColor="#527754"
@@ -34,7 +35,7 @@
         BarTextColor="{StaticResource primary-title-color}"
         Icon="ic_action_account_circle.png">
         <x:Arguments>
-            <views:AccountPage />
+            <account:Account />
         </x:Arguments>
     </NavigationPage>
 </TabbedPage>
