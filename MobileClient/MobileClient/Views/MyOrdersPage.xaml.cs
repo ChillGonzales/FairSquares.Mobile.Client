@@ -24,6 +24,7 @@ namespace MobileClient.Views
         private ICacheRefresher _cacheRefresher;
         private IOrderValidationService _validationService;
         private ICurrentUserService _userService;
+        private ICache<LocalUser> _localUser;
         public static IList<OrderGroup> All { private set; get; }
 
         public MyOrdersPage()
@@ -38,6 +39,7 @@ namespace MobileClient.Views
                 _imageCache = App.Container.GetInstance<ICache<ImageModel>>();
                 _logger = App.Container.GetInstance<ILogger<MyOrdersPage>>();
                 _cacheRefresher = App.Container.GetInstance<ICacheRefresher>();
+                _localUser = App.Container.GetInstance<ICache<LocalUser>>();
                 _validationService = App.Container.GetInstance<IOrderValidationService>();
                 MessagingCenter.Subscribe<App>(this, "CacheInvalidated", async x => await this.SetViewState());
                 FreeReportButton.Clicked += (s, e) => (Application.Current.MainPage as BaseTabPage).NavigateFromMenu(ViewModels.PageType.Order);
@@ -64,10 +66,17 @@ namespace MobileClient.Views
                     try
                     {
                         OrderListView.IsRefreshing = true;
-                        var user = _userService.GetLoggedInAccount();
-                        if (user == null)
-                            return;
-                        await _cacheRefresher.RefreshCaches(user.UserId);
+                        string userId = "";
+                        userId = _userService.GetLoggedInAccount()?.UserId;
+                        if (userId == null)
+                        {
+                            try
+                            {
+                                userId = _localUser.Get("")?.UserId;
+                            }
+                            catch { }
+                        }
+                        await _cacheRefresher.RefreshCaches(userId);
                         SetListViewSource(_orderCache.GetAll().Select(x => x.Value).ToList());
                         OrderListView.IsRefreshing = false;
                     }
@@ -107,8 +116,12 @@ namespace MobileClient.Views
                 MainLayout.IsVisible = false;
                 LoadingLayout.IsVisible = true;
                 LoadingAnimation.IsRunning = true;
-                var fresh = await _orderService.GetMemberOrders(_userService.GetLoggedInAccount().UserId);
-                _orderCache.Update(fresh.ToDictionary(x => x.OrderId, x => x));
+                var user = _userService.GetLoggedInAccount();
+                if (user != null)
+                {
+                    var fresh = await _orderService.GetMemberOrders(user.UserId);
+                    _orderCache.Update(fresh.ToDictionary(x => x.OrderId, x => x));
+                }
                 MainLayout.IsVisible = true;
                 LoadingLayout.IsVisible = false;
                 LoadingAnimation.IsRunning = false;
@@ -118,8 +131,16 @@ namespace MobileClient.Views
             var anyOrders = orders.Any();
             MainLayout.IsVisible = anyOrders;
             NoOrderLayout.IsVisible = !anyOrders;
-            var validation = await _validationService.ValidateOrderRequest(_userService.GetLoggedInAccount());
-            FreeReportLayout.IsVisible = validation.State == ValidationState.FreeReportValid;
+            var usr = _userService.GetLoggedInAccount();
+            if (usr != null)
+            {
+                var validation = await _validationService.ValidateOrderRequest(usr);
+                FreeReportLayout.IsVisible = validation.State == ValidationState.FreeReportValid;
+            }
+            else
+            {
+                FreeReportLayout.IsVisible = true;
+            }
             SetListViewSource(orders);
         }
 

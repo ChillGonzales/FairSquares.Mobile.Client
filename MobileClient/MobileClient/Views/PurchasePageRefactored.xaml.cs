@@ -169,6 +169,9 @@ namespace MobileClient.Views
 
         private async Task PurchaseSubscription(string subCode)
         {
+            var user = _userCache.GetLoggedInAccount();
+            if (user == null)
+                throw new InvalidOperationException("User must be logged in to purchase a subscription.");
 #if RELEASE
             var sub = await _purchaseService.PurchaseSubscription(subCode, "payload");
 #else

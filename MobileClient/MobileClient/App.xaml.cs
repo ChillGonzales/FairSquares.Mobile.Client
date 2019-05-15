@@ -70,6 +70,7 @@ namespace MobileClient
                 var imageCache = new LocalSqlCache<ImageModel>(Path.Combine(dbBasePath, "images.db3"), new DebugLogger<LocalSqlCache<ImageModel>>());
                 var subCache = new LocalSqlCache<SubscriptionModel>(Path.Combine(dbBasePath, "subs.db3"), new DebugLogger<LocalSqlCache<SubscriptionModel>>());
                 var settingsCache = new LocalSqlCache<SettingsModel>(Path.Combine(dbBasePath, "sets.db3"), new DebugLogger<LocalSqlCache<SettingsModel>>());
+                var localUserCache = new LocalSqlCache<LocalUser>(Path.Combine(dbBasePath, "localuser.db3"), new DebugLogger<LocalSqlCache<LocalUser>>());
 
                 Action ClearCaches = () =>
                 {
@@ -79,7 +80,6 @@ namespace MobileClient
                         propertyCache.Clear();
                         imageCache.Clear();
                         subCache.Clear();
-                        settingsCache.Clear();
                     }
                     catch { }
                 };
@@ -163,9 +163,13 @@ namespace MobileClient
                 });
 
                 var refresher = new CacheRefresher(new DebugLogger<CacheRefresher>(), RefreshCaches);
-                var user = userService.GetLoggedInAccount();
-                if (user != null)
-                    refresher.RefreshCaches(user.UserId);
+                string uId = "";
+                uId = userService.GetLoggedInAccount()?.UserId;
+                if (uId == null)
+                {
+                    uId = localUserCache.Get("")?.UserId;
+                }
+                refresher.RefreshCaches(uId);
 
                 userService.OnLoggedIn += (s, e) =>
                 {
@@ -210,23 +214,7 @@ namespace MobileClient
         public App()
         {
             InitializeComponent();
-            ICurrentUserService userService = null;
-            try
-            {
-                userService = Container.GetInstance<ICurrentUserService>();
-                userService.OnLoggedIn += (s, e) => Device.BeginInvokeOnMainThread(() => MainPage = new BaseTabPage());
-                userService.OnLoggedOut += (s, e) => Device.BeginInvokeOnMainThread(() => MainPage = new LandingPage());
-            }
-            catch { }
-
-            if (userService?.GetLoggedInAccount() == null)
-            {
-                MainPage = new LandingPage();
-            }
-            else
-            {
-                MainPage = new BaseTabPage();
-            }
+            MainPage = new BaseTabPage();
         }
 
         protected override void OnStart()

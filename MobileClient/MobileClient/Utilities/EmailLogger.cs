@@ -25,7 +25,7 @@ namespace MobileClient.Utilities
         {
             try
             {
-                var emailBody = $"<p>User with ID '{_userCache.GetLoggedInAccount().UserId}' and email '{_userCache.GetLoggedInAccount().Email}' had the following issue: ";
+                var emailBody = $"<p>User with ID '{_userCache.GetLoggedInAccount()?.UserId ?? "Not logged in user"}' and email '{_userCache.GetLoggedInAccount().Email}' had the following issue: ";
                 emailBody += @"<br/>" + message;
                 foreach (var arg in args)
                 {
