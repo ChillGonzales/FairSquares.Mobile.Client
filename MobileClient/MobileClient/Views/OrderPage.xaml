@@ -30,7 +30,6 @@
                         <RowDefinition x:Name="CityRow" Height="40" />
                         <RowDefinition x:Name="StateRow" Height="40" />
                         <RowDefinition x:Name="ZipRow" Height="40" />
-                        <RowDefinition x:Name="EmailRow" Height="40" />
                         <RowDefinition x:Name="OptionRow" Height="40" />
                         <RowDefinition x:Name="CommentsRow" Height="40" />
                         <RowDefinition x:Name="PaddingRow" Height="15" />
@@ -108,48 +107,35 @@
                             WidthRequest="100"
                             Keyboard="Numeric"
                             HorizontalOptions="StartAndExpand" />
-                    <Label Text="Email" 
-                           Grid.Row="5"
-                           Grid.Column="0"
-                           FontSize="Medium"
-                           VerticalOptions="Center"
-                           HorizontalOptions="End"/>
-                    <mobileclient:BorderlessEntry x:Name="Email"
-                            VerticalOptions="Center"
-                            FontSize="Medium"
-                            Grid.Row="5"
-                            Grid.Column="1"
-                            WidthRequest="250"
-                            HorizontalOptions="StartAndExpand" />
                     <Label Text="Option" 
                            FontSize="Medium"
-                           Grid.Row="6"
+                           Grid.Row="5"
                            Grid.Column="0"
                            VerticalOptions="Center"
                            HorizontalOptions="End" />
                     <Picker x:Name="OptionPicker" 
                             FontSize="Medium"
-                            Grid.Row="6"
+                            Grid.Row="5"
                             Grid.Column="1"
                             WidthRequest="250" 
                             VerticalOptions="Center"
                             HorizontalOptions="StartAndExpand" />
                     <Label Text="Comments" 
                            FontSize="Medium"
-                           Grid.Row="7"
+                           Grid.Row="6"
                            Grid.Column="0"
                            VerticalOptions="Center"
                            HorizontalOptions="End"/>
                     <mobileclient:BorderlessEntry x:Name="Comments"
                             VerticalOptions="Center"
-                            Grid.Row="7"
+                            Grid.Row="6"
                             Grid.Column="1"
                             FontSize="Medium"
                             WidthRequest="250"
                             HorizontalOptions="StartAndExpand" />
                     <Label x:Name="ErrorMessage"
                        TextColor="Red"
-                       Grid.Row="9"
+                       Grid.Row="8"
                        Grid.Column="0"
                        Grid.ColumnSpan="2"
                        VerticalOptions="Center"
@@ -158,7 +144,7 @@
                     <Button Text="Submit"
                         x:Name="SubmitButton"
                         StyleClass="Success"
-                        Grid.Row="10"
+                        Grid.Row="9"
                         Grid.Column="0"
                         Grid.ColumnSpan="2"
                         WidthRequest="200"

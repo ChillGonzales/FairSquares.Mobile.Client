@@ -41,9 +41,7 @@ namespace MobileClient.Views
         {
             if (NotShowAgainToggle.IsToggled)
             {
-                var curr = _settings.GetAll().FirstOrDefault();
-                _settings.Clear();
-                _settings.Put("", new SettingsModel() { DisplayWelcomeMessage = false, UsedFreeReport = curr.Value.UsedFreeReport });
+                _settings.Put("", new SettingsModel() { DisplayWelcomeMessage = false });
             }
             await _popAction();
         }

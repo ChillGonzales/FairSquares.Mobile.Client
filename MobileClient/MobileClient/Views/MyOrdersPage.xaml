@@ -13,6 +13,21 @@
                 <ActivityIndicator x:Name="LoadingAnimation" Color="Black" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" />
             </StackLayout>
             <StackLayout x:Name="NoOrderLayout" IsVisible="False" Margin="10" Orientation="Vertical">
+                <Frame x:Name="LoginLayout" IsVisible="False" OutlineColor="Black">
+                    <StackLayout Orientation="Vertical">
+                        <Label Text="Log in with Google to submit a report."
+                               FontSize="Medium"
+                               HorizontalOptions="CenterAndExpand"
+                               VerticalOptions="CenterAndExpand" />
+                        <Label HeightRequest="10" VerticalOptions="Fill" />
+                        <Button x:Name="LogInButton"
+                                Text="Log In"
+                                HorizontalOptions="CenterAndExpand"
+                                VerticalOptions="CenterAndExpand"
+                                WidthRequest="250"
+                                StyleClass="Info" />
+                    </StackLayout>
+                </Frame>
                 <Frame x:Name="FreeReportLayout" IsVisible="False" OutlineColor="Black">
                     <StackLayout Orientation="Vertical">
                         <Label Text="You have a free report to use! Click below to try Fair Squares for free."

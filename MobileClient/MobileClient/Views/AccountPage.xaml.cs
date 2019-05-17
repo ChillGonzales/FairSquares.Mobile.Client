@@ -33,6 +33,11 @@ namespace MobileClient.Views
                 SetUIToAccount(e.Account);
                 SetSubUI(e.Account);
             };
+            _userCache.OnLoggedOut += (s, e) =>
+            {
+                SetUIToAccount(null);
+                SetSubUI(null);
+            };
             SetUIToAccount(_user);
             SetSubUI(_user);
             LogoutButton.Clicked += LogoutButton_Clicked;
@@ -107,7 +112,7 @@ namespace MobileClient.Views
         {
             if (account == null)
             {
-                EmailLabel.Text = "Log In To Manage Your Account";
+                EmailLabel.Text = "Log in to manage your account.";
                 LogoutButton.Text = "Log In";
                 LogoutButton.StyleClass = new List<string>() { "Info" };
             }

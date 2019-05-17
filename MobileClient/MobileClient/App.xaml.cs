@@ -70,7 +70,6 @@ namespace MobileClient
                 var imageCache = new LocalSqlCache<ImageModel>(Path.Combine(dbBasePath, "images.db3"), new DebugLogger<LocalSqlCache<ImageModel>>());
                 var subCache = new LocalSqlCache<SubscriptionModel>(Path.Combine(dbBasePath, "subs.db3"), new DebugLogger<LocalSqlCache<SubscriptionModel>>());
                 var settingsCache = new LocalSqlCache<SettingsModel>(Path.Combine(dbBasePath, "sets.db3"), new DebugLogger<LocalSqlCache<SettingsModel>>());
-                var localUserCache = new LocalSqlCache<LocalUser>(Path.Combine(dbBasePath, "localuser.db3"), new DebugLogger<LocalSqlCache<LocalUser>>());
 
                 Action ClearCaches = () =>
                 {
@@ -163,13 +162,7 @@ namespace MobileClient
                 });
 
                 var refresher = new CacheRefresher(new DebugLogger<CacheRefresher>(), RefreshCaches);
-                string uId = "";
-                uId = userService.GetLoggedInAccount()?.UserId;
-                if (uId == null)
-                {
-                    uId = localUserCache.Get("")?.UserId;
-                }
-                refresher.RefreshCaches(uId);
+                refresher.RefreshCaches(userService.GetLoggedInAccount()?.UserId);
 
                 userService.OnLoggedIn += (s, e) =>
                 {

@@ -20,14 +20,13 @@ namespace MobileClient.Views
     public partial class OrderPage : ContentPage
     {
         private BaseTabPage RootPage { get => Application.Current.MainPage as BaseTabPage; }
-        private readonly int _errorIndex = 8;
+        private readonly int _errorIndex = 7;
         private readonly IOrderValidationService _orderValidator;
         private readonly ICurrentUserService _userService;
         private readonly IOrderService _orderService;
         private readonly IAlertService _toast;
         private readonly ICache<Order> _orderCache;
         private readonly ICache<SettingsModel> _settings;
-        private readonly ICache<LocalUser> _localUser;
 
         public OrderPage()
         {
@@ -37,7 +36,6 @@ namespace MobileClient.Views
             _orderCache = App.Container.GetInstance<ICache<Order>>();
             _orderValidator = App.Container.GetInstance<IOrderValidationService>();
             _settings = App.Container.GetInstance<ICache<SettingsModel>>();
-            _localUser = App.Container.GetInstance<ICache<LocalUser>>();
             _toast = DependencyService.Get<IAlertService>();
             Grid.RowDefinitions[_errorIndex].Height = 0;
             StatePicker.ItemsSource = States.Select(x => x.Text).ToList();
@@ -56,26 +54,13 @@ namespace MobileClient.Views
         private async Task SetVisualStateForValidation()
         {
             var user = _userService.GetLoggedInAccount();
-            if (user == null && !(_settings.Get("")?.UsedFreeReport ?? false))
+            if (user == null)
             {
                 MainLayout.IsVisible = true;
                 CannotSubmitLayout.IsVisible = false;
-                EmailRow.Height = GridLength.Star;
                 return;
             }
-            else if (user == null)
-            {
-                MainLayout.IsVisible = false;
-                CannotSubmitHeader.Text = "Thanks for trying Fair Squares!";
-                CannotSubmitLabel.Text = $"Please login to claim your free trial.";
-                CannotSubmitLayout.IsVisible = true;
-                return;
-            }
-            else
-            {
-                EmailRow.Height = 0;
-            }
-            var validation = await _orderValidator.ValidateOrderRequest(_userService.GetLoggedInAccount());
+            var validation = await _orderValidator.ValidateOrderRequest(user);
             switch (validation.State)
             {
                 case ValidationState.NoReportsLeftInPeriod:
@@ -111,48 +96,29 @@ namespace MobileClient.Views
 
                 SubmitButton.IsEnabled = false;
                 ErrorMessage.Text = "";
-                if (string.IsNullOrWhiteSpace(AddressLine1.Text)
-                    || string.IsNullOrWhiteSpace(City.Text)
-                    || StatePicker.SelectedIndex < 0
-                    || string.IsNullOrWhiteSpace(Zip.Text)
-                    || (user == null && string.IsNullOrWhiteSpace(Email.Text)))
+                if (string.IsNullOrWhiteSpace(AddressLine1.Text) || 
+                    string.IsNullOrWhiteSpace(City.Text) || 
+                    StatePicker.SelectedIndex < 0 || 
+                    string.IsNullOrWhiteSpace(Zip.Text))
                 {
                     Grid.RowDefinitions[_errorIndex].Height = GridLength.Star;
                     ErrorMessage.Text = "Please fill out all fields before submitting.";
                     SubmitButton.IsEnabled = true;
                     return;
                 }
-                var validation = new ValidationResponse() { State = ValidationState.FreeReportValid };
-                if (user != null)
-                    validation = await _orderValidator.ValidateOrderRequest(_userService.GetLoggedInAccount());
-                if (validation.State == ValidationState.FreeReportValid)
+                if (user == null)
                 {
-                    var answer = await DisplayAlert("Free Report Usage", "You are about to use up your free report. Are you sure you'd like to continue?", "Ok", "Cancel");
+                    var answer = await DisplayAlert("Please Log In", "Please log in first to submit a report.", "Login", "Cancel");
                     if (!answer)
                     {
                         SubmitButton.IsEnabled = true;
                         return;
                     }
+                    await Navigation.PushAsync(new LandingPage());
+                    SubmitButton.IsEnabled = true;
+                    return;
                 }
-                string userId = user?.UserId;
-                string email = user?.Email ?? Email.Text;
-                if (user == null)
-                {
-                    try
-                    {
-                        var curr = _settings.GetAll().FirstOrDefault();
-                        _settings.Clear();
-                        _settings.Put("", new SettingsModel() { DisplayWelcomeMessage = curr.Value.DisplayWelcomeMessage, UsedFreeReport = true });
-                    }
-                    catch { }
-                    try
-                    {
-                        userId = Guid.NewGuid().ToString();
-                        _localUser.Put("", new LocalUser() { Email = Email.Text, UserId = userId });
-                    }
-                    catch { }
-                }
-                await SubmitOrder(userId, email);
+                await SubmitOrder(user.UserId, user.Email);
             }
             catch (Exception ex)
             {
@@ -190,7 +156,6 @@ namespace MobileClient.Views
             Zip.Text = "";
             SubmitButton.IsEnabled = true;
             Comments.Text = "";
-            Email.Text = "";
             RootPage.NavigateFromMenu(PageType.MyOrders);
         }
 
