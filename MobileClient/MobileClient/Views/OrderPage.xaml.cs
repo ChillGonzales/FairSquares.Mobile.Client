@@ -26,6 +26,7 @@ namespace MobileClient.Views
         private readonly IOrderService _orderService;
         private readonly IAlertService _toast;
         private readonly ICache<Order> _orderCache;
+        private readonly ICache<SettingsModel> _settings;
 
         public OrderPage()
         {
@@ -34,6 +35,7 @@ namespace MobileClient.Views
             _orderService = App.Container.GetInstance<IOrderService>();
             _orderCache = App.Container.GetInstance<ICache<Order>>();
             _orderValidator = App.Container.GetInstance<IOrderValidationService>();
+            _settings = App.Container.GetInstance<ICache<SettingsModel>>();
             _toast = DependencyService.Get<IAlertService>();
             Grid.RowDefinitions[_errorIndex].Height = 0;
             StatePicker.ItemsSource = States.Select(x => x.Text).ToList();
@@ -51,71 +53,72 @@ namespace MobileClient.Views
 
         private async Task SetVisualStateForValidation()
         {
-            var validation = await _orderValidator.ValidateOrderRequest(_userService.GetLoggedInAccount());
-            if (validation.State == ValidationState.NoReportsLeftInPeriod)
+            var user = _userService.GetLoggedInAccount();
+            if (user == null)
             {
-                MainLayout.IsVisible = false;
-                CannotSubmitHeader.Text = "You've been busy!";
-                CannotSubmitLabel.Text = $"Sorry, you have used all of your reports for this month.";
-                CannotSubmitLayout.IsVisible = true;
+                MainLayout.IsVisible = true;
+                CannotSubmitLayout.IsVisible = false;
                 return;
             }
-            if (validation.State == ValidationState.NoSubscriptionAndTrialValid)
+            var validation = await _orderValidator.ValidateOrderRequest(user);
+            switch (validation.State)
             {
-                MainLayout.IsVisible = false;
-                CannotSubmitHeader.Text = "Thanks for trying Fair Squares!";
-                CannotSubmitLabel.Text = $"Please go to the Account Tab to claim your free one month trial before continuing.";
-                CannotSubmitLayout.IsVisible = true;
-                return;
+                case ValidationState.NoReportsLeftInPeriod:
+                    MainLayout.IsVisible = false;
+                    CannotSubmitHeader.Text = "You've been busy!";
+                    CannotSubmitLabel.Text = $"Sorry, you have used all of your reports for this month.";
+                    CannotSubmitLayout.IsVisible = true;
+                    break;
+                case ValidationState.NoSubscriptionAndTrialValid:
+                    MainLayout.IsVisible = false;
+                    CannotSubmitHeader.Text = "Thanks for trying Fair Squares!";
+                    CannotSubmitLabel.Text = $"Please go to the Account Tab to claim your free one month trial before continuing.";
+                    CannotSubmitLayout.IsVisible = true;
+                    break;
+                case ValidationState.NoSubscriptionAndTrialAlreadyUsed:
+                    MainLayout.IsVisible = false;
+                    CannotSubmitHeader.Text = "Thanks for trying Fair Squares!";
+                    CannotSubmitLabel.Text = $"Please purchase a subscription from the Account Tab before continuing.";
+                    CannotSubmitLayout.IsVisible = true;
+                    break;
+                default:
+                    MainLayout.IsVisible = true;
+                    CannotSubmitLayout.IsVisible = false;
+                    break;
             }
-            if (validation.State == ValidationState.NoSubscriptionAndTrialAlreadyUsed)
-            {
-                MainLayout.IsVisible = false;
-                CannotSubmitHeader.Text = "Thanks for trying Fair Squares!";
-                CannotSubmitLabel.Text = $"Please purchase a subscription from the Account Tab before continuing.";
-                CannotSubmitLayout.IsVisible = true;
-                return;
-            }
-            MainLayout.IsVisible = true;
-            CannotSubmitLayout.IsVisible = false;
         }
 
         private async Task HandleSubmitClick(object sender, EventArgs e)
         {
             try
             {
+                var user = _userService.GetLoggedInAccount();
+
                 SubmitButton.IsEnabled = false;
                 ErrorMessage.Text = "";
-                if (string.IsNullOrWhiteSpace(AddressLine1.Text)
-                    || string.IsNullOrWhiteSpace(City.Text)
-                    || StatePicker.SelectedIndex < 0
-                    || string.IsNullOrWhiteSpace(Zip.Text))
+                if (string.IsNullOrWhiteSpace(AddressLine1.Text) || 
+                    string.IsNullOrWhiteSpace(City.Text) || 
+                    StatePicker.SelectedIndex < 0 || 
+                    string.IsNullOrWhiteSpace(Zip.Text))
                 {
                     Grid.RowDefinitions[_errorIndex].Height = GridLength.Star;
                     ErrorMessage.Text = "Please fill out all fields before submitting.";
                     SubmitButton.IsEnabled = true;
                     return;
                 }
-                var user = _userService.GetLoggedInAccount();
                 if (user == null)
                 {
-                    Grid.RowDefinitions[_errorIndex].Height = GridLength.Star;
-                    ErrorMessage.Text = "You must be logged in to submit an order.";
-                    SubmitButton.IsEnabled = true;
-                    return;
-                }
-
-                var validation = await _orderValidator.ValidateOrderRequest(_userService.GetLoggedInAccount());
-                if (validation.State == ValidationState.FreeReportValid)
-                {
-                    var answer = await DisplayAlert("Free Report Usage", "You are about to use up your free report. Are you sure you'd like to continue?", "Ok", "Cancel");
+                    var answer = await DisplayAlert("Please Log In", "Please log in first to submit a report.", "Login", "Cancel");
                     if (!answer)
                     {
                         SubmitButton.IsEnabled = true;
                         return;
                     }
+                    await Navigation.PushAsync(new LandingPage());
+                    SubmitButton.IsEnabled = true;
+                    return;
                 }
-                await SubmitOrder(user);
+                await SubmitOrder(user.UserId, user.Email);
             }
             catch (Exception ex)
             {
@@ -126,15 +129,15 @@ namespace MobileClient.Views
             }
         }
 
-        private async Task SubmitOrder(AccountModel user)
+        private async Task SubmitOrder(string userId, string email)
         {
             var newOrder = new Models.Order()
             {
                 StreetAddress = $"{AddressLine1.Text}\n{(string.IsNullOrWhiteSpace(AddressLine2.Text) ? "" : AddressLine2.Text + "\n")}\n" +
                                 $"{City.Text}, {States[StatePicker.SelectedIndex].Code} {Zip.Text}",
                 ReportType = ReportType.Basic,
-                MemberId = user.UserId,
-                MemberEmail = user.Email,
+                MemberId = userId,
+                MemberEmail = email,
                 RoofOption = Options[OptionPicker.SelectedIndex].RoofOption,
                 Comments = Comments.Text
             };

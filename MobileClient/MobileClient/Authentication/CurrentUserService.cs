@@ -25,7 +25,7 @@ namespace MobileClient.Authentication
             if (_loggedIn != null)
                 return _loggedIn;
 
-            var token = SecureStorageStore.FindAccountsForServiceAsync(Configuration.GoogleServiceName).Result.FirstOrDefault();
+            var token = SecureStorageStore.FindAccountsForServiceAsync(Configuration.GoogleServiceName)?.Result?.FirstOrDefault();
             var model = GetModelFromAccount(token);
             _loggedIn = model;
             return model;
@@ -42,7 +42,7 @@ namespace MobileClient.Authentication
         {
             try
             {
-                var acct = SecureStorageStore.FindAccountsForServiceAsync(Configuration.GoogleServiceName).Result.FirstOrDefault();
+                var acct = SecureStorageStore.FindAccountsForServiceAsync(Configuration.GoogleServiceName)?.Result?.FirstOrDefault();
                 SecureStorageStore.SaveAsync(null, Configuration.GoogleServiceName).Wait();
                 _loggedIn = null;
             } 

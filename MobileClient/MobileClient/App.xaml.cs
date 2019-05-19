@@ -79,7 +79,6 @@ namespace MobileClient
                         propertyCache.Clear();
                         imageCache.Clear();
                         subCache.Clear();
-                        settingsCache.Clear();
                     }
                     catch { }
                 };
@@ -163,9 +162,7 @@ namespace MobileClient
                 });
 
                 var refresher = new CacheRefresher(new DebugLogger<CacheRefresher>(), RefreshCaches);
-                var user = userService.GetLoggedInAccount();
-                if (user != null)
-                    refresher.RefreshCaches(user.UserId);
+                refresher.RefreshCaches(userService.GetLoggedInAccount()?.UserId);
 
                 userService.OnLoggedIn += (s, e) =>
                 {
@@ -206,23 +203,7 @@ namespace MobileClient
         public App()
         {
             InitializeComponent();
-            ICurrentUserService userService = null;
-            try
-            {
-                userService = Container.GetInstance<ICurrentUserService>();
-                userService.OnLoggedIn += (s, e) => Device.BeginInvokeOnMainThread(() => MainPage = new BaseTabPage());
-                userService.OnLoggedOut += (s, e) => Device.BeginInvokeOnMainThread(() => MainPage = new LandingPage());
-            }
-            catch { }
-
-            if (userService?.GetLoggedInAccount() == null)
-            {
-                MainPage = new LandingPage();
-            }
-            else
-            {
-                MainPage = new BaseTabPage();
-            }
+            MainPage = new BaseTabPage();
         }
 
         protected override void OnStart()

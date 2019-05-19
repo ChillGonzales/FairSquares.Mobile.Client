@@ -21,6 +21,8 @@ namespace MobileClient.Utilities
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(userId))
+                    return;
                 await _refreshFunc(userId);
                 Invalidated = false;
             }

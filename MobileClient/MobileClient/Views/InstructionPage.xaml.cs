@@ -41,7 +41,6 @@ namespace MobileClient.Views
         {
             if (NotShowAgainToggle.IsToggled)
             {
-                _settings.Clear();
                 _settings.Put("", new SettingsModel() { DisplayWelcomeMessage = false });
             }
             await _popAction();

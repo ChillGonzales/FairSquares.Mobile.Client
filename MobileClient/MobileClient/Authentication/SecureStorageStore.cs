@@ -13,17 +13,9 @@ namespace MobileClient.Authentication
     {
         public static async Task SaveAsync(Account account, string serviceId)
         {
-            // Find existing accounts for the service
-            var accounts = await FindAccountsForServiceAsync(serviceId).ConfigureAwait(false);
-
-            // Remove existing account with Id if exists
-            accounts.RemoveAll(a => a.Username == account.Username);
-
-            // Add account we are saving
-            accounts.Add(account);
-
+            // We don't want to update saved user, we just want to PUT. Only 1 user should be cached at a time.
             // Serialize all the accounts to javascript
-            var json = JsonConvert.SerializeObject(accounts);
+            var json = JsonConvert.SerializeObject(new List<Account>() { account });
 
             // Securely save the accounts for the given service
             await SecureStorage.SetAsync(serviceId, json);
