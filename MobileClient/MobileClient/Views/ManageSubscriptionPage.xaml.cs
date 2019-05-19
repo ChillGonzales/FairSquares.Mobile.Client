@@ -15,12 +15,10 @@ namespace MobileClient.Views
     public partial class ManageSubscriptionPage : ContentPage
     {
         private readonly ManageSubscriptionViewModel _model;
-        private readonly IPurchasingService _purchaseService;
 
         public ManageSubscriptionPage(ManageSubscriptionViewModel model)
         {
             InitializeComponent();
-            _purchaseService = App.Container.GetInstance<IPurchasingService>();
             _model = model;
             SubscriptionTypeLabel.Text = "   " + _model.SubscriptionType.ToString();
             RemainingOrdersLabel.Text = "   " + _model.RemainingOrders.ToString();

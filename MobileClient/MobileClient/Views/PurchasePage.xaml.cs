@@ -15,7 +15,7 @@ namespace MobileClient.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class PurchasePage : ContentPage
     {
-        private readonly ValidationResponse _validationResponse;
+        private readonly ValidationModel _validationResponse;
         private List<SubscriptionType> _subscriptionSource = new List<SubscriptionType>()
         {
             SubscriptionType.Basic,
@@ -33,7 +33,7 @@ namespace MobileClient.Views
                                       ICache<SubscriptionModel> subCache,
                                       ISubscriptionService subService,
                                       ICurrentUserService userCache,
-                                      ValidationResponse validationResponse)
+                                      ValidationModel validationResponse)
         {
             InitializeComponent();
             _validationResponse = validationResponse;
@@ -63,7 +63,7 @@ namespace MobileClient.Views
             SetVisualState(selected, _validationResponse);
         }
 
-        private void SetVisualState(SubscriptionType selected, ValidationResponse validation)
+        private void SetVisualState(SubscriptionType selected, ValidationModel validation)
         {
             try
             {
@@ -157,6 +157,10 @@ namespace MobileClient.Views
 
         private async Task PurchaseSubscription(string subCode)
         {
+            if (_userCache.GetLoggedInAccount() == null)
+            {
+                throw new InvalidOperationException("User must be logged in to purchase a subscription.");
+            }
 #if RELEASE
             var sub = await _purchaseService.PurchaseSubscription(subCode, "payload");
 #else
@@ -189,7 +193,7 @@ namespace MobileClient.Views
 
         }
 
-        private static string GetLegalJargon(SubscriptionType selected, ValidationResponse validation)
+        private static string GetLegalJargon(SubscriptionType selected, ValidationModel validation)
         {
             string costDesc = "";
             string periodText = (new[] { ValidationState.FreeReportValid, ValidationState.NoSubscriptionAndTrialValid }.Contains(validation.State)

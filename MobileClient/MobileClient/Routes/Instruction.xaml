@@ -1,20 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             Title="Information"
-             x:Class="MobileClient.Views.InstructionPage">
+             x:Class="MobileClient.Routes.Instruction">
     <ContentPage.Content>
         <ScrollView Margin="10">
             <Grid RowSpacing="15" x:Name="InstructionGrid">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="s50" />
+                    <RowDefinition Height="{Binding TitleColHeight}" />
                     <RowDefinition Height="50" />
                     <RowDefinition Height="50" />
                     <RowDefinition Height="50" />
                     <RowDefinition Height="30" />
                     <RowDefinition Height="50" />
-                    <RowDefinition Height="50" />
-                    <RowDefinition Height="50" />
+                    <RowDefinition Height="{Binding SwitchColHeight}" />
+                    <RowDefinition Height="{Binding DismissBtnColHeight}" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -72,11 +71,11 @@
                 VerticalOptions="Center" 
                 HorizontalOptions="CenterAndExpand" />
                 <StackLayout Orientation="Horizontal" Grid.Row="6" Grid.Column="0">
-                    <Switch x:Name="NotShowAgainToggle" HorizontalOptions="Start" VerticalOptions="Center"/>
+                    <Switch IsToggled="{Binding NotShowAgain}" HorizontalOptions="Start" VerticalOptions="Center"/>
                     <Label Text="Don't show this message again." HorizontalOptions="StartAndExpand" VerticalOptions="Center" />
                 </StackLayout>
-                <Button x:Name="DismissButton"
-                StyleClass="Success"
+                <Button StyleClass="Success"
+                Command="{Binding DismissCommand}"
                 Text="Got It, Thanks"
                 WidthRequest="250"
                 HorizontalOptions="CenterAndExpand"

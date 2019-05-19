@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace MobileClient.Routes.Instruction
+namespace MobileClient.Routes
 {
-    public class InstructionViewModel
+    class LandingViewModel
     {
     }
 }

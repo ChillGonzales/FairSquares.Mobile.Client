@@ -3,6 +3,7 @@ using MobileClient.Authentication;
 using MobileClient.Models;
 using MobileClient.Services;
 using MobileClient.Utilities;
+using MobileClient.Utility;
 using MobileClient.Views;
 using Newtonsoft.Json;
 using Plugin.InAppBilling;
@@ -184,6 +185,7 @@ namespace MobileClient
                 Container.Register<ICacheRefresher>(() => refresher, Lifestyle.Singleton);
                 Container.Register<ISubscriptionService>(() => subService, Lifestyle.Singleton);
                 Container.Register<IOrderValidationService, OrderValidationService>();
+                Container.Register<IPageFactory, PageFactory>(Lifestyle.Singleton);
 
                 // Finish registering created caches
                 Container.Register<ICache<PropertyModel>>(() => propertyCache, Lifestyle.Singleton);

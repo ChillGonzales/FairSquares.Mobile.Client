@@ -22,7 +22,7 @@ namespace MobileClient.Services
             _logger = logger;
         }
 
-        public async Task<ValidationResponse> ValidateOrderRequest(AccountModel user)
+        public async Task<ValidationModel> ValidateOrderRequest(AccountModel user)
         {
             try
             {
@@ -34,14 +34,14 @@ namespace MobileClient.Services
                     // This case means they've never had a subscription before, and are eligible for a trial month.
                     if (sub == null)
                     {
-                        return new ValidationResponse()
+                        return new ValidationModel()
                         {
                             State = ValidationState.NoSubscriptionAndTrialValid,
                             Message = "User has used their free report, but is eligible for a free trial period."
                         };
                     }
 
-                    return new ValidationResponse()
+                    return new ValidationModel()
                     {
                         State = ValidationState.NoSubscriptionAndTrialAlreadyUsed,
                         Message = "User does not have a subscription and has used their free report and trial period."
@@ -49,7 +49,7 @@ namespace MobileClient.Services
                 }
                 if (!SubscriptionUtility.SubscriptionActive(sub) && !orders.Any())
                 {
-                    return new ValidationResponse()
+                    return new ValidationModel()
                     {
                         State = ValidationState.FreeReportValid,
                         Message = "User can use their free report."
@@ -62,7 +62,7 @@ namespace MobileClient.Services
                     (sub.SubscriptionType == SubscriptionType.Premium && activeSubOrderCount >= SubscriptionUtility.PremiumOrderCount) ||
                     (sub.SubscriptionType == SubscriptionType.Enterprise && activeSubOrderCount >= SubscriptionUtility.EnterpriseOrderCount))
                 {
-                    return new ValidationResponse()
+                    return new ValidationModel()
                     {
                         State = ValidationState.NoReportsLeftInPeriod,
                         RemainingOrders = 0,
@@ -75,7 +75,7 @@ namespace MobileClient.Services
                     var remainingCount = sub.SubscriptionType == SubscriptionType.Basic ? SubscriptionUtility.BasicOrderCount - activeSubOrderCount :
                                         (sub.SubscriptionType == SubscriptionType.Premium ? SubscriptionUtility.PremiumOrderCount - activeSubOrderCount :
                                         SubscriptionUtility.EnterpriseOrderCount - activeSubOrderCount);
-                    return new ValidationResponse()
+                    return new ValidationModel()
                     {
                         State = ValidationState.SubscriptionReportValid,
                         Subscription = sub,
@@ -91,7 +91,7 @@ namespace MobileClient.Services
         }
     }
 
-    public class ValidationResponse
+    public class ValidationModel
     {
         public ValidationState State { get; set; }
         public string Message { get; set; }

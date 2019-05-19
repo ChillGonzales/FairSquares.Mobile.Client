@@ -9,6 +9,6 @@ namespace MobileClient.Services
 {
     public interface IOrderValidationService
     {
-        Task<ValidationResponse> ValidateOrderRequest(AccountModel user);
+        Task<ValidationModel> ValidateOrderRequest(AccountModel user);
     }
 }

@@ -39,13 +39,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="Routes\Account\Account.xaml">
+    <EmbeddedResource Update="Routes\Account.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Routes\Instruction\Instruction.xaml">
+    <EmbeddedResource Update="Routes\Instruction.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Views\AccountPage.xaml">
+    <EmbeddedResource Update="Routes\Landing.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Routes\ManageSubscription.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Routes\Purchase.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Views\BaseTabPage.xaml">

@@ -14,110 +14,133 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Xamarin.Forms;
 
-namespace MobileClient.Routes.Account
+namespace MobileClient.Routes
 {
     public class AccountViewModel : INotifyPropertyChanged
     {
         private readonly INavigation _navigation;
+        private readonly IPageFactory _pageFactory;
         private readonly ICurrentUserService _userCache;
-        private readonly ICache<SubscriptionModel> _subCache;
         private readonly IOrderValidationService _orderValidator;
-        private readonly AccountModel _user;
+        private readonly Action<string> _changeLoginStyleClass;
+        private readonly Action<string> _changeSubStyleClass;
         private readonly ILogger<AccountViewModel> _logger;
         private string _email;
         private string _subscriptionLabel;
         private string _subscriptionButtonText;
-        private ObservableCollection<string> _logoutStyleClass;
-        private ObservableCollection<string> _subscriptionButtonStyleClass;
         private string _logoutText;
+        private bool _subscriptionButtonEnabled;
 
         public AccountViewModel(ICurrentUserService userCache, 
-                                ICache<SubscriptionModel> subCache, 
                                 IOrderValidationService orderValidator, 
                                 INavigation navigation,
+                                IPageFactory pageFactory,
+                                Action<string> changeLogInStyleClass,
+                                Action<string> changeSubStyleClass,
                                 ILogger<AccountViewModel> logger)
         {
             _navigation = navigation;
+            _pageFactory = pageFactory;
             _userCache = userCache;
-            _subCache = subCache;
+            _userCache.OnLoggedIn += async (s, e) =>
+            {
+                SetAccountState(e.Account);
+                await SetSubState(e.Account);
+            };
+            _userCache.OnLoggedOut += async (s, e) =>
+            {
+                SetAccountState(null);
+                await SetSubState(null);
+            };
             _orderValidator = orderValidator;
-            _user = userCache.GetLoggedInAccount();
+            _changeLoginStyleClass = changeLogInStyleClass;
+            _changeSubStyleClass = changeSubStyleClass;
+            var user = userCache.GetLoggedInAccount();
             _logger = logger;
-            SetInitialState();
+            SetInitialState(user);
         }
 
-        private void SetInitialState()
+        private void SetInitialState(AccountModel user)
         {
-            ToolbarInfoCommand = new Command(async () => await _navigation.PushAsync(PageFactory.GetPage(PageType.Instruction)));
-            SetAccountState(_user);
-            LogOutCommand = new Command(() =>
+            ToolbarInfoCommand = new Command(async () => await _navigation.PushAsync(_pageFactory.GetPage(PageType.Instruction, false)));
+            SetAccountState(user);
+            LogOutCommand = new Command(async () =>
             {
-                _userCache.LogOut();
-                SetAccountState(null);
+                if (_userCache.GetLoggedInAccount() == null)
+                {
+                    await _navigation.PushAsync(_pageFactory.GetPage(PageType.Landing));
+                }
+                else
+                {
+                    _userCache.LogOut();
+                    SetAccountState(null);
+                    await SetSubState(null);
+                }
             });
 
-            Task.Run(async () => await SetSubState()).Wait();
+            Task.Run(async () => await SetSubState(user)).Wait();
             SubscriptionCommand = new Command(async () => await SubscriptionPressed());
 
-            OnPageAppearing = new Action(async () => await SetSubState());
-            FeedbackCommand = new Command(async () => await _navigation.PushAsync(new FeedbackPage()));
+            FeedbackCommand = new Command(async () => await _navigation.PushAsync(_pageFactory.GetPage(PageType.Feedback)));
         }
 
         private void SetAccountState(AccountModel user)
         {
-            if (_user == null)
+            if (user == null)
             {
-                Email = "Please Log In To Continue";
-                LogOutStyleClass = new ObservableCollection<string>() { "Info" };
+                Email = "Please log in to continue";
+                _changeLoginStyleClass("Info");
                 LogOutText = "Log In";
             }
             else
             {
-                Email = _user.Email;
-                LogOutStyleClass = new ObservableCollection<string>() { "Danger" };
+                Email = user.Email;
+                _changeLoginStyleClass("Danger");
                 LogOutText = "Sign Out";
             }
         }
 
-        private async Task SetSubState()
+        private async Task SetSubState(AccountModel user)
         {
-            var validity = await _orderValidator.ValidateOrderRequest(_user);
+            if (user == null)
+            {
+                SubscriptionLabel = $"Log in to manage your subscription.";
+                _changeSubStyleClass("Info");
+                SubscriptionButtonText = "Manage";
+                SubscriptionButtonEnabled = false;
+                return;
+            }
+            var validity = await _orderValidator.ValidateOrderRequest(user);
             if (validity.State == ValidationState.NoReportsLeftInPeriod || validity.State == ValidationState.SubscriptionReportValid)
             {
                 SubscriptionLabel = $"Reports remaining this period: {validity.RemainingOrders.ToString()}";
-                SubscriptionButtonStyleClass = new ObservableCollection<string>() { "Info" };
+                _changeSubStyleClass("Info");
                 SubscriptionButtonText = "Manage";
+                SubscriptionButtonEnabled = true;
             }
             else
             {
                 SubscriptionLabel = "Purchase a monthly subscription that fits your needs.";
-                SubscriptionButtonStyleClass = new ObservableCollection<string>() { "Success" };
+                _changeSubStyleClass("Success");
                 SubscriptionButtonText = "Purchase";
+                SubscriptionButtonEnabled = true;
             }
         }
 
         private async Task SubscriptionPressed()
         {
+            if (_userCache.GetLoggedInAccount() == null)
+                return;
             try
             {
                 var validation = await _orderValidator.ValidateOrderRequest(_userCache.GetLoggedInAccount());
                 if (new[] { ValidationState.SubscriptionReportValid, ValidationState.NoReportsLeftInPeriod }.Contains(validation.State))
                 {
-                    await _navigation.PushAsync(new ManageSubscriptionPage(new ViewModels.ManageSubscriptionViewModel()
-                    {
-                        RemainingOrders = validation.RemainingOrders,
-                        SubscriptionType = validation.Subscription.SubscriptionType,
-                        EndDateTime = validation.Subscription.EndDateTime
-                    }));
+                    await _navigation.PushAsync(_pageFactory.GetPage(PageType.ManageSubscription, validation));
                 }
                 else
                 {
-                    await _navigation.PushAsync(new PurchasePage(DependencyService.Get<IAlertService>(),
-                                                                          App.Container.GetInstance<IPurchasingService>(),
-                                                                          App.Container.GetInstance<ICache<SubscriptionModel>>(),
-                                                                          App.Container.GetInstance<ISubscriptionService>(),
-                                                                          App.Container.GetInstance<ICurrentUserService>(),
-                                                                          validation));
+                    await _navigation.PushAsync(_pageFactory.GetPage(PageType.Purchase, validation));
                 }
             }
             catch (Exception ex)
@@ -154,18 +177,6 @@ namespace MobileClient.Routes.Account
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LogOutText)));
             }
         }
-        public ObservableCollection<string> LogOutStyleClass
-        {
-            get
-            {
-                return _logoutStyleClass;
-            }
-            private set
-            {
-                _logoutStyleClass = value;
-                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LogOutStyleClass)));
-            }
-        }
         public string SubscriptionLabel
         {
             get
@@ -191,20 +202,19 @@ namespace MobileClient.Routes.Account
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SubscriptionButtonText)));
             }
         }
-        public ObservableCollection<string> SubscriptionButtonStyleClass
+        public bool SubscriptionButtonEnabled
         {
             get
             {
-                return _subscriptionButtonStyleClass;
+                return _subscriptionButtonEnabled;
             }
             private set
             {
-                _subscriptionButtonStyleClass = value;
-                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SubscriptionButtonStyleClass)));
+                _subscriptionButtonEnabled = value;
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SubscriptionButtonEnabled)));
             }
         }
         public ICommand FeedbackCommand { get; private set; }
-        public Action OnPageAppearing { get; private set; }
         #endregion
     }
 }
