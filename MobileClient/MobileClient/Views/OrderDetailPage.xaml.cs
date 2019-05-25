@@ -1,5 +1,5 @@
 ﻿using FairSquares.Measurement.Core.Models;
-using FairSquares.Measurement.Core.Utilities;
+using FairSquares.Measurement.Core.Utility;
 using MobileClient.Models;
 using MobileClient.Services;
 using MobileClient.Utilities;
@@ -103,6 +103,18 @@ namespace MobileClient.Views
             OrderId.Text = $"Order ID: {_order.OrderId}";
             Pitch.Text = $"{_recalculated.CurrentPitch}:12";
             NumberOfRoofs.Text = $"Number of Roofs Measured: {_recalculated.Roofs.Count()}";
+            NumberOfPitches.Text = $"Number of Distinct Pitches Measured: {_recalculated.PitchCount}";
+            RoofsInfoBtn.Clicked += (s, e) => DisplayAlert("Roof Count Information", 
+                "This is the number of roofs Fair Squares measured for this order.", "Close");
+            PitchesInfoBtn.Clicked += (s, e) => DisplayAlert("Pitch Count Information", 
+                "This is the number of distinct pitches Fair Squares used to measure this order. \n\n" +
+                "NOTE: Only the pitch with the largest square footage (the predominant pitch) can be adjusted.", "Close");
+            PredomPitchInfoBtn.Clicked += (s, e) => DisplayAlert("Predominant Pitch Information",
+                "The predominant pitch is the pitch with the largest measured area on the roof. \n\n" +
+                "For example: A Ranch-style house has a pitch of 4:12 on the main roof, has two dormers that are 6:12 each, and " +
+                "an attached garage that is 3:12. The predominant pitch of the house will be 4:12, because that is the pitch that " +
+                "covers the most roof area.\n\n" +
+                "Predominant pitch is the only pitch that is adjustable with Fair Squares.", "Close");
             TopImage.Source = stream;
             Address.Text = $"{Regex.Replace(_property.Address, @"\r\n", @" ")}";
             Area.Text = $"{Convert.ToInt64(_property.Roofs.Sum(x => x.TotalArea)).ToString()} sq. ft.";
@@ -163,8 +175,8 @@ namespace MobileClient.Views
         {
             foreach (var roof in property.Roofs)
             {
-                var response = RoofUtilities.CalculateTotals(roof);
-                var rise = RoofUtilities.GetPredominantPitchFromSections(roof.Sections);
+                var response = RoofUtility.CalculateTotals(roof);
+                var rise = RoofUtility.GetPredominantPitchFromSections(roof.Sections);
                 roof.TotalArea = Math.Round(response.TotalArea, 0);
                 roof.TotalSquares = Math.Round(response.TotalSquaresCount, 0);
                 roof.PredominantPitchRise = rise;
@@ -173,12 +185,15 @@ namespace MobileClient.Views
 
         private RecalculatedPropertyModel GetViewModelFromProperty(PropertyModel property)
         {
-            var overallPitch = RoofUtilities.GetPredominantPitchFromSections(_property.Roofs.SelectMany(x => x.Sections).ToList());
+            var sections = _property.Roofs.SelectMany(x => x.Sections).ToList();
+            var overallPitch = RoofUtility.GetPredominantPitchFromSections(sections);
+            var count = RoofUtility.GetPitchCount(sections)?.PitchCount ?? 1;
             return new RecalculatedPropertyModel(property)
             {
                 RecalculatedSections = property.Roofs.SelectMany(x => x.Sections).Where(x => x.PitchRise == overallPitch).ToList(),
                 CurrentPitch = overallPitch,
-                OriginalPitch = overallPitch
+                OriginalPitch = overallPitch,
+                PitchCount = count
             };
         }
 
@@ -193,7 +208,7 @@ namespace MobileClient.Views
                 foreach (var section in _recalculated.RecalculatedSections)
                 {
                     section.PitchRise = newValue;
-                    var totals = SectionUtilities.CalculateAreaAndSquares(new CalculateSectionModelRequest()
+                    var totals = SectionUtility.CalculateAreaAndSquares(new CalculateSectionModelRequest()
                     {
                         Length = section.Length,
                         NumberOfSections = section.NumberOfSections,
@@ -209,10 +224,10 @@ namespace MobileClient.Views
                 }
                 foreach (var roof in _recalculated.Roofs)
                 {
-                    var totals = RoofUtilities.CalculateTotals(roof);
+                    var totals = RoofUtility.CalculateTotals(roof);
                     roof.TotalArea = totals.TotalArea;
                     roof.TotalSquares = totals.TotalSquaresCount;
-                    roof.PredominantPitchRise = RoofUtilities.GetPredominantPitchFromSections(roof.Sections);
+                    roof.PredominantPitchRise = RoofUtility.GetPredominantPitchFromSections(roof.Sections);
                 }
                 Area.Text = $"{Convert.ToInt64(_recalculated.Roofs.Sum(x => x.TotalArea)).ToString()} sq. ft.";
                 Squares.Text = $"Total Squares: {Math.Ceiling(_recalculated.Roofs.Sum(x => x.TotalSquares)).ToString()} squares";
