@@ -19,6 +19,7 @@ namespace MobileClient.ViewModels
         }
         public int OriginalPitch { get; set; }
         public int CurrentPitch { get; set; }
+        public int PitchCount { get; set; }
         public List<SectionModel> RecalculatedSections { get; set; }
     }
 }

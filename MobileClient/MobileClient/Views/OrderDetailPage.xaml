@@ -48,14 +48,22 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                            <Label FontAttributes="Bold"
-                               FontSize="Medium"
-                               Grid.Row="0"
-                               Grid.Column="0"
-                               x:Name="PitchLabel"
-                               Text="Predominant Pitch"
-                               VerticalOptions="Start"
-                               HorizontalOptions="Center" />
+                            <StackLayout Orientation="Horizontal">
+                                <Label FontAttributes="Bold"
+                                   FontSize="Medium"
+                                   Grid.Row="0"
+                                   Grid.Column="0"
+                                   x:Name="PitchLabel"
+                                   Text="Predominant Pitch"
+                                   VerticalOptions="Start"
+                                   HorizontalOptions="Center" />
+                            <ImageButton Source="ic_action_info_outline.png"
+                                     x:Name="PredomPitchInfoBtn"
+                                     HeightRequest="25"
+                                     WidthRequest="25"
+                                     HorizontalOptions="End"
+                                     VerticalOptions="Start" />
+                        </StackLayout>
                             <StackLayout Orientation="Horizontal" 
                                          Grid.Row="1"
                                          Grid.Column="0"
@@ -98,9 +106,28 @@
                     <Label x:Name="OrderId"
                         VerticalOptions="Center" 
                         HorizontalOptions="Start" />
-                    <Label x:Name="NumberOfRoofs"
-                           VerticalOptions="Center"
-                           HorizontalOptions="Start" />
+                    <StackLayout Orientation="Horizontal">
+                        <Label x:Name="NumberOfRoofs"
+                               VerticalOptions="Center"
+                               HorizontalOptions="Start" />
+                        <ImageButton Source="ic_action_info_outline.png"
+                                     x:Name="RoofsInfoBtn"
+                                     HeightRequest="25"
+                                     WidthRequest="25"
+                                     HorizontalOptions="End"
+                                     VerticalOptions="Center" />
+                    </StackLayout>
+                    <StackLayout Orientation="Horizontal">
+                        <Label x:Name="NumberOfPitches"
+                               VerticalOptions="Center"
+                               HorizontalOptions="Start" />
+                        <ImageButton Source="ic_action_info_outline.png"
+                                     x:Name="PitchesInfoBtn"
+                                     HeightRequest="25"
+                                     WidthRequest="25"
+                                     HorizontalOptions="End"
+                                     VerticalOptions="Center" />
+                    </StackLayout>
                     <Label HeightRequest="15" />
                     <Label Text="Safety Stock Calculations"
                         x:Name="SafetyStockLabel"
