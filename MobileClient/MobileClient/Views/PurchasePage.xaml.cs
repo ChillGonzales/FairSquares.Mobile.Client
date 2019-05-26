@@ -132,7 +132,7 @@ namespace MobileClient.Views
                     await PurchaseSubscription(subCode);
                     Device.BeginInvokeOnMainThread(async () => await Navigation.PopAsync());
                     _alertService.LongAlert($"Thank you for your purchase!");
-                    (Application.Current.MainPage as BaseTabPage).NavigateFromMenu(ViewModels.PageType.Order);
+                    (Application.Current.MainPage as BaseTabPage).NavigateFromMenu(ViewModels.BaseNavPageType.Order);
                 }
                 catch (Exception ex)
                 {

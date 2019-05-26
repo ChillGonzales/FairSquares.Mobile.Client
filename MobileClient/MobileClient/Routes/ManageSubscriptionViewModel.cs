@@ -11,22 +11,26 @@ namespace MobileClient.Routes
     public class ManageSubscriptionViewModel : INotifyPropertyChanged
     {
         private readonly ValidationModel _model;
+        private readonly string _runtimePlatform;
+        private readonly Action<Uri> _openUri;
         private string _subscriptionTypeLabel;
         private string _remainingOrdersLabel;
         private string _endDateLabel;
         private string _disclaimerLabel;
 
-        public ManageSubscriptionViewModel(ValidationModel model)
+        public ManageSubscriptionViewModel(ValidationModel model, string runtimePlatform, Action<Uri> openUri)
         {
             _model = model;
+            _runtimePlatform = runtimePlatform;
+            _openUri = openUri;
             SubscriptionTypeLabel = "   " + _model.Subscription.SubscriptionType.ToString();
             RemainingOrdersLabel = "   " + _model.RemainingOrders.ToString();
             EndDateLabel = "   " + _model.Subscription.EndDateTime.ToString("dddd, dd MMMM yyyy");
-            var compName = Device.RuntimePlatform == Device.Android ? "Google" : "Apple";
-            var supportUri = Device.RuntimePlatform == Device.Android ? "https://support.google.com/googleplay/answer/7018481" :
+            var compName = _runtimePlatform == Device.Android ? "Google" : "Apple";
+            var supportUri = _runtimePlatform == Device.Android ? "https://support.google.com/googleplay/answer/7018481" :
                                 "https://support.apple.com/en-us/HT202039#subscriptions";
             DisclaimerLabel = $"NOTE: {compName} does not allow subscriptions to be cancelled through the app. This button will open a web browser with instructions on how to cancel from your device.";
-            CancelSubCommand = new Command(() => Device.OpenUri(new Uri(supportUri)));
+            CancelSubCommand = new Command(() => _openUri(new Uri(supportUri)));
         }
 
         // Bound properties

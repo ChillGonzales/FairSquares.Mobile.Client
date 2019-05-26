@@ -156,7 +156,7 @@ namespace MobileClient.Views
             Zip.Text = "";
             SubmitButton.IsEnabled = true;
             Comments.Text = "";
-            RootPage.NavigateFromMenu(PageType.MyOrders);
+            RootPage.NavigateFromMenu(BaseNavPageType.MyOrders);
         }
 
         private async void ToolbarItem_Activated(object sender, EventArgs e)

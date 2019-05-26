@@ -68,7 +68,8 @@ namespace MobileClient.Routes
             {
                 if (_userCache.GetLoggedInAccount() == null)
                 {
-                    await _navigation.PushAsync(_pageFactory.GetPage(PageType.Landing));
+                    //await _navigation.PushAsync(_pageFactory.GetPage(PageType.Landing));
+                    await _navigation.PushAsync(new LandingPage());
                 }
                 else
                 {

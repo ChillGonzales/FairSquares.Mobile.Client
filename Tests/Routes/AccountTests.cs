@@ -46,7 +46,7 @@ namespace Tests.Routes
         public void WhenUserLogsIn_NavToLanding()
         {
             _pageFac.Setup(x => x.GetPage(PageType.Landing)).Returns(null as Landing);
-            _pageFac.Setup(x => x.GetPage(PageType.Instruction)).Returns(null as Instruction);
+            _pageFac.Setup(x => x.GetPage(PageType.Instruction, false)).Returns(null as Instruction);
             var account = new AccountViewModel(_userCache.Object,
                     _validator.Object,
                     _nav.Object,
@@ -62,9 +62,9 @@ namespace Tests.Routes
             Assert.AreEqual("Manage", account.SubscriptionButtonText);
             Assert.AreEqual("Log in to manage your subscription.", account.SubscriptionLabel);
             account.LogOutCommand.Execute(null);
-            _pageFac.Verify(x => x.GetPage(PageType.Landing));
             account.ToolbarInfoCommand.Execute(null);
-            _pageFac.Verify(x => x.GetPage(PageType.Instruction));
+            _pageFac.Verify(x => x.GetPage(PageType.Landing), Times.Once);
+            _pageFac.Verify(x => x.GetPage(PageType.Instruction, false), Times.Once);
             _nav.Verify(x => x.PushAsync(It.IsAny<Page>()), Times.Exactly(2));
         }
 

@@ -22,7 +22,9 @@ namespace MobileClient.Utility
                 case PageType.ManageSubscription:
                     return new ManageSubscription(stateArgs[0] as ValidationModel);
                 case PageType.Purchase:
-                    return new Purchase();
+                    return new Purchase(stateArgs[0] as ValidationModel);
+                case PageType.Feedback:
+                    return new Feedback();
                 default:
                     return new Account();
             }

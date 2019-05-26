@@ -4,7 +4,7 @@ using System.Text;
 
 namespace MobileClient.Routes
 {
-    class LandingViewModel
+    public class LandingViewModel
     {
     }
 }

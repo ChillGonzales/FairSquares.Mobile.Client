@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:mobileclient="clr-namespace:MobileClient"
+             Title="Send Feedback"
+             mc:Ignorable="d"
+             x:Class="MobileClient.Routes.Feedback">
+    <ContentPage.Content>
+        <StackLayout Orientation="Vertical" Margin="5">
+            <StackLayout Orientation="Vertical">
+                <Label FontSize="Medium"
+                        FontAttributes="Bold"
+                        Text="Enter your feedback:" />
+                <Entry FontSize="Medium"
+                        Text="{Binding FeedbackEntry}"
+                        Margin="10"
+                        WidthRequest="300"
+                        HeightRequest="100"
+                        VerticalOptions="Center"
+                        HorizontalOptions="CenterAndExpand" />
+            </StackLayout>
+            <Button Margin="10"
+                Command="{Binding SubmitCommand}"
+                Text="Submit"
+                WidthRequest="250"
+                StyleClass="Info"
+                VerticalOptions="Center"
+                HorizontalOptions="CenterAndExpand" />
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

@@ -16,7 +16,7 @@ namespace MobileClient.Routes
         public ManageSubscription(ValidationModel model)
         {
             InitializeComponent();
-            BindingContext = new ManageSubscriptionViewModel(model);
+            BindingContext = new ManageSubscriptionViewModel(model, Device.RuntimePlatform, x => Device.OpenUri(x));
         }
     }
 }

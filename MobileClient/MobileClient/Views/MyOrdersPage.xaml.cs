@@ -41,7 +41,7 @@ namespace MobileClient.Views
                 _validationService = App.Container.GetInstance<IOrderValidationService>();
                 MessagingCenter.Subscribe<App>(this, "CacheInvalidated", async x => await this.SetViewState());
                 LogInButton.Clicked += async (s, e) => await Navigation.PushAsync(new LandingPage());
-                FreeReportButton.Clicked += (s, e) => (Application.Current.MainPage as BaseTabPage).NavigateFromMenu(ViewModels.PageType.Order);
+                FreeReportButton.Clicked += (s, e) => (Application.Current.MainPage as BaseTabPage).NavigateFromMenu(ViewModels.BaseNavPageType.Order);
                 ExampleReportButton.Clicked += async (s, e) =>
                 {
                     try

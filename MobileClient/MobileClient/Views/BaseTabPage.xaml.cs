@@ -22,7 +22,7 @@ namespace MobileClient.Views
         {
             InitializeComponent();
             _settings = App.Container.GetInstance<ICache<SettingsModel>>();
-            NavigateFromMenu(PageType.MyOrders);
+            NavigateFromMenu(BaseNavPageType.MyOrders);
         }
 
         protected async override void OnAppearing()
@@ -35,17 +35,17 @@ namespace MobileClient.Views
             }
         }
 
-        public void NavigateFromMenu(PageType pageType)
+        public void NavigateFromMenu(BaseNavPageType pageType)
         {
             switch (pageType)
             {
-                case PageType.Account:
+                case BaseNavPageType.Account:
                     CurrentPage = AccountTab;
                     break;
-                case PageType.MyOrders:
+                case BaseNavPageType.MyOrders:
                     CurrentPage = MyOrdersTab;
                     break;
-                case PageType.Order:
+                case BaseNavPageType.Order:
                     CurrentPage = OrderTab;
                     break;
                 default:
