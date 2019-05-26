@@ -59,6 +59,9 @@ namespace MobileClient.Views
                 UpButton.IsVisible = false;
                 SafetyStockLabel.IsVisible = false;
                 SafetyStockTable.IsVisible = false;
+                PitchesInfoBtn.IsVisible = false;
+                PredomPitchInfoBtn.IsVisible = false;
+                RoofsInfoBtn.IsVisible = false;
                 return;
             }
             _property = _propertyCache.Get(order.OrderId);
