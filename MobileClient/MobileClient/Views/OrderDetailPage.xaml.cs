@@ -45,8 +45,8 @@ namespace MobileClient.Views
             _propertyService = App.Container.GetInstance<IPropertyService>();
             _imageService = App.Container.GetInstance<IImageService>();
             _alertService = DependencyService.Get<IAlertService>();
-
             _order = order;
+
             // Display message if order isn't fulfilled yet.
             if (!order.Fulfilled)
             {
