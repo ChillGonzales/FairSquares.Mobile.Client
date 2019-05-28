@@ -10,6 +10,7 @@
                     <RowDefinition Height="50" />
                     <RowDefinition Height="50" />
                     <RowDefinition Height="50" />
+                    <RowDefinition Height="75" />
                     <RowDefinition Height="30" />
                     <RowDefinition Height="50" />
                     <RowDefinition Height="{Binding SwitchColHeight}" />
@@ -63,14 +64,29 @@
                         </FormattedString>
                     </Label.FormattedText>
                 </Label>
+                <Label 
+                FontSize="Medium"
+                Grid.Row="4"
+                Grid.Column="0"
+                VerticalOptions="Center" 
+                HorizontalOptions="CenterAndExpand" >
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text= "- Fair Squares is optimized for " FontSize="Medium"/>
+                            <Span Text = "residential" FontAttributes="Bold" FontSize="Medium"/>
+                            <Span Text = " properties. " FontSize="Medium"/>
+                            <Span Text = "We do not recommend using Fair Squares for non-residential properties." FontAttributes="Bold" FontSize="Medium"/>
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
                 <Label Text="Thank you for using Fair Squares!"
                 FontSize="Medium"
-                Grid.Row="5"
+                Grid.Row="6"
                 Grid.Column="0"
                 FontAttributes="Bold"
                 VerticalOptions="Center" 
                 HorizontalOptions="CenterAndExpand" />
-                <StackLayout Orientation="Horizontal" Grid.Row="6" Grid.Column="0">
+                <StackLayout Orientation="Horizontal" Grid.Row="7" Grid.Column="0">
                     <Switch IsToggled="{Binding NotShowAgain}" HorizontalOptions="Start" VerticalOptions="Center"/>
                     <Label Text="Don't show this message again." HorizontalOptions="StartAndExpand" VerticalOptions="Center" />
                 </StackLayout>
@@ -80,7 +96,7 @@
                 WidthRequest="250"
                 HorizontalOptions="CenterAndExpand"
                 VerticalOptions="Center"
-                Grid.Row="7" />
+                Grid.Row="8" />
             </Grid>
         </ScrollView>
     </ContentPage.Content>
