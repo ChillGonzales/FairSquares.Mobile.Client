@@ -14,8 +14,8 @@ namespace MobileClient.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class InstructionPage : ContentPage
     {
-        private const int _dismissButtonCol = 8;
-        private const int _switchCol = 7;
+        private const int _dismissButtonCol = 9;
+        private const int _switchCol = 8;
         private const int _titleCol = 0;
         private Func<Task> _popAction;
         private readonly ICache<SettingsModel> _settings;
