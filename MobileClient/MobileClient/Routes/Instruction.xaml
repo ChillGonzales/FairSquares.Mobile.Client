@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             Title="Information"
              x:Class="MobileClient.Routes.Instruction">
     <ContentPage.Content>
         <ScrollView Margin="10">
@@ -9,9 +10,10 @@
                     <RowDefinition Height="{Binding TitleColHeight}" />
                     <RowDefinition Height="50" />
                     <RowDefinition Height="50" />
-                    <RowDefinition Height="50" />
+                    <RowDefinition Height="75" />
                     <RowDefinition Height="75" />
                     <RowDefinition Height="30" />
+                    <RowDefinition Height="50" />
                     <RowDefinition Height="50" />
                     <RowDefinition Height="{Binding SwitchColHeight}" />
                     <RowDefinition Height="{Binding DismissBtnColHeight}" />
@@ -60,7 +62,10 @@
                 HorizontalOptions="CenterAndExpand" >
                     <Label.FormattedText>
                         <FormattedString>
-                            <Span Text="- Submitted orders will be completed in ONE business day." FontSize="Medium" FontAttributes="Bold"/>
+                            <Span Text= "- Fair Squares is optimized for " FontSize="Medium"/>
+                            <Span Text = "residential" FontAttributes="Bold" FontSize="Medium"/>
+                            <Span Text = " properties. " FontSize="Medium"/>
+                            <Span Text = "We do not recommend using Fair Squares for non-residential properties." FontAttributes="Bold" FontSize="Medium"/>
                         </FormattedString>
                     </Label.FormattedText>
                 </Label>
@@ -72,21 +77,34 @@
                 HorizontalOptions="CenterAndExpand" >
                     <Label.FormattedText>
                         <FormattedString>
-                            <Span Text= "- Fair Squares is optimized for " FontSize="Medium"/>
-                            <Span Text = "residential" FontAttributes="Bold" FontSize="Medium"/>
-                            <Span Text = " properties. " FontSize="Medium"/>
-                            <Span Text = "We do not recommend using Fair Squares for non-residential properties." FontAttributes="Bold" FontSize="Medium"/>
+                            <Span Text="- " FontSize="Medium" />
+                            <Span Text = "You're the boss! " FontAttributes="Bold" FontSize="Medium"/>
+                            <Span Text= "Fair Squares gives you the ability to " FontSize="Medium" />
+                            <Span Text ="change the predominant pitch " FontSize="Medium" FontAttributes="Bold" />
+                            <Span Text ="and will adjust our measurements on the fly to match it." FontSize="Medium"/>
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+                <Label 
+                FontSize="Medium"
+                Grid.Row="6"
+                Grid.Column="0"
+                VerticalOptions="Center" 
+                HorizontalOptions="CenterAndExpand" >
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text="Submitted orders will be completed in ONE business day." FontSize="Medium" FontAttributes="Bold"/>
                         </FormattedString>
                     </Label.FormattedText>
                 </Label>
                 <Label Text="Thank you for using Fair Squares!"
                 FontSize="Medium"
-                Grid.Row="6"
+                Grid.Row="7"
                 Grid.Column="0"
                 FontAttributes="Bold"
                 VerticalOptions="Center" 
                 HorizontalOptions="CenterAndExpand" />
-                <StackLayout Orientation="Horizontal" Grid.Row="7" Grid.Column="0">
+                <StackLayout Orientation="Horizontal" Grid.Row="8" Grid.Column="0">
                     <Switch IsToggled="{Binding NotShowAgain}" HorizontalOptions="Start" VerticalOptions="Center"/>
                     <Label Text="Don't show this message again." HorizontalOptions="StartAndExpand" VerticalOptions="Center" />
                 </StackLayout>
@@ -96,7 +114,7 @@
                 WidthRequest="250"
                 HorizontalOptions="CenterAndExpand"
                 VerticalOptions="Center"
-                Grid.Row="8" />
+                Grid.Row="9" />
             </Grid>
         </ScrollView>
     </ContentPage.Content>

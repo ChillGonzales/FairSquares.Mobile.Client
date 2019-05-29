@@ -7,7 +7,7 @@
         <ScrollView Margin="10">
             <Grid RowSpacing="15" x:Name="InstructionGrid">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="s50" />
+                    <RowDefinition Height="50" />
                     <RowDefinition Height="50" />
                     <RowDefinition Height="50" />
                     <RowDefinition Height="50" />
