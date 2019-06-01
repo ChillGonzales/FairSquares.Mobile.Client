@@ -3,6 +3,7 @@ using MobileClient.Authentication;
 using MobileClient.Models;
 using MobileClient.Services;
 using MobileClient.Utilities;
+using MobileClient.Utility;
 using MobileClient.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -24,7 +25,8 @@ namespace MobileClient.Views
         private readonly IOrderValidationService _orderValidator;
         private readonly ICurrentUserService _userService;
         private readonly IOrderService _orderService;
-        private readonly IAlertService _toast;
+        private readonly IToastService _toast;
+        private readonly IPageFactory _pageFactory;
         private readonly ICache<Order> _orderCache;
         private readonly ICache<SettingsModel> _settings;
 
@@ -36,7 +38,8 @@ namespace MobileClient.Views
             _orderCache = App.Container.GetInstance<ICache<Order>>();
             _orderValidator = App.Container.GetInstance<IOrderValidationService>();
             _settings = App.Container.GetInstance<ICache<SettingsModel>>();
-            _toast = DependencyService.Get<IAlertService>();
+            _toast = DependencyService.Get<IToastService>();
+            _pageFactory = App.Container.GetInstance<IPageFactory>();
             Grid.RowDefinitions[_errorIndex].Height = 0;
             StatePicker.ItemsSource = States.Select(x => x.Text).ToList();
             OptionPicker.ItemsSource = Options.Select(x => x.Text).ToList();
@@ -114,7 +117,7 @@ namespace MobileClient.Views
                         SubmitButton.IsEnabled = true;
                         return;
                     }
-                    await Navigation.PushAsync(new LandingPage());
+                    await Navigation.PushAsync(_pageFactory.GetPage(PageType.Landing));
                     SubmitButton.IsEnabled = true;
                     return;
                 }
@@ -144,7 +147,7 @@ namespace MobileClient.Views
             newOrder.OrderId = await _orderService.AddOrder(newOrder);
             DependencyService.Get<IMessagingSubscriber>().Subscribe(new List<string>() { newOrder.OrderId });
             _orderCache.Put(newOrder.OrderId, newOrder);
-            _toast.ShortAlert($"Your address has been submitted!");
+            _toast.ShortToast($"Your address has been submitted!");
 
             // Clear all fields
             AddressLine1.Text = "";
@@ -161,7 +164,7 @@ namespace MobileClient.Views
 
         private async void ToolbarItem_Activated(object sender, EventArgs e)
         {
-            await this.Navigation.PushAsync(new InstructionPage(null, false));
+            await this.Navigation.PushAsync(_pageFactory.GetPage(PageType.Instruction, false));
         }
 
         private readonly List<OptionViewModel> Options = new List<OptionViewModel>()

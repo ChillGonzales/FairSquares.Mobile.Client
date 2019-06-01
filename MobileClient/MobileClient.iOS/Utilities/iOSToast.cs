@@ -5,13 +5,14 @@ using System.Text;
 
 using Foundation;
 using MobileClient.iOS.Utilities;
+using MobileClient.Services;
 using MobileClient.Utilities;
 using UIKit;
 
-[assembly: Xamarin.Forms.Dependency(typeof(iOSMessage))]
+[assembly: Xamarin.Forms.Dependency(typeof(iOSToast))]
 namespace MobileClient.iOS.Utilities
 {
-    public class iOSMessage : IAlertService
+    public class iOSToast : IToastService
     {
         const double LONG_DELAY = 3.5;
         const double SHORT_DELAY = 2.0;
@@ -19,11 +20,11 @@ namespace MobileClient.iOS.Utilities
         NSTimer alertDelay;
         UIAlertController alert;
 
-        public void LongAlert(string message)
+        public void LongToast(string message)
         {
             ShowAlert(message, LONG_DELAY);
         }
-        public void ShortAlert(string message)
+        public void ShortToast(string message)
         {
             ShowAlert(message, SHORT_DELAY);
         }

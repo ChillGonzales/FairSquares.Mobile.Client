@@ -3,6 +3,7 @@ using FairSquares.Measurement.Core.Utility;
 using MobileClient.Models;
 using MobileClient.Services;
 using MobileClient.Utilities;
+using MobileClient.Utility;
 using MobileClient.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -26,7 +27,7 @@ namespace MobileClient.Views
         private ICache<ImageModel> _imageCache;
         private IPropertyService _propertyService;
         private IImageService _imageService;
-        private IAlertService _alertService;
+        private IToastService _alertService;
         private RecalculatedPropertyModel _recalculated;
         private readonly ILogger<OrderDetailPage> _logger;
 
@@ -44,7 +45,7 @@ namespace MobileClient.Views
             _imageCache = App.Container.GetInstance<ICache<ImageModel>>();
             _propertyService = App.Container.GetInstance<IPropertyService>();
             _imageService = App.Container.GetInstance<IImageService>();
-            _alertService = DependencyService.Get<IAlertService>();
+            _alertService = DependencyService.Get<IToastService>();
 
             _order = order;
             // Display message if order isn't fulfilled yet.
@@ -116,7 +117,7 @@ namespace MobileClient.Views
                 "covers the most roof area.\n\n" +
                 "Predominant pitch is the only pitch that is adjustable with Fair Squares.", "Close");
             TopImage.Source = stream;
-            Address.Text = $"{Regex.Replace(_property.Address, @"\r\n", @" ")}";
+            Address.Text = StringUtility.RemoveEmptyLines(_property.Address);
             Area.Text = $"{Convert.ToInt64(_property.Roofs.Sum(x => x.TotalArea)).ToString()} sq. ft.";
             Squares.Text = $"Total Squares: {_property.Roofs.Sum(x => x.TotalSquares).ToString()} squares";
             RefreshTableView(_property.Roofs.Sum(x => x.TotalArea));
@@ -140,7 +141,7 @@ namespace MobileClient.Views
                     catch { }
                     if (newModel == null || string.IsNullOrWhiteSpace(newModel.OrderId))
                     {
-                        _alertService.LongAlert($"Your order is marked as completed but the measurements cannot be found. Please check your internet connection and try again.");
+                        _alertService.LongToast($"Your order is marked as completed but the measurements cannot be found. Please check your internet connection and try again.");
                         return;
                     }
                     _propertyCache.Put(newModel.OrderId, newModel);
@@ -156,7 +157,7 @@ namespace MobileClient.Views
                     catch { }
                     if (image == null)
                     {
-                        _alertService.LongAlert($"Your order is marked as completed but the image cannot be found. Please check your internet connection.");
+                        _alertService.LongToast($"Your order is marked as completed but the image cannot be found. Please check your internet connection.");
                     }
                     else
                     {

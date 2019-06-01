@@ -22,12 +22,9 @@ namespace MobileClient.Routes
         {
             _nav = nav;
             _settings = settings;
-            if (!showDismissButton)
-            {
-                TitleColHeight = 0;
-                SwitchColHeight = 0;
-                DismissBtnColHeight = 0;
-            }
+            TitleColHeight = showDismissButton ? 50 : 0;
+            SwitchColHeight = showDismissButton ? 50 : 0;
+            DismissBtnColHeight = showDismissButton ? 50 : 0;
             DismissCommand = new Command(async () =>
             {
                 if (NotShowAgain)

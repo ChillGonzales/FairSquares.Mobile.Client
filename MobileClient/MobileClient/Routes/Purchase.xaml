@@ -73,7 +73,7 @@
                     <Label.FormattedText>
                         <FormattedString>
                             <Span Text="{Binding LegalText}" FontSize="Small" FontAttributes="Italic" />
-                            <Span Text = "here." TextDecorations="Underline" FontSize="Small" FontAttributes="Italic">
+                            <Span Text = "see our terms and conditions on our website here." TextDecorations="Underline" FontSize="Small" FontAttributes="Italic">
                                 <Span.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding LegalLinkCommand}" NumberOfTapsRequired="1" />
                                 </Span.GestureRecognizers>

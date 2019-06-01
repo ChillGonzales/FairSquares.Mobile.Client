@@ -67,7 +67,7 @@ namespace MobileClient
                 // Setup caches and begin process of filling them.
                 var dbBasePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
                 var propertyCache = new LocalSqlCache<PropertyModel>(Path.Combine(dbBasePath, "property.db3"), new DebugLogger<LocalSqlCache<PropertyModel>>());
-                var orderCache = new LocalSqlCache<Order>(Path.Combine(dbBasePath, "order.db3"), new DebugLogger<LocalSqlCache<Order>>());
+                var orderCache = new LocalSqlCache<Models.Order>(Path.Combine(dbBasePath, "order.db3"), new DebugLogger<LocalSqlCache<Models.Order>>());
                 var imageCache = new LocalSqlCache<ImageModel>(Path.Combine(dbBasePath, "images.db3"), new DebugLogger<LocalSqlCache<ImageModel>>());
                 var subCache = new LocalSqlCache<SubscriptionModel>(Path.Combine(dbBasePath, "subs.db3"), new DebugLogger<LocalSqlCache<SubscriptionModel>>());
                 var settingsCache = new LocalSqlCache<SettingsModel>(Path.Combine(dbBasePath, "sets.db3"), new DebugLogger<LocalSqlCache<SettingsModel>>());
@@ -186,6 +186,8 @@ namespace MobileClient
                 Container.Register<ISubscriptionService>(() => subService, Lifestyle.Singleton);
                 Container.Register<IOrderValidationService, OrderValidationService>();
                 Container.Register<IPageFactory, PageFactory>(Lifestyle.Singleton);
+                Container.Register<IToastService>(() => DependencyService.Get<IToastService>(), Lifestyle.Singleton);
+                Container.Register<IMessagingSubscriber>(() => DependencyService.Get<IMessagingSubscriber>(), Lifestyle.Singleton);
 
                 // Finish registering created caches
                 Container.Register<ICache<PropertyModel>>(() => propertyCache, Lifestyle.Singleton);

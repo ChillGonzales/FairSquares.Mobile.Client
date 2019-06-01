@@ -114,7 +114,7 @@
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
     <Compile Include="Utilities\CustomList.cs" />
-    <Compile Include="Utilities\iOSMessage.cs" />
+    <Compile Include="Utilities\iOSToast.cs" />
     <Compile Include="Utilities\MessagingSubscriber.cs" />
     <None Include="Entitlements.plist" />
     <BundleResource Include="GoogleService-Info.plist" />

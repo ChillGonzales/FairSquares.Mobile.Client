@@ -17,7 +17,7 @@ namespace Tests.Routes
     {
         private Mock<INotificationService> _notifier;
         private Mock<ICurrentUserService> _userCache;
-        private Mock<IAlertService> _toast;
+        private Mock<IToastService> _toast;
         private Mock<INavigation> _nav;
 
         [SetUp]
@@ -25,7 +25,7 @@ namespace Tests.Routes
         {
             _notifier = new Mock<INotificationService>();
             _userCache = new Mock<ICurrentUserService>();
-            _toast = new Mock<IAlertService>();
+            _toast = new Mock<IToastService>();
             _nav = new Mock<INavigation>();
             _notifier.Setup(x => x.Notify(It.Is<NotificationRequest>(y => y.From == "feedback@fairsquarestech.com" &&
                                                                           y.To == "colin.monroe@fairsquarestech.com" &&
@@ -35,7 +35,7 @@ namespace Tests.Routes
                 Email = "test@test.com",
                 UserId = "1234"
             });
-            _toast.Setup(x => x.ShortAlert(It.IsAny<string>()));
+            _toast.Setup(x => x.ShortToast(It.IsAny<string>()));
             _nav.Setup(x => x.PopAsync()).ReturnsAsync(null as Page);
         }
 
@@ -53,7 +53,7 @@ namespace Tests.Routes
                 _notifier.Verify(x => x.Notify(It.IsAny<NotificationRequest>()), Times.Never);
                 _userCache.Verify(x => x.GetLoggedInAccount(), Times.Never);
                 _nav.Verify(x => x.PopAsync(), Times.Never);
-                _toast.Verify(x => x.ShortAlert(It.IsAny<string>()), Times.Never);
+                _toast.Verify(x => x.ShortToast(It.IsAny<string>()), Times.Never);
             }
             else
             {

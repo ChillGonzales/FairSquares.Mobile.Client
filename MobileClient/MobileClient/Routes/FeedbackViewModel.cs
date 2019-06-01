@@ -15,13 +15,13 @@ namespace MobileClient.Routes
     {
         private readonly INotificationService _notifier;
         private readonly ICurrentUserService _userCache;
-        private readonly IAlertService _toast;
+        private readonly IToastService _toast;
         private readonly INavigation _nav;
         private string _feedbackEntry;
 
         public FeedbackViewModel(INotificationService notifier,
                                  ICurrentUserService userCache,
-                                 IAlertService toast,
+                                 IToastService toast,
                                  INavigation nav)
         {
             _notifier = notifier;
@@ -49,7 +49,7 @@ namespace MobileClient.Routes
                     MessageType = Models.MessageType.Email,
                     Subject = "Feedback from " + user?.Email
                 });
-                _toast.ShortAlert($"Thank you for your feedback!");
+                _toast.ShortToast($"Thank you for your feedback!");
             }
             catch { }
             await _nav.PopAsync();

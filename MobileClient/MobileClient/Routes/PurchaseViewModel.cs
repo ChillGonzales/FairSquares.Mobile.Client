@@ -18,7 +18,7 @@ namespace MobileClient.Routes
 {
     public class PurchaseViewModel : INotifyPropertyChanged
     {
-        private readonly IAlertService _alertService;
+        private readonly IToastService _alertService;
         private readonly IPurchasingService _purchaseService;
         private readonly ICache<SubscriptionModel> _subCache;
         private readonly ISubscriptionService _subService;
@@ -52,7 +52,7 @@ namespace MobileClient.Routes
         private bool _loadAnimationVisible;
         private string _legalText;
 
-        public PurchaseViewModel(IAlertService alertService,
+        public PurchaseViewModel(IToastService alertService,
                                  IPurchasingService purchaseService,
                                  ICache<SubscriptionModel> subCache,
                                  ISubscriptionService subService,
@@ -167,17 +167,17 @@ namespace MobileClient.Routes
                 {
                     await PurchaseSubscription(subCode);
                     Device.BeginInvokeOnMainThread(async () => await _nav.PopAsync());
-                    _alertService.LongAlert($"Thank you for your purchase!");
+                    _alertService.LongToast($"Thank you for your purchase!");
                     _navigateFromMenu(BaseNavPageType.Order);
                 }
                 catch (Exception ex)
                 {
-                    _alertService.LongAlert($"Failed to purchase subscription. {ex.Message}");
+                    _alertService.LongToast($"Failed to purchase subscription. {ex.Message}");
                 }
             }
             catch (Exception ex)
             {
-                _alertService.LongAlert($"Something went wrong when trying to purchase subscription. {ex.Message}");
+                _alertService.LongToast($"Something went wrong when trying to purchase subscription. {ex.Message}");
             }
             finally
             {
@@ -252,7 +252,7 @@ namespace MobileClient.Routes
                     $@"Subscriptions will automatically renew unless canceled within 24-hours before the end of the current period. " +
                     $@"You can cancel anytime with your {platformText} account settings. " +
                     $@"Any unused portion of a free trial will be forfeited if you purchase a subscription. " +
-                    $@"For more information, see our terms and conditions on our website ";
+                    $@"For more information, ";
         }
 
         // Bound handlers

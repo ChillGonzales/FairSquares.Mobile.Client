@@ -3,6 +3,7 @@ using MobileClient.Authentication;
 using MobileClient.Models;
 using MobileClient.Services;
 using MobileClient.Utilities;
+using MobileClient.Utility;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -23,6 +24,7 @@ namespace MobileClient.Views
         private ILogger<MyOrdersPage> _logger;
         private ICacheRefresher _cacheRefresher;
         private IOrderValidationService _validationService;
+        private readonly IPageFactory _pageFactory;
         private ICurrentUserService _userService;
         public static IList<OrderGroup> All { private set; get; }
 
@@ -39,8 +41,9 @@ namespace MobileClient.Views
                 _logger = App.Container.GetInstance<ILogger<MyOrdersPage>>();
                 _cacheRefresher = App.Container.GetInstance<ICacheRefresher>();
                 _validationService = App.Container.GetInstance<IOrderValidationService>();
+                _pageFactory = App.Container.GetInstance<IPageFactory>();
                 MessagingCenter.Subscribe<App>(this, "CacheInvalidated", async x => await this.SetViewState());
-                LogInButton.Clicked += async (s, e) => await Navigation.PushAsync(new LandingPage());
+                LogInButton.Clicked += async (s, e) => await Navigation.PushAsync(_pageFactory.GetPage(PageType.Landing));
                 FreeReportButton.Clicked += (s, e) => (Application.Current.MainPage as BaseTabPage).NavigateFromMenu(ViewModels.BaseNavPageType.Order);
                 ExampleReportButton.Clicked += async (s, e) =>
                 {
@@ -156,7 +159,7 @@ namespace MobileClient.Views
 
         private async void ToolbarItem_Activated(object sender, EventArgs e)
         {
-            await this.Navigation.PushAsync(new InstructionPage(null, false));
+            await this.Navigation.PushAsync(_pageFactory.GetPage(PageType.Instruction, false));
         }
     }
 

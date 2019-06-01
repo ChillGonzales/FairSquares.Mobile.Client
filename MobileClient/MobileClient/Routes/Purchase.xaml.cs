@@ -20,7 +20,7 @@ namespace MobileClient.Routes
         public Purchase(ValidationModel model)
         {
             InitializeComponent();
-            BindingContext = new PurchaseViewModel(DependencyService.Get<IAlertService>(),
+            BindingContext = new PurchaseViewModel(App.Container.GetInstance<IToastService>(),
                                                    App.Container.GetInstance<IPurchasingService>(),
                                                    App.Container.GetInstance<ICache<SubscriptionModel>>(),
                                                    App.Container.GetInstance<ISubscriptionService>(),
