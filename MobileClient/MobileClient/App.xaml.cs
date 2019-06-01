@@ -188,6 +188,7 @@ namespace MobileClient
                 Container.Register<IPageFactory, PageFactory>(Lifestyle.Singleton);
                 Container.Register<IToastService>(() => DependencyService.Get<IToastService>(), Lifestyle.Singleton);
                 Container.Register<IMessagingSubscriber>(() => DependencyService.Get<IMessagingSubscriber>(), Lifestyle.Singleton);
+                Container.Register<IMessagingCenter>(() => MessagingCenter.Instance, Lifestyle.Singleton);
 
                 // Finish registering created caches
                 Container.Register<ICache<PropertyModel>>(() => propertyCache, Lifestyle.Singleton);

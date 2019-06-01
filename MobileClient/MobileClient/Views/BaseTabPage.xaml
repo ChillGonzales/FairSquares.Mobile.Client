@@ -26,7 +26,7 @@
         BarTextColor="{StaticResource primary-title-color}"
         Icon="ic_action_folder_open.png">
         <x:Arguments>
-            <views:MyOrdersPage />
+            <routes:MyOrders />
         </x:Arguments>
     </NavigationPage>
     <NavigationPage x:Name="AccountTab"

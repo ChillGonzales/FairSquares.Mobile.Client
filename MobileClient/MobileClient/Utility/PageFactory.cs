@@ -21,6 +21,10 @@ namespace MobileClient.Utility
                     return new Landing();
                 case PageType.ManageSubscription:
                     return new ManageSubscription(stateArgs[0] as ValidationModel);
+                case PageType.MyOrders:
+                    return new MyOrders();
+                case PageType.OrderDetail:
+                    return new OrderDetail(stateArgs[0] as Models.Order);
                 case PageType.Purchase:
                     return new Purchase(stateArgs[0] as ValidationModel);
                 case PageType.Feedback:

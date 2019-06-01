@@ -66,6 +66,7 @@ namespace MobileClient.Routes
 
             ErrorMessageRowHeight = 0;
             SelectedOptionIndex = 0;
+            SelectedStateIndex = -1;
             SetVisualStateForValidation();
         }
 

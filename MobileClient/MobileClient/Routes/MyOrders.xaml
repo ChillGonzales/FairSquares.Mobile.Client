@@ -1,26 +1,33 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
              Title="View Submitted Orders"
-             x:Class="MobileClient.Views.MyOrdersPage">
+             x:Class="MobileClient.Routes.MyOrders">
     <ContentPage.ToolbarItems>
         <ToolbarItem Icon="ic_action_info_outline.png" 
-                     Activated="ToolbarItem_Activated" />
+                     Command="{Binding ToolbarInfoCommand}" />
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
         <StackLayout Orientation="Vertical" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand">
-            <StackLayout x:Name="LoadingLayout" IsVisible="False">
-                <ActivityIndicator x:Name="LoadingAnimation" Color="Black" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand" />
+            <StackLayout IsVisible="{Binding LoadingLayoutVisible}">
+                <ActivityIndicator IsVisible="{Binding LoadingAnimVisible}" 
+                                   IsRunning="{Binding LoadingAnimRunning}"
+                                   Color="Black" 
+                                   VerticalOptions="CenterAndExpand" 
+                                   HorizontalOptions="CenterAndExpand" />
             </StackLayout>
-            <StackLayout x:Name="NoOrderLayout" IsVisible="False" Margin="10" Orientation="Vertical">
-                <Frame x:Name="LoginLayout" IsVisible="False" OutlineColor="Black">
+            <StackLayout IsVisible="{Binding NoOrderLayoutVisible}" Margin="10" Orientation="Vertical">
+                <Frame IsVisible="{Binding LoginLayoutVisible}" OutlineColor="Black">
                     <StackLayout Orientation="Vertical">
                         <Label Text="Log in with Google to submit a report."
                                FontSize="Medium"
                                HorizontalOptions="CenterAndExpand"
                                VerticalOptions="CenterAndExpand" />
                         <Label HeightRequest="10" VerticalOptions="Fill" />
-                        <Button x:Name="LogInButton"
+                        <Button Command="{Binding LoginCommand}"
                                 Text="Log In"
                                 HorizontalOptions="CenterAndExpand"
                                 VerticalOptions="CenterAndExpand"
@@ -28,14 +35,14 @@
                                 StyleClass="Info" />
                     </StackLayout>
                 </Frame>
-                <Frame x:Name="FreeReportLayout" IsVisible="False" OutlineColor="Black">
+                <Frame IsVisible="{Binding FreeReportLayoutVisible}" OutlineColor="Black">
                     <StackLayout Orientation="Vertical">
                         <Label Text="You have a free report to use! Click below to try Fair Squares for free."
                                FontSize="Medium"
                                HorizontalOptions="CenterAndExpand"
                                VerticalOptions="CenterAndExpand" />
                         <Label HeightRequest="10" VerticalOptions="Fill"/>
-                        <Button x:Name="FreeReportButton"
+                        <Button Command="{Binding FreeReportCommand}"
                                 Text="Try For Free"
                                 HorizontalOptions="CenterAndExpand"
                                 VerticalOptions="CenterAndExpand"
@@ -51,7 +58,7 @@
                            HorizontalOptions="CenterAndExpand"
                            VerticalOptions="CenterAndExpand" />
                         <Label HeightRequest="10" VerticalOptions="Fill"/>
-                        <Button x:Name="ExampleReportButton"
+                        <Button Command="{Binding ExampleReportCommand}"
                             Text="View Example"
                             HorizontalOptions="CenterAndExpand"
                             VerticalOptions="CenterAndExpand"
@@ -60,10 +67,13 @@
                     </StackLayout>
                 </Frame>
             </StackLayout>
-            <StackLayout x:Name="MainLayout">
-                <ListView x:Name="OrderListView"
-                IsPullToRefreshEnabled="True"
+            <StackLayout IsVisible="{Binding MainLayoutVisible}">
+                <ListView IsPullToRefreshEnabled="True"
                 IsGroupingEnabled="True"
+                SelectedItem="{Binding OrderListSelectedItem}"
+                IsRefreshing="{Binding OrderListRefreshing}"
+                RefreshCommand="{Binding OrderListRefreshCommand}"
+                ItemsSource="{Binding OrdersSource}"
                 GroupDisplayBinding="{Binding Title}"
                 VerticalOptions="CenterAndExpand"
                 HorizontalOptions="CenterAndExpand">
