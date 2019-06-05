@@ -26,6 +26,7 @@ namespace MobileClient.Routes
         private ICache<PropertyModel> _propertyCache;
         private ICache<ImageModel> _imageCache;
         private IPropertyService _propertyService;
+        private IPageFactory _pageFactory;
         private IImageService _imageService;
         private IToastService _toastService;
         private readonly INavigation _nav;
@@ -55,6 +56,7 @@ namespace MobileClient.Routes
                                     IImageService imgService,
                                     IToastService toast,
                                     INavigation nav,
+                                    IPageFactory pageFactory,
                                     Func<string, string, string, Task> alertAction,
                                     ILogger<OrderDetailViewModel> logger)
         {
@@ -62,6 +64,7 @@ namespace MobileClient.Routes
             _propertyCache = propertyCache;
             _imageCache = imgCache;
             _propertyService = propService;
+            _pageFactory = pageFactory;
             _imageService = imgService;
             _toastService = toast;
             _nav = nav;
@@ -342,7 +345,7 @@ namespace MobileClient.Routes
         public ICommand ImageTapCommand => new Command(async () =>
         {
             ImageEnabled = false;
-            await _nav.PushAsync(new ImagePopup((StreamImageSource)ImageSource));
+            await _nav.PushAsync(_pageFactory.GetPage(PageType.ImagePopup, (StreamImageSource)ImageSource));
             ImageEnabled = true;
         });
         public string Squares

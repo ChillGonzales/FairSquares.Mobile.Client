@@ -2,6 +2,7 @@
 using MobileClient.Models;
 using MobileClient.Services;
 using MobileClient.Utilities;
+using MobileClient.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,6 +29,7 @@ namespace MobileClient.Routes
                                               App.Container.GetInstance<IImageService>(),
                                               App.Container.GetInstance<IToastService>(),
                                               this.Navigation,
+                                              App.Container.GetInstance<IPageFactory>(),
                                               (s1, s2, s3) => DisplayAlert(s1, s2, s3),
                                               App.Container.GetInstance<ILogger<OrderDetailViewModel>>());
             _onAppearing = vm.OnAppearingBehavior;

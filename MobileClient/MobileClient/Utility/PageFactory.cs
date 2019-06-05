@@ -15,6 +15,10 @@ namespace MobileClient.Utility
             {
                 case PageType.Account:
                     return new Account();
+                case PageType.BaseTab:
+                    return new BaseTab();
+                case PageType.ImagePopup:
+                    return new ImagePopup(stateArgs[0] as StreamImageSource);
                 case PageType.Instruction:
                     return new Instruction((stateArgs[0] as bool?) ?? false);
                 case PageType.Landing:
@@ -38,6 +42,7 @@ namespace MobileClient.Utility
     public enum PageType
     {
         Account,
+        BaseTab,
         Feedback,
         ImagePopup,
         Instruction,
