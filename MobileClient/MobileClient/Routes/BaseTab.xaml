@@ -1,15 +1,43 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+<TabbedPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:d="http://xamarin.com/schemas/2014/forms/design"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:routes="clr-namespace:MobileClient.Routes"
+             xmlns:android="clr-namespace:Xamarin.Forms.PlatformConfiguration.AndroidSpecific;assembly=Xamarin.Forms.Core"
+             android:TabbedPage.ToolbarPlacement="Bottom"
              mc:Ignorable="d"
+             BarBackgroundColor="#527754"
+             BarTextColor="White"
+             android:TabbedPage.BarItemColor="#66FFFFFF"
+             android:TabbedPage.BarSelectedItemColor="White"
+             CurrentPage="{Binding CurrentPage}"
              x:Class="MobileClient.Routes.BaseTab">
-    <ContentPage.Content>
-        <StackLayout>
-            <Label Text="Welcome to Xamarin.Forms!"
-                VerticalOptions="CenterAndExpand" 
-                HorizontalOptions="CenterAndExpand" />
-        </StackLayout>
-    </ContentPage.Content>
-</ContentPage>
+        <NavigationPage x:Name="OrderTab"
+            Title="Measure It"
+            BarBackgroundColor="{StaticResource primary-back-title-color}"
+            BarTextColor="{StaticResource primary-title-color}"
+            Icon="ic_action_straighten.png">
+            <x:Arguments>
+                <routes:Order />
+            </x:Arguments>
+        </NavigationPage>
+        <NavigationPage x:Name="MyOrdersTab"
+            Title="My Orders" 
+            BarBackgroundColor="{StaticResource primary-back-title-color}"
+            BarTextColor="{StaticResource primary-title-color}"
+            Icon="ic_action_folder_open.png">
+            <x:Arguments>
+                <routes:MyOrders />
+            </x:Arguments>
+        </NavigationPage>
+        <NavigationPage x:Name="AccountTab"
+            Title="My Account"
+            BarBackgroundColor="{StaticResource primary-back-title-color}"
+            BarTextColor="{StaticResource primary-title-color}"
+            Icon="ic_action_account_circle.png">
+            <x:Arguments>
+                <routes:Account />
+            </x:Arguments>
+        </NavigationPage>
+</TabbedPage>
