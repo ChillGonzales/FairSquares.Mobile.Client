@@ -2,7 +2,6 @@
 using MobileClient.Services;
 using MobileClient.Utilities;
 using MobileClient.Utility;
-using MobileClient.Views;
 using System.Windows.Input;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
@@ -24,7 +23,7 @@ namespace MobileClient.Routes
                                                 this.Navigation,
                                                 App.Container.GetInstance<IMessagingSubscriber>(),
                                                 (s1, s2, s3, s4) => DisplayAlert(s1, s2, s3, s4),
-                                                x => (App.Current.MainPage as BaseTabPage).NavigateFromMenu(x),
+                                                x => (App.Current.MainPage as BaseTab).NavigateToTab(x),
                                                 App.Container.GetInstance<ICache<Models.Order>>());
             _onAppearingBehavior = vm.OnAppearingBehavior;
             BindingContext = vm;

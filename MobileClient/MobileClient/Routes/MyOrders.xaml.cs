@@ -4,7 +4,6 @@ using MobileClient.Models;
 using MobileClient.Services;
 using MobileClient.Utilities;
 using MobileClient.Utility;
-using MobileClient.Views;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +33,7 @@ namespace MobileClient.Routes
                                            App.Container.GetInstance<ICurrentUserService>(),
                                            this.Navigation,
                                            App.Container.GetInstance<IMessagingCenter>(),
-                                           x => (Application.Current.MainPage as BaseTabPage).NavigateFromMenu(x));
+                                           x => (Application.Current.MainPage as BaseTab).NavigateToTab(x));
             _onAppearingBehavior = vm.OnAppearingBehavior;
             BindingContext = vm;
         }

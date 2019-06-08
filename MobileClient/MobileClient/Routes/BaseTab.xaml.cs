@@ -21,15 +21,10 @@ namespace MobileClient.Routes
         public BaseTab()
         {
             InitializeComponent();
+            CurrentPage = MyOrdersTab;
             var vm = new BaseTabViewModel(App.Container.GetInstance<ICache<SettingsModel>>(),
                                           App.Container.GetInstance<IPageFactory>(),
-                                          this.Navigation,
-                                          new Dictionary<BaseNavPageType, Page>()
-                                          {
-                                              { BaseNavPageType.Account, AccountTab },
-                                              { BaseNavPageType.MyOrders, MyOrdersTab },
-                                              { BaseNavPageType.Order, OrderTab }
-                                          });
+                                          this.Navigation);
             _onAppearing = vm.OnAppearingBehavior;
             BindingContext = vm;
         }
@@ -38,6 +33,25 @@ namespace MobileClient.Routes
         {
             base.OnAppearing();
             _onAppearing.Execute(null);
+        }
+
+        public void NavigateToTab(BaseNavPageType pageType)
+        {
+            switch (pageType)
+            {
+                case BaseNavPageType.Account:
+                    CurrentPage = AccountTab;
+                    break;
+                case BaseNavPageType.MyOrders:
+                    CurrentPage = MyOrdersTab;
+                    break;
+                case BaseNavPageType.Order:
+                    CurrentPage = OrderTab;
+                    break;
+                default:
+                    CurrentPage = MyOrdersTab;
+                    break;
+            }
         }
     }
 }

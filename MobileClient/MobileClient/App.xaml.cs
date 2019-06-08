@@ -1,10 +1,10 @@
 ﻿using FairSquares.Measurement.Core.Models;
 using MobileClient.Authentication;
 using MobileClient.Models;
+using MobileClient.Routes;
 using MobileClient.Services;
 using MobileClient.Utilities;
 using MobileClient.Utility;
-using MobileClient.Views;
 using Newtonsoft.Json;
 using Plugin.InAppBilling;
 using Plugin.InAppBilling.Abstractions;
@@ -192,7 +192,7 @@ namespace MobileClient
 
                 // Finish registering created caches
                 Container.Register<ICache<PropertyModel>>(() => propertyCache, Lifestyle.Singleton);
-                Container.Register<ICache<Order>>(() => orderCache, Lifestyle.Singleton);
+                Container.Register<ICache<Models.Order>>(() => orderCache, Lifestyle.Singleton);
                 Container.Register<ICache<ImageModel>>(() => imageCache, Lifestyle.Singleton);
                 Container.Register<ICache<SubscriptionModel>>(() => subCache, Lifestyle.Singleton);
                 Container.Register<ICache<SettingsModel>>(() => settingsCache, Lifestyle.Singleton);
@@ -208,7 +208,7 @@ namespace MobileClient
         public App()
         {
             InitializeComponent();
-            MainPage = new BaseTabPage();
+            MainPage = new BaseTab();
         }
 
         protected override void OnStart()

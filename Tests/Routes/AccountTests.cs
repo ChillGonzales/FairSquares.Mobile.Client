@@ -4,7 +4,6 @@ using MobileClient.Routes;
 using MobileClient.Services;
 using MobileClient.Utilities;
 using MobileClient.Utility;
-using MobileClient.Views;
 using Moq;
 using NUnit.Framework;
 using System;

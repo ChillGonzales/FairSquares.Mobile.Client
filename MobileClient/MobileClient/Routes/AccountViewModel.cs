@@ -3,7 +3,6 @@ using MobileClient.Models;
 using MobileClient.Services;
 using MobileClient.Utilities;
 using MobileClient.Utility;
-using MobileClient.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

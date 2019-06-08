@@ -5,7 +5,6 @@ using MobileClient.Services;
 using MobileClient.Utilities;
 using MobileClient.Utility;
 using MobileClient.ViewModels;
-using MobileClient.Views;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
