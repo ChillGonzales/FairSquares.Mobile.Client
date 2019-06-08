@@ -27,6 +27,7 @@ namespace MobileClient.Routes
         private readonly Func<string, string, string, string, Task<bool>> _alertTask;
         private readonly IMessagingSubscriber _topicSubscriber;
         private readonly Action<BaseNavPageType> _baseNavigationAction;
+        private readonly string _deviceType;
         private GridLength _errorMessageRowHeight;
         private bool _cannotSubmitLayoutVisible;
         private string _cannotSubmitHeaderText;
@@ -49,6 +50,7 @@ namespace MobileClient.Routes
                               IPageFactory pageFactory,
                               INavigation nav,
                               IMessagingSubscriber topicSubscriber,
+                              string deviceType,
                               Func<string, string, string, string, Task<bool>> alertTask,
                               Action<BaseNavPageType> baseNavigationAction,
                               ICache<Models.Order> orderCache)
@@ -63,6 +65,7 @@ namespace MobileClient.Routes
             _alertTask = alertTask;
             _topicSubscriber = topicSubscriber;
             _baseNavigationAction = baseNavigationAction;
+            _deviceType = deviceType;
 
             ErrorMessageRowHeight = 0;
             SelectedOptionIndex = 0;
@@ -157,7 +160,8 @@ namespace MobileClient.Routes
                 MemberId = userId,
                 MemberEmail = email,
                 RoofOption = Options[SelectedOptionIndex].RoofOption,
-                Comments = Comments
+                Comments = Comments,
+                PlatformType = _deviceType == Device.Android ? Models.PlatformType.Android : Models.PlatformType.iOS
             };
             newOrder.OrderId = await _orderService.AddOrder(newOrder);
             _topicSubscriber.Subscribe(new List<string>() { newOrder.OrderId });

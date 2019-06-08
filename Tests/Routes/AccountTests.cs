@@ -54,7 +54,7 @@ namespace Tests.Routes
                     _subStyleAction,
                     _logger.Object);
             Assert.AreEqual("Info", _loginStyle);
-            Assert.AreEqual("Info", _subStyle);
+            Assert.AreEqual("Success", _subStyle);
             Assert.AreEqual(false, account.SubscriptionButtonEnabled);
             Assert.AreEqual("Please log in to continue", account.Email);
             Assert.AreEqual("Log In", account.LogOutText);

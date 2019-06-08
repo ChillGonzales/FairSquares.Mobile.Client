@@ -26,13 +26,14 @@ namespace MobileClient.Services
         {
             try
             {
-                var sub = _subService.GetSubscriptions(user.UserId).OrderBy(x => x.StartDateTime).LastOrDefault();
+                var subs = _subService.GetSubscriptions(user.UserId).OrderBy(x => x.StartDateTime);
+                var lastSub = subs.LastOrDefault();
                 var orders = await _orderService.GetMemberOrders(user.UserId);
 
-                if (!SubscriptionUtility.SubscriptionActive(sub) && orders.Any())
+                if (!SubscriptionUtility.SubscriptionActive(lastSub) && orders.Any())
                 {
                     // This case means they've never had a subscription before, and are eligible for a trial month.
-                    if (sub == null)
+                    if (lastSub == null)
                     {
                         return new ValidationModel()
                         {
@@ -40,14 +41,13 @@ namespace MobileClient.Services
                             Message = "User has used their free report, but is eligible for a free trial period."
                         };
                     }
-
                     return new ValidationModel()
                     {
                         State = ValidationState.NoSubscriptionAndTrialAlreadyUsed,
                         Message = "User does not have a subscription and has used their free report and trial period."
                     };
                 }
-                if (!SubscriptionUtility.SubscriptionActive(sub) && !orders.Any())
+                if (!SubscriptionUtility.SubscriptionActive(lastSub) && !orders.Any())
                 {
                     return new ValidationModel()
                     {
@@ -55,31 +55,26 @@ namespace MobileClient.Services
                         Message = "User can use their free report."
                     };
                 }
-                var activeSubOrderCount = orders.Where(x => x.DateReceived >= sub.StartDateTime && x.DateReceived <= sub.EndDateTime)
-                                                .Count();
+                var totalRemainingOrders = subs
+                    .Select(x => SubscriptionUtility.GetInfoFromSubType(x.SubscriptionType).OrderCount).Sum() - orders.Count();
 
-                if ((sub.SubscriptionType == SubscriptionType.Basic && activeSubOrderCount >= SubscriptionUtility.BasicOrderCount) ||
-                    (sub.SubscriptionType == SubscriptionType.Premium && activeSubOrderCount >= SubscriptionUtility.PremiumOrderCount) ||
-                    (sub.SubscriptionType == SubscriptionType.Enterprise && activeSubOrderCount >= SubscriptionUtility.EnterpriseOrderCount))
+                if (totalRemainingOrders <= 0)
                 {
                     return new ValidationModel()
                     {
                         State = ValidationState.NoReportsLeftInPeriod,
                         RemainingOrders = 0,
-                        Subscription = sub,
+                        Subscription = lastSub,
                         Message = "User has used all of their orders for this subscription period."
                     };
                 }
                 else
                 {
-                    var remainingCount = sub.SubscriptionType == SubscriptionType.Basic ? SubscriptionUtility.BasicOrderCount - activeSubOrderCount :
-                                        (sub.SubscriptionType == SubscriptionType.Premium ? SubscriptionUtility.PremiumOrderCount - activeSubOrderCount :
-                                        SubscriptionUtility.EnterpriseOrderCount - activeSubOrderCount);
                     return new ValidationModel()
                     {
                         State = ValidationState.SubscriptionReportValid,
-                        Subscription = sub,
-                        RemainingOrders = remainingCount,
+                        Subscription = lastSub,
+                        RemainingOrders = totalRemainingOrders,
                     };
                 }
             }

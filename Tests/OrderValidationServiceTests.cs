@@ -56,7 +56,7 @@ namespace Tests
         {
             var sub = new Mock<ISubscriptionService>();
             sub.Setup(x => x.GetSubscriptions(It.IsAny<string>()))
-                .Returns(new List<SubscriptionModel>() { new SubscriptionModel() { EndDateTime = DateTimeOffset.Now.AddDays(-3)} });
+                .Returns(new List<SubscriptionModel>() { new SubscriptionModel() { EndDateTime = DateTimeOffset.Now.AddDays(-3) } });
 
             var valSvc = new OrderValidationService(_orderService.Object, sub.Object, _logger.Object);
             var result = await valSvc.ValidateOrderRequest(new MobileClient.Authentication.AccountModel() { UserId = "1234" });
@@ -123,6 +123,61 @@ namespace Tests
             var valSvc = new OrderValidationService(order.Object, sub.Object, _logger.Object);
             var result = await valSvc.ValidateOrderRequest(new MobileClient.Authentication.AccountModel() { UserId = "234" });
             Assert.AreEqual(ValidationState.NoReportsLeftInPeriod, result.State);
+            sub.VerifyAll();
+            order.VerifyAll();
+        }
+
+        [Test]
+        [TestCase(2, ValidationState.SubscriptionReportValid)]
+        [TestCase(38, ValidationState.SubscriptionReportValid)]
+        [TestCase(39, ValidationState.NoReportsLeftInPeriod)]
+        [TestCase(40, ValidationState.NoReportsLeftInPeriod)]
+        public async Task WhenNotAllOrdersUsedFromOneSub_RollsOverToNextMonth(int totalOrders, ValidationState expected)
+        {
+            var sub = new Mock<ISubscriptionService>();
+            var order = new Mock<IOrderService>();
+            var subs = new List<SubscriptionModel>()
+                {
+                    new SubscriptionModel()
+                    {
+                        EndDateTime = DateTimeOffset.Now.AddDays(2),
+                        SubscriptionType = SubscriptionType.Basic,
+                        StartDateTime = DateTimeOffset.Now.AddDays(-20)
+                    },
+                    new SubscriptionModel()
+                    {
+                        EndDateTime = DateTimeOffset.Now.AddDays(-20),
+                        SubscriptionType = SubscriptionType.Premium,
+                        StartDateTime = DateTimeOffset.Now.AddDays(-40)
+                    },
+                    new SubscriptionModel()
+                    {
+                        EndDateTime = DateTimeOffset.Now.AddDays(-40),
+                        SubscriptionType = SubscriptionType.Enterprise,
+                        StartDateTime = DateTimeOffset.Now.AddDays(-60)
+                    },
+                    new SubscriptionModel()
+                    {
+                        EndDateTime = DateTimeOffset.Now.AddDays(-60),
+                        SubscriptionType = SubscriptionType.Basic,
+                        StartDateTime = DateTimeOffset.Now.AddDays(-80)
+                    }
+                };
+            var purchasedOrderCount = subs.Select(x => SubscriptionUtility.GetInfoFromSubType(x.SubscriptionType).OrderCount).Sum();
+
+            sub.Setup(x => x.GetSubscriptions(It.IsAny<string>()))
+                .Returns(subs);
+            order.Setup(x => x.GetMemberOrders(It.IsAny<string>()))
+                .ReturnsAsync(Enumerable.Range(0, totalOrders).Select(x => new Order()
+                {
+                    Fulfilled = true,
+                    DateReceived = DateTimeOffset.Now.AddDays(-2)
+                }));
+            var valSvc = new OrderValidationService(order.Object, sub.Object, _logger.Object);
+            var result = await valSvc.ValidateOrderRequest(new MobileClient.Authentication.AccountModel() { UserId = "234" });
+            var expectedCount = purchasedOrderCount - totalOrders > 0 ? purchasedOrderCount - totalOrders : 0;
+            Assert.AreEqual(expectedCount, result.RemainingOrders);
+            Assert.AreEqual(expected, result.State);
             sub.VerifyAll();
             order.VerifyAll();
         }

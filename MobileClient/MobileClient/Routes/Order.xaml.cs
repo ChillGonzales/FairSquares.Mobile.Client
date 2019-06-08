@@ -22,6 +22,7 @@ namespace MobileClient.Routes
                                                 App.Container.GetInstance<IPageFactory>(),
                                                 this.Navigation,
                                                 App.Container.GetInstance<IMessagingSubscriber>(),
+                                                Device.RuntimePlatform,
                                                 (s1, s2, s3, s4) => DisplayAlert(s1, s2, s3, s4),
                                                 x => (App.Current.MainPage as BaseTab).NavigateToTab(x),
                                                 App.Container.GetInstance<ICache<Models.Order>>());

@@ -104,7 +104,7 @@ namespace MobileClient.Routes
             if (user == null)
             {
                 SubscriptionLabel = $"Log in to manage your subscription.";
-                _changeSubStyleClass("Info");
+                _changeSubStyleClass("Success");
                 SubscriptionButtonText = "Manage";
                 SubscriptionButtonEnabled = false;
                 return;
