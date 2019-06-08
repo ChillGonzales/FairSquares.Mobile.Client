@@ -14,7 +14,7 @@
                     FontSize="Medium"
                     VerticalOptions="Start" 
                     HorizontalOptions="Start" />
-                <Label Text="Remaining Orders This Period"
+                <Label Text="Remaining Orders"
                     FontSize="Medium"
                     FontAttributes="Bold"
                     VerticalOptions="Start"

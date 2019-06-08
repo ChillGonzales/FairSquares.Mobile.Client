@@ -112,7 +112,7 @@ namespace MobileClient.Routes
             var validity = await _orderValidator.ValidateOrderRequest(user);
             if (validity.State == ValidationState.NoReportsLeftInPeriod || validity.State == ValidationState.SubscriptionReportValid)
             {
-                SubscriptionLabel = $"Reports remaining this period: {validity.RemainingOrders.ToString()}";
+                SubscriptionLabel = $"Reports remaining: {validity.RemainingOrders.ToString()}";
                 _changeSubStyleClass("Info");
                 SubscriptionButtonText = "Manage";
                 SubscriptionButtonEnabled = true;

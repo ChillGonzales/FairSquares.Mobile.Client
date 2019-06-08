@@ -130,7 +130,7 @@ namespace Tests.Routes
             Assert.AreEqual("Danger", _loginStyle);
             Assert.AreEqual("Info", _subStyle);
             Assert.AreEqual("Manage", acct.SubscriptionButtonText);
-            Assert.AreEqual("Reports remaining this period: 2", acct.SubscriptionLabel);
+            Assert.AreEqual("Reports remaining: 2", acct.SubscriptionLabel);
             Assert.AreEqual(true, acct.SubscriptionButtonEnabled);
             Assert.AreEqual(user.Email, acct.Email);
             acct.SubscriptionCommand.Execute(null);
