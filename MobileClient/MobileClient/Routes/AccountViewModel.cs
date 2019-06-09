@@ -17,6 +17,7 @@ namespace MobileClient.Routes
 {
     public class AccountViewModel : INotifyPropertyChanged
     {
+        public readonly ICommand OnAppearingBehavior;
         private readonly INavigation _navigation;
         private readonly IPageFactory _pageFactory;
         private readonly ICurrentUserService _userCache;
@@ -56,6 +57,12 @@ namespace MobileClient.Routes
             _changeSubStyleClass = changeSubStyleClass;
             var user = userCache.GetLoggedInAccount();
             _logger = logger;
+            OnAppearingBehavior = new Command(async () =>
+            {
+                var u = _userCache.GetLoggedInAccount();
+                SetAccountState(u);
+                await SetSubState(u);
+            });
             SetInitialState(user);
         }
 
@@ -79,7 +86,6 @@ namespace MobileClient.Routes
 
             Task.Run(async () => await SetSubState(user)).Wait();
             SubscriptionCommand = new Command(async () => await SubscriptionPressed());
-
             FeedbackCommand = new Command(async () => await _navigation.PushAsync(_pageFactory.GetPage(PageType.Feedback)));
         }
 
