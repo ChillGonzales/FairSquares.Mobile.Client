@@ -55,8 +55,10 @@ namespace MobileClient.Services
                         Message = "User can use their free report."
                     };
                 }
+
+                // Add 1 to the calculation to take into account free report
                 var totalRemainingOrders = subs
-                    .Select(x => SubscriptionUtility.GetInfoFromSubType(x.SubscriptionType).OrderCount).Sum() - orders.Count();
+                    .Select(x => SubscriptionUtility.GetInfoFromSubType(x.SubscriptionType).OrderCount).Sum() - orders.Count() + 1;
 
                 if (totalRemainingOrders <= 0)
                 {

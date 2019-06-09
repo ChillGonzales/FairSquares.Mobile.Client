@@ -148,13 +148,6 @@ namespace MobileClient.Routes
             PurchaseButtonEnabled = false;
             try
             {
-
-                if (_validationModel.State == ValidationState.FreeReportValid)
-                {
-                    var result = await _displayAlert("Are you sure?", "You are still eligible for a free report, are you sure you want to continue?", "Ok", "Cancel");
-                    if (!result)
-                        return;
-                }
                 SubscriptionType selected = SubscriptionType.Basic;
                 try
                 {

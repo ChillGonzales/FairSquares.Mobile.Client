@@ -85,7 +85,7 @@ namespace Tests
                 });
             order.Setup(x => x.GetMemberOrders(It.IsAny<string>()))
                 .Returns(Task.FromResult(
-                    Enumerable.Range(0, orderCount).Select(x => new Order() { DateReceived = DateTimeOffset.Now.AddDays(-2) })));
+                    Enumerable.Range(0, orderCount + 1).Select(x => new Order() { DateReceived = DateTimeOffset.Now.AddDays(-2) })));
 
             var valSvc = new OrderValidationService(order.Object, sub.Object, _logger.Object);
             var result = await valSvc.ValidateOrderRequest(new MobileClient.Authentication.AccountModel() { UserId = "12345" });
@@ -117,7 +117,7 @@ namespace Tests
 
             order.Setup(x => x.GetMemberOrders(It.IsAny<string>()))
                 .Returns(Task.FromResult(
-                    Enumerable.Range(0, SubscriptionUtility.GetInfoFromSubType(type).OrderCount)
+                    Enumerable.Range(0, SubscriptionUtility.GetInfoFromSubType(type).OrderCount + 1)
                     .Select(x => new Order() { DateReceived = DateTimeOffset.Now.AddDays(-2) })));
 
             var valSvc = new OrderValidationService(order.Object, sub.Object, _logger.Object);
@@ -168,7 +168,7 @@ namespace Tests
             sub.Setup(x => x.GetSubscriptions(It.IsAny<string>()))
                 .Returns(subs);
             order.Setup(x => x.GetMemberOrders(It.IsAny<string>()))
-                .ReturnsAsync(Enumerable.Range(0, totalOrders).Select(x => new Order()
+                .ReturnsAsync(Enumerable.Range(0, totalOrders + 1).Select(x => new Order()
                 {
                     Fulfilled = true,
                     DateReceived = DateTimeOffset.Now.AddDays(-2)
