@@ -44,7 +44,7 @@ namespace MobileClient.Services
                 if (!result.IsSuccessStatusCode)
                 {
                     if (result.StatusCode == System.Net.HttpStatusCode.NotFound)
-                        return null;
+                        return new List<SubscriptionModel>();
                     else
                         throw new Exception(result.Content.ReadAsStringAsync().Result);
                 }
