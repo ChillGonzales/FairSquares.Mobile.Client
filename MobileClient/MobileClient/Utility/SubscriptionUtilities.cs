@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using MobileClient.Models;
 using Plugin.InAppBilling.Abstractions;
@@ -12,6 +13,14 @@ namespace MobileClient.Utilities
         public const string SUB_NAME_PREMIUM = "premium_subscription_monthly";
         public const string SUB_NAME_BASIC = "basic_subscription_monthly";
         public const string SUB_NAME_ENTERPRISE = "enterprise_subscription_monthly";
+        public const string INDV_REPORT_NO_SUB = "no_subscription_one_report";
+        public const string INDV_REPORT_BASIC = "basic_subscription_one_report";
+        public const string INDV_REPORT_PREMIUM = "premium_subscription_one_report";
+        public const string INDV_REPORT_ENTERPRISE = "enterprise_subscription_one_report";
+        public const double IndvReportNoSubPrice = 8.99;
+        public const double IndvReportBasicPrice = 7.99;
+        public const double IndvReportPremiumPrice = 5.99;
+        public const double IndvReportEnterprisePrice = 3.99;
         public const int BasicOrderCount = 3;
         public const int PremiumOrderCount = 8;
         public const int EnterpriseOrderCount = 25;
@@ -98,6 +107,15 @@ namespace MobileClient.Utilities
                         SubscriptionCode = SUB_NAME_BASIC
                     };
             }
+        }
+        public static bool ValidatePurchaseType(string name, ItemType iapType)
+        {
+            if (new[] { SUB_NAME_BASIC, SUB_NAME_PREMIUM, SUB_NAME_ENTERPRISE }.Contains(name) && iapType == ItemType.Subscription)
+                return true;
+            if (new[] { INDV_REPORT_NO_SUB, INDV_REPORT_BASIC, INDV_REPORT_PREMIUM, INDV_REPORT_ENTERPRISE }.Contains(name) && iapType == ItemType.InAppPurchase)
+                return true;
+
+            return false;
         }
     }
 

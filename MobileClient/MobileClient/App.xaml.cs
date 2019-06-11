@@ -30,6 +30,7 @@ namespace MobileClient
         private static string _orderEndpoint = @"https://fairsquares-order-management-api.azurewebsites.net/api/orders";
         private static string _notifyEndpoint = @"https://fairsquares-order-management-api.azurewebsites.net/api/notification";
         private static string _subEndpoint = @"https://fairsquares-order-management-api.azurewebsites.net/api/subscriptions";
+        private static string _purchasedReportsEndpoint = @"https://fairsquares-order-management-api.azurewebsites.net/api/purchasedreports";
         private static string _propertyEndpoint = @"https://property-measurements.azurewebsites.net/api/properties";
         private static string _blobEndpoint = @"https://fairsquaresapplogging.blob.core.windows.net/roof-images";
         private const string GoogleAuthorizeUrl = "https://accounts.google.com/o/oauth2/v2/auth";
@@ -44,6 +45,7 @@ namespace MobileClient
                 var propertyService = new PropertyService(new HttpClient(), _propertyEndpoint, new DebugLogger<PropertyService>());
                 var imageService = new BlobImageService(new HttpClient(), _blobEndpoint, new DebugLogger<BlobImageService>());
                 var subService = new SubscriptionService(new HttpClient(), _subEndpoint, new DebugLogger<SubscriptionService>());
+                var prService = new PurchasedReportService(new HttpClient(), _purchasedReportsEndpoint, new DebugLogger<PurchasedReportService>());
                 var authenticator = new OAuth2Authenticator(Configuration.ClientId,
                                                             null,
                                                             Configuration.Scope,
@@ -128,7 +130,7 @@ namespace MobileClient
                                 var purchases = new List<InAppBillingPurchase>();
                                 try
                                 {
-                                    purchases = (await purchaseService.GetPurchases()).ToList();
+                                    purchases = (await purchaseService.GetPurchases(ItemType.Subscription)).ToList();
                                 }
                                 catch (Exception ex)
                                 {
@@ -189,6 +191,7 @@ namespace MobileClient
                 Container.Register<IToastService>(() => DependencyService.Get<IToastService>(), Lifestyle.Singleton);
                 Container.Register<IMessagingSubscriber>(() => DependencyService.Get<IMessagingSubscriber>(), Lifestyle.Singleton);
                 Container.Register<IMessagingCenter>(() => MessagingCenter.Instance, Lifestyle.Singleton);
+                Container.Register<IPurchasedReportService>(() => prService, Lifestyle.Singleton);
 
                 // Finish registering created caches
                 Container.Register<ICache<PropertyModel>>(() => propertyCache, Lifestyle.Singleton);

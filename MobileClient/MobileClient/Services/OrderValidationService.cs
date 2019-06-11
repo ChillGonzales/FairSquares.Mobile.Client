@@ -13,12 +13,17 @@ namespace MobileClient.Services
     {
         private readonly IOrderService _orderService;
         private readonly ISubscriptionService _subService;
+        private readonly IPurchasedReportService _prService;
         private readonly ILogger<OrderValidationService> _logger;
 
-        public OrderValidationService(IOrderService orderService, ISubscriptionService subService, ILogger<OrderValidationService> logger)
+        public OrderValidationService(IOrderService orderService,
+                                      ISubscriptionService subService,
+                                      IPurchasedReportService prService,
+                                      ILogger<OrderValidationService> logger)
         {
             _orderService = orderService;
             _subService = subService;
+            _prService = prService;
             _logger = logger;
         }
 
@@ -28,8 +33,31 @@ namespace MobileClient.Services
             {
                 var subs = _subService.GetSubscriptions(user.UserId).OrderBy(x => x.StartDateTime);
                 var lastSub = subs.LastOrDefault();
+                var purchased = _prService.GetPurchasedReports(user.UserId);
                 var orders = await _orderService.GetMemberOrders(user.UserId);
 
+                if (!SubscriptionUtility.SubscriptionActive(lastSub) && !orders.Any())
+                {
+                    return new ValidationModel()
+                    {
+                        State = ValidationState.FreeReportValid,
+                        Message = "User can use their free report.",
+                        RemainingOrders = purchased.Count() + 1
+                    };
+                }
+                // Handle case of no sub but purchased reports
+                if (!SubscriptionUtility.SubscriptionActive(lastSub) && purchased.Any())
+                {
+                    if (orders.Count() < (1 + purchased.Count()))
+                    {
+                        return new ValidationModel()
+                        {
+                            State = ValidationState.NoSubscriptionAndReportValid,
+                            RemainingOrders = (1 + purchased.Count()) - orders.Count(),
+                            Message = "User can use their purchased report."
+                        };
+                    }
+                }
                 if (!SubscriptionUtility.SubscriptionActive(lastSub) && orders.Any())
                 {
                     // This case means they've never had a subscription before, and are eligible for a trial month.
@@ -47,18 +75,12 @@ namespace MobileClient.Services
                         Message = "User does not have a subscription and has used their free report and trial period."
                     };
                 }
-                if (!SubscriptionUtility.SubscriptionActive(lastSub) && !orders.Any())
-                {
-                    return new ValidationModel()
-                    {
-                        State = ValidationState.FreeReportValid,
-                        Message = "User can use their free report."
-                    };
-                }
 
                 // Add 1 to the calculation to take into account free report
                 var totalRemainingOrders = subs
-                    .Select(x => SubscriptionUtility.GetInfoFromSubType(x.SubscriptionType).OrderCount).Sum() - orders.Count() + 1;
+                    .Select(x => SubscriptionUtility.GetInfoFromSubType(x.SubscriptionType).OrderCount).Sum() + 1 
+                                                                                                              + purchased.Count()
+                                                                                                              - orders.Count();
 
                 if (totalRemainingOrders <= 0)
                 {
@@ -100,6 +122,7 @@ namespace MobileClient.Services
     {
         NoSubscriptionAndTrialAlreadyUsed,
         NoSubscriptionAndTrialValid,
+        NoSubscriptionAndReportValid,
         FreeReportValid,
         SubscriptionReportValid,
         NoReportsLeftInPeriod
