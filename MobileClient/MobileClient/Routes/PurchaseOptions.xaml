@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="MobileClient.Routes.PurchaseOptions">
+    <ContentPage.Content>
+        <StackLayout>
+            <Label Text="Choose between a single report or a subscription plan."
+                FontSize="Medium"
+                FontAttributes="Bold"
+                VerticalOptions="Start" 
+                HorizontalOptions="CenterAndExpand" />
+            <Frame BorderColor="Black">
+                <StackLayout>
+                    <Label Text="Single reports offer you flexibility at a slightly higher rate."
+                        VerticalOptions="Start" 
+                        HorizontalOptions="CenterAndExpand" />
+                    <Button Text="Single Report Details"
+                        WidthRequest="250"
+                        StyleClass="Success" />
+                </StackLayout>
+            </Frame>
+            <Frame BorderColor="Black">
+                <StackLayout>
+                    <Label Text="Subscriptions give you the best deal, and give you access to additional single reports at your subscription rate."
+                        VerticalOptions="Start" 
+                        HorizontalOptions="CenterAndExpand" />
+                    <Button Text="Subscription Details" 
+                        WidthRequest="250"
+                        StyleClass="Success" />
+                </StackLayout>
+            </Frame>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

@@ -48,7 +48,7 @@
                     StyleClass="Success"
                     VerticalOptions="Start"
                     HorizontalOptions="CenterAndExpand" />
-                <Label Text="Subscription"
+                <Label Text="Get Orders"
                    Grid.Row="4"
                    FontSize="Medium"
                    FontAttributes="Bold"

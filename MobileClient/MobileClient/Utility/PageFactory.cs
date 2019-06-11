@@ -31,6 +31,10 @@ namespace MobileClient.Utility
                     return new OrderDetail(stateArgs[0] as Models.Order);
                 case PageType.Purchase:
                     return new Purchase(stateArgs[0] as ValidationModel);
+                case PageType.PurchaseOptions:
+                    return new PurchaseOptions();
+                case PageType.SingleReportPurchase:
+                    return new SingleReportPurchase();
                 case PageType.Feedback:
                     return new Feedback();
                 default:
@@ -52,6 +56,8 @@ namespace MobileClient.Utility
         OrderDetail,
         Order,
         PaymentConfirmation,
-        Purchase
+        Purchase,
+        PurchaseOptions,
+        SingleReportPurchase
     }
 }

@@ -191,7 +191,7 @@ namespace MobileClient.Routes
                 throw new InvalidOperationException("User must be logged in to purchase a subscription.");
             }
 #if RELEASE
-            var sub = await _purchaseService.PurchaseSubscription(subCode, "payload");
+            var sub = await _purchaseService.PurchaseItem(subCode, ItemType.Subscription, "payload");
 #else
             var sub = new InAppBillingPurchase()
             {

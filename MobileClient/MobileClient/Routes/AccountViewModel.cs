@@ -109,7 +109,7 @@ namespace MobileClient.Routes
         {
             if (user == null)
             {
-                SubscriptionLabel = $"Log in to manage your subscription.";
+                SubscriptionLabel = $"Please log in first.";
                 _changeSubStyleClass("Success");
                 SubscriptionButtonText = "Manage";
                 SubscriptionButtonEnabled = false;
@@ -125,9 +125,9 @@ namespace MobileClient.Routes
             }
             else
             {
-                SubscriptionLabel = "Purchase a monthly subscription that fits your needs.";
+                SubscriptionLabel = "View our purchasing options and choose the right one for you.";
                 _changeSubStyleClass("Success");
-                SubscriptionButtonText = "Purchase";
+                SubscriptionButtonText = "Learn More";
                 SubscriptionButtonEnabled = true;
             }
         }
@@ -145,7 +145,7 @@ namespace MobileClient.Routes
                 }
                 else
                 {
-                    await _navigation.PushAsync(_pageFactory.GetPage(PageType.Purchase, validation));
+                    await _navigation.PushAsync(_pageFactory.GetPage(PageType.PurchaseOptions));
                 }
             }
             catch (Exception ex)
