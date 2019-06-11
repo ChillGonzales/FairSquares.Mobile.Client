@@ -124,7 +124,7 @@ namespace MobileClient.Routes
                 if (user != null)
                 {
                     var fresh = await _orderService.GetMemberOrders(user.UserId);
-                    _orderCache.Update(fresh.ToDictionary(x => x.OrderId, x => x));
+                    _orderCache.Put(fresh.ToDictionary(x => x.OrderId, x => x));
                 }
                 MainLayoutVisible = true;
                 LoadingLayoutVisible = false;

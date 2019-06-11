@@ -61,7 +61,7 @@ namespace MobileClient.Utilities
         {
             try
             {
-                _connection.DeleteAll<T>();
+                _connection.DeleteAll<Storable>();
                 foreach (var kvp in keyValuePairs)
                 {
                     _connection.Insert(new Storable()
