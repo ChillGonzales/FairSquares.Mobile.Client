@@ -1,0 +1,98 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             Title="My Account"
+             x:Class="MobileClient.Routes.Account">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Icon="ic_action_info_outline.png" 
+                     Command="{Binding ToolbarInfoCommand}" />
+    </ContentPage.ToolbarItems>
+    <ContentPage.Content>
+        <ScrollView>
+            <Grid Margin="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="30" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="30" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Label Text="Account Information"
+                   Grid.Row="0"
+                   FontSize="Medium"
+                   FontAttributes="Bold"
+                   Grid.Column="0"
+                   VerticalOptions="End"
+                   HorizontalOptions="StartAndExpand" />
+                <Label Text="{Binding Email}"
+                    FontSize="Small"
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    VerticalOptions="Start" 
+                    HorizontalOptions="StartAndExpand" />
+                <Button x:Name="LogOutButton"
+                    Command="{Binding LogOutCommand}"
+                    Text="{Binding LogOutText}"
+                    Grid.Row="2"
+                    Grid.Column="0"
+                    WidthRequest="250"
+                    StyleClass="Success"
+                    VerticalOptions="Start"
+                    HorizontalOptions="CenterAndExpand" />
+                <Label Text="Subscription"
+                   Grid.Row="4"
+                   FontSize="Medium"
+                   FontAttributes="Bold"
+                   Grid.Column="0"
+                   VerticalOptions="End"
+                   HorizontalOptions="StartAndExpand" />
+                <Label Text="{Binding SubscriptionLabel}"
+                   FontSize="Small"
+                   Grid.Row="5"
+                   Grid.Column="0"
+                   VerticalOptions="Start"
+                   HorizontalOptions="StartAndExpand" />
+                <Button x:Name="SubButton"
+                   Command="{Binding SubscriptionCommand}"
+                   Text="{Binding SubscriptionButtonText}"
+                   Grid.Row="6"
+                   Grid.Column="0"
+                   WidthRequest="250"
+                   IsEnabled="{Binding SubscriptionButtonEnabled}"
+                   StyleClass= "Info"
+                   VerticalOptions="Start"
+                   HorizontalOptions="CenterAndExpand" />
+                <Label Text="Feedback"
+                   Grid.Row="8"
+                   Grid.Column="0"
+                   FontSize="Medium"
+                   FontAttributes="Bold"
+                   VerticalOptions="End"
+                   HorizontalOptions="StartAndExpand" />
+                <Label Text="We're always happy to answer your questions."
+                    Grid.Row="9"
+                    Grid.Column="0"
+                    FontSize="Small"
+                    VerticalOptions="Start"
+                    HorizontalOptions="StartAndExpand" />
+                <Button Command="{Binding FeedbackCommand}"
+                    Text="Send Feedback"
+                    Grid.Row="10"
+                    Grid.Column="0"
+                    StyleClass="Info"
+                    WidthRequest="250"
+                    HorizontalOptions="CenterAndExpand"
+                    VerticalOptions="Start" />
+            </Grid>
+        </ScrollView>
+    </ContentPage.Content>
+</ContentPage>

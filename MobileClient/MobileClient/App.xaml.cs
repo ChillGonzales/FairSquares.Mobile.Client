@@ -1,10 +1,12 @@
 ﻿using FairSquares.Measurement.Core.Models;
 using MobileClient.Authentication;
 using MobileClient.Models;
+using MobileClient.Routes;
 using MobileClient.Services;
 using MobileClient.Utilities;
-using MobileClient.Views;
+using MobileClient.Utility;
 using Newtonsoft.Json;
+using Plugin.InAppBilling;
 using Plugin.InAppBilling.Abstractions;
 using SimpleInjector;
 using System;
@@ -28,7 +30,6 @@ namespace MobileClient
         private static string _orderEndpoint = @"https://fairsquares-order-management-api.azurewebsites.net/api/orders";
         private static string _notifyEndpoint = @"https://fairsquares-order-management-api.azurewebsites.net/api/notification";
         private static string _subEndpoint = @"https://fairsquares-order-management-api.azurewebsites.net/api/subscriptions";
-        private static string _userEndpoint = @"https://fairsquares-order-management-api.azurewebsites.net/api/users";
         private static string _propertyEndpoint = @"https://property-measurements.azurewebsites.net/api/properties";
         private static string _blobEndpoint = @"https://fairsquaresapplogging.blob.core.windows.net/roof-images";
         private const string GoogleAuthorizeUrl = "https://accounts.google.com/o/oauth2/v2/auth";
@@ -39,10 +40,10 @@ namespace MobileClient
             try
             {
                 Container = new Container();
-                var orderService = new AzureOrderService(_orderEndpoint, _apiKey);
-                var propertyService = new PropertyService(_propertyEndpoint, new DebugLogger<PropertyService>());
-                var imageService = new BlobImageService(_blobEndpoint, new DebugLogger<BlobImageService>());
-                var subService = new SubscriptionService(_subEndpoint, new DebugLogger<SubscriptionService>());
+                var orderService = new AzureOrderService(new HttpClient(), _orderEndpoint, _apiKey);
+                var propertyService = new PropertyService(new HttpClient(), _propertyEndpoint, new DebugLogger<PropertyService>());
+                var imageService = new BlobImageService(new HttpClient(), _blobEndpoint, new DebugLogger<BlobImageService>());
+                var subService = new SubscriptionService(new HttpClient(), _subEndpoint, new DebugLogger<SubscriptionService>());
                 var authenticator = new OAuth2Authenticator(Configuration.ClientId,
                                                             null,
                                                             Configuration.Scope,
@@ -54,7 +55,7 @@ namespace MobileClient
                 var userService = new CurrentUserService();
                 var notifyService = new NotificationService(new HttpClient(), _notifyEndpoint, _apiKey);
                 var emailLogger = new EmailLogger<PurchasingService>(notifyService, userService);
-                var purchaseService = new PurchasingService(emailLogger);
+                var purchaseService = new PurchasingService(CrossInAppBilling.Current, emailLogger);
                 authenticator.Completed += (s, e) =>
                 {
                     if (e.IsAuthenticated)
@@ -66,7 +67,7 @@ namespace MobileClient
                 // Setup caches and begin process of filling them.
                 var dbBasePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
                 var propertyCache = new LocalSqlCache<PropertyModel>(Path.Combine(dbBasePath, "property.db3"), new DebugLogger<LocalSqlCache<PropertyModel>>());
-                var orderCache = new LocalSqlCache<Order>(Path.Combine(dbBasePath, "order.db3"), new DebugLogger<LocalSqlCache<Order>>());
+                var orderCache = new LocalSqlCache<Models.Order>(Path.Combine(dbBasePath, "order.db3"), new DebugLogger<LocalSqlCache<Models.Order>>());
                 var imageCache = new LocalSqlCache<ImageModel>(Path.Combine(dbBasePath, "images.db3"), new DebugLogger<LocalSqlCache<ImageModel>>());
                 var subCache = new LocalSqlCache<SubscriptionModel>(Path.Combine(dbBasePath, "subs.db3"), new DebugLogger<LocalSqlCache<SubscriptionModel>>());
                 var settingsCache = new LocalSqlCache<SettingsModel>(Path.Combine(dbBasePath, "sets.db3"), new DebugLogger<LocalSqlCache<SettingsModel>>());
@@ -122,7 +123,7 @@ namespace MobileClient
                             // TODO: This should be somewhere else, not in the client.
                             var sub = subService.GetSubscriptions(userId).OrderByDescending(x => x.StartDateTime).FirstOrDefault();
                             // Check app store purchases to see if they auto-renewed
-                            if (sub != null && !SubscriptionUtilities.SubscriptionActive(sub))
+                            if (sub != null && !SubscriptionUtility.SubscriptionActive(sub))
                             {
                                 var purchases = new List<InAppBillingPurchase>();
                                 try
@@ -136,7 +137,7 @@ namespace MobileClient
                                 var mostRecent = purchases.OrderByDescending(x => x.TransactionDateUtc)?.FirstOrDefault();
                                 if (mostRecent != null)
                                 {
-                                    var newSub = SubscriptionUtilities.GetModelFromIAP(mostRecent, userId, sub);
+                                    var newSub = SubscriptionUtility.GetModelFromIAP(mostRecent, userId, sub);
                                     if (newSub != null)
                                     {
                                         sub = newSub;
@@ -184,14 +185,14 @@ namespace MobileClient
                 Container.Register<ICacheRefresher>(() => refresher, Lifestyle.Singleton);
                 Container.Register<ISubscriptionService>(() => subService, Lifestyle.Singleton);
                 Container.Register<IOrderValidationService, OrderValidationService>();
-                Container.Register<IUserService>(() => new UserService(new HttpClient()
-                {
-                    BaseAddress = new Uri(_userEndpoint)
-                }, new DebugLogger<UserService>()), Lifestyle.Singleton);
+                Container.Register<IPageFactory, PageFactory>(Lifestyle.Singleton);
+                Container.Register<IToastService>(() => DependencyService.Get<IToastService>(), Lifestyle.Singleton);
+                Container.Register<IMessagingSubscriber>(() => DependencyService.Get<IMessagingSubscriber>(), Lifestyle.Singleton);
+                Container.Register<IMessagingCenter>(() => MessagingCenter.Instance, Lifestyle.Singleton);
 
                 // Finish registering created caches
                 Container.Register<ICache<PropertyModel>>(() => propertyCache, Lifestyle.Singleton);
-                Container.Register<ICache<Order>>(() => orderCache, Lifestyle.Singleton);
+                Container.Register<ICache<Models.Order>>(() => orderCache, Lifestyle.Singleton);
                 Container.Register<ICache<ImageModel>>(() => imageCache, Lifestyle.Singleton);
                 Container.Register<ICache<SubscriptionModel>>(() => subCache, Lifestyle.Singleton);
                 Container.Register<ICache<SettingsModel>>(() => settingsCache, Lifestyle.Singleton);
@@ -207,7 +208,7 @@ namespace MobileClient
         public App()
         {
             InitializeComponent();
-            MainPage = new BaseTabPage();
+            MainPage = new BaseTab();
         }
 
         protected override void OnStart()

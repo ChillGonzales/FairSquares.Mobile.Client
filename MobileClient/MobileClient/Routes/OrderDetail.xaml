@@ -1,0 +1,153 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             Title="View Details"
+             mc:Ignorable="d"
+             x:Class="MobileClient.Routes.OrderDetail">
+    <ContentPage.Content>
+        <ScrollView Margin="5">
+            <StackLayout Orientation="Vertical">
+                <ActivityIndicator IsRunning="{Binding LoadingAnimRunning}"
+                                   IsVisible="{Binding LoadingAnimVisible}"
+                                   HorizontalOptions="CenterAndExpand"
+                                   VerticalOptions="CenterAndExpand"
+                                   Color="Black" />
+                <Label IsVisible="{Binding StatusMessageVisible}" 
+                       FontSize="Medium"
+                       Text="Your order has been submitted and is in the process of being measured."
+                       VerticalOptions="Center"
+                       HorizontalOptions="CenterAndExpand" />
+                <StackLayout IsVisible="{Binding MainLayoutVisible}" Orientation="Vertical">
+                    <Label Text="{Binding Address}"
+                        FontSize="Large"
+                        FontAttributes="Bold"
+                        VerticalOptions="Center" 
+                        HorizontalOptions="CenterAndExpand" />
+                    <Image Source="{Binding ImageSource}"
+                        IsEnabled="{Binding ImageEnabled}"
+                        VerticalOptions="Center"
+                        HorizontalOptions="CenterAndExpand" >
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ImageTapCommand}"
+                            NumberOfTapsRequired="1" />
+                        </Image.GestureRecognizers>
+                    </Image>
+                    <Label Text="{Binding Squares}"
+                        FontAttributes="Bold"
+                        FontSize="Large"
+                        Margin="10"
+                        VerticalOptions="Center" 
+                        HorizontalOptions="CenterAndExpand" />
+                    <Label HeightRequest="10" />
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <StackLayout Orientation="Horizontal">
+                            <Label FontAttributes="Bold"
+                                   FontSize="Medium"
+                                   Grid.Row="0"
+                                   Grid.Column="0"
+                                   Text="Predominant Pitch"
+                                   VerticalOptions="Start"
+                                   HorizontalOptions="Center" />
+                            <ImageButton Source="ic_action_info_outline.png"
+                                     Command="{Binding PredomPitchInfoCommand}"
+                                     HeightRequest="25"
+                                     WidthRequest="25"
+                                     HorizontalOptions="End"
+                                     VerticalOptions="Start" />
+                        </StackLayout>
+                        <StackLayout Orientation="Horizontal" 
+                                         Grid.Row="1"
+                                         Grid.Column="0"
+                                         HorizontalOptions="CenterAndExpand" 
+                                         VerticalOptions="Center">
+                            <ImageButton Source="ic_action_keyboard_arrow_down.png"
+                                    Command="{Binding DownButtonCommand}"
+                                    HeightRequest="40"
+                                    WidthRequest="40"
+                                    HorizontalOptions="Center"
+                                    VerticalOptions="Center" />
+                            <Label Text="{Binding PredominantPitch}"
+                                   FontSize="Medium"
+                                   VerticalOptions="Center"
+                                   HorizontalOptions="Center" />
+                            <ImageButton Source="ic_action_keyboard_arrow_up.png"
+                                    Command="{Binding UpButtonCommand}"
+                                    HeightRequest="40"
+                                    WidthRequest="40"
+                                    HorizontalOptions="Center"
+                                    VerticalOptions="Center" />
+                        </StackLayout>
+                        <Label FontAttributes="Bold"
+                           FontSize="Medium"
+                           Grid.Row="0"
+                           Grid.Column="1"
+                           Text="Total Area"
+                           VerticalOptions="Start"
+                           HorizontalOptions="Center" />
+                        <Label Text="{Binding Area}"
+                            FontSize="Medium"
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            VerticalOptions="Center" 
+                            HorizontalOptions="Center" />
+                    </Grid>
+                    <Label HeightRequest="15" />
+                    <Label Text="{Binding OrderId}"
+                        VerticalOptions="Center" 
+                        HorizontalOptions="Start" />
+                    <StackLayout Orientation="Horizontal">
+                        <Label Text="{Binding NumberOfRoofs}"
+                               VerticalOptions="Center"
+                               HorizontalOptions="Start" />
+                        <ImageButton Source="ic_action_info_outline.png"
+                                     Command="{Binding RoofsInfoCommand}"
+                                     HeightRequest="25"
+                                     WidthRequest="25"
+                                     HorizontalOptions="End"
+                                     VerticalOptions="Center" />
+                    </StackLayout>
+                    <StackLayout Orientation="Horizontal">
+                        <Label Text="{Binding NumberOfPitches}"
+                               VerticalOptions="Center"
+                               HorizontalOptions="Start" />
+                        <ImageButton Source="ic_action_info_outline.png"
+                                     Command="{Binding PitchesInfoCommand}"
+                                     HeightRequest="25"
+                                     WidthRequest="25"
+                                     HorizontalOptions="End"
+                                     VerticalOptions="Center" />
+                    </StackLayout>
+                    <Label HeightRequest="15" />
+                    <Label Text="Safety Stock Calculations"
+                        FontAttributes="Bold"
+                        VerticalOptions="Center" 
+                        HorizontalOptions="Start" />
+                    <ListView IsGroupingEnabled="True"
+                        ItemsSource="{Binding SafetyStockSource}"
+                        GroupDisplayBinding="{Binding Title}"
+                        VerticalOptions="End"
+                        HorizontalOptions="Center">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <TextCell Text="{Binding Text}"
+                                  Detail="{Binding Detail}"
+                                  TextColor= "Black"
+                                  DetailColor="{Binding DetailColor}" />
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </StackLayout>
+            </StackLayout>
+        </ScrollView>
+    </ContentPage.Content>
+</ContentPage>

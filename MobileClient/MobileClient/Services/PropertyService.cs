@@ -16,11 +16,11 @@ namespace MobileClient.Services
         private readonly HttpClient _http;
         private readonly ILogger<PropertyService> _logger;
 
-        public PropertyService(string baseUrl, ILogger<PropertyService> logger)
+        public PropertyService(HttpClient http, string baseUrl, ILogger<PropertyService> logger)
         {
             _baseUrl = baseUrl;
             _logger = logger;
-            _http = new HttpClient();
+            _http = http;
         }
 
         public async Task<Dictionary<string, PropertyModel>> GetProperties(List<string> orderIds)

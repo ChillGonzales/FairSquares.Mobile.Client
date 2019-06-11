@@ -14,9 +14,9 @@ namespace MobileClient.Services
         private readonly string _baseUri;
         private readonly ILogger<SubscriptionService> _logger;
 
-        public SubscriptionService(string baseUri, ILogger<SubscriptionService> logger)
+        public SubscriptionService(HttpClient http, string baseUri, ILogger<SubscriptionService> logger)
         {
-            _http = new HttpClient();
+            _http = http;
             _baseUri = baseUri;
             _logger = logger;
         }
@@ -44,7 +44,7 @@ namespace MobileClient.Services
                 if (!result.IsSuccessStatusCode)
                 {
                     if (result.StatusCode == System.Net.HttpStatusCode.NotFound)
-                        return null;
+                        return new List<SubscriptionModel>();
                     else
                         throw new Exception(result.Content.ReadAsStringAsync().Result);
                 }

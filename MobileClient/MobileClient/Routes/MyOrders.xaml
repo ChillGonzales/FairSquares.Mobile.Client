@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             Title="View Submitted Orders"
+             x:Class="MobileClient.Routes.MyOrders">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Icon="ic_action_info_outline.png" 
+                     Command="{Binding ToolbarInfoCommand}" />
+    </ContentPage.ToolbarItems>
+    <ContentPage.Content>
+        <StackLayout Orientation="Vertical" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand">
+            <StackLayout IsVisible="{Binding LoadingLayoutVisible}">
+                <ActivityIndicator IsVisible="{Binding LoadingAnimVisible}" 
+                                   IsRunning="{Binding LoadingAnimRunning}"
+                                   Color="Black" 
+                                   VerticalOptions="CenterAndExpand" 
+                                   HorizontalOptions="CenterAndExpand" />
+            </StackLayout>
+            <StackLayout IsVisible="{Binding NoOrderLayoutVisible}" Margin="10" Orientation="Vertical">
+                <Frame IsVisible="{Binding LoginLayoutVisible}" OutlineColor="Black">
+                    <StackLayout Orientation="Vertical">
+                        <Label Text="Log in with Google to submit a report."
+                               FontSize="Medium"
+                               HorizontalOptions="CenterAndExpand"
+                               VerticalOptions="CenterAndExpand" />
+                        <Label HeightRequest="10" VerticalOptions="Fill" />
+                        <Button Command="{Binding LoginCommand}"
+                                Text="Log In"
+                                HorizontalOptions="CenterAndExpand"
+                                VerticalOptions="CenterAndExpand"
+                                WidthRequest="250"
+                                StyleClass="Info" />
+                    </StackLayout>
+                </Frame>
+                <Frame IsVisible="{Binding FreeReportLayoutVisible}" OutlineColor="Black">
+                    <StackLayout Orientation="Vertical">
+                        <Label Text="You have a free report to use! Click below to try Fair Squares for free."
+                               FontSize="Medium"
+                               HorizontalOptions="CenterAndExpand"
+                               VerticalOptions="CenterAndExpand" />
+                        <Label HeightRequest="10" VerticalOptions="Fill"/>
+                        <Button Command="{Binding FreeReportCommand}"
+                                Text="Try For Free"
+                                HorizontalOptions="CenterAndExpand"
+                                VerticalOptions="CenterAndExpand"
+                                WidthRequest="250"
+                                StyleClass="Success" />
+                    </StackLayout>
+                </Frame>
+                <Label HeightRequest="40" VerticalOptions="Fill"/>
+                <Frame OutlineColor="Black">
+                    <StackLayout Orientation="Vertical" >
+                        <Label Text="It looks like you don't have any orders yet. Click below to see an example report."
+                           FontSize="Medium"
+                           HorizontalOptions="CenterAndExpand"
+                           VerticalOptions="CenterAndExpand" />
+                        <Label HeightRequest="10" VerticalOptions="Fill"/>
+                        <Button Command="{Binding ExampleReportCommand}"
+                            Text="View Example"
+                            HorizontalOptions="CenterAndExpand"
+                            VerticalOptions="CenterAndExpand"
+                            WidthRequest="250"
+                            StyleClass="Info" />
+                    </StackLayout>
+                </Frame>
+            </StackLayout>
+            <StackLayout IsVisible="{Binding MainLayoutVisible}">
+                <ListView IsPullToRefreshEnabled="True"
+                IsGroupingEnabled="True"
+                SelectedItem="{Binding OrderListSelectedItem}"
+                IsRefreshing="{Binding OrderListRefreshing}"
+                RefreshCommand="{Binding OrderListRefreshCommand}"
+                ItemsSource="{Binding OrdersSource}"
+                GroupDisplayBinding="{Binding Title}"
+                VerticalOptions="CenterAndExpand"
+                HorizontalOptions="CenterAndExpand">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <TextCell Text="{Binding Text}"
+                                  Detail="{Binding Detail}"
+                                  TextColor= "Black"
+                                  DetailColor="{Binding DetailColor}" />
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </StackLayout>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

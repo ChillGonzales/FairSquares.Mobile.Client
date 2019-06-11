@@ -22,64 +22,61 @@ namespace MobileClient.Services
             _logger = logger;
         }
 
-        public async Task<ValidationResponse> ValidateOrderRequest(AccountModel user)
+        public async Task<ValidationModel> ValidateOrderRequest(AccountModel user)
         {
             try
             {
-                var sub = _subService.GetSubscriptions(user.UserId).OrderBy(x => x.StartDateTime).LastOrDefault();
+                var subs = _subService.GetSubscriptions(user.UserId).OrderBy(x => x.StartDateTime);
+                var lastSub = subs.LastOrDefault();
                 var orders = await _orderService.GetMemberOrders(user.UserId);
 
-                if (!SubscriptionUtilities.SubscriptionActive(sub) && orders.Any())
+                if (!SubscriptionUtility.SubscriptionActive(lastSub) && orders.Any())
                 {
                     // This case means they've never had a subscription before, and are eligible for a trial month.
-                    if (sub == null)
+                    if (lastSub == null)
                     {
-                        return new ValidationResponse()
+                        return new ValidationModel()
                         {
                             State = ValidationState.NoSubscriptionAndTrialValid,
                             Message = "User has used their free report, but is eligible for a free trial period."
                         };
                     }
-
-                    return new ValidationResponse()
+                    return new ValidationModel()
                     {
                         State = ValidationState.NoSubscriptionAndTrialAlreadyUsed,
                         Message = "User does not have a subscription and has used their free report and trial period."
                     };
                 }
-                if (!SubscriptionUtilities.SubscriptionActive(sub) && !orders.Any())
+                if (!SubscriptionUtility.SubscriptionActive(lastSub) && !orders.Any())
                 {
-                    return new ValidationResponse()
+                    return new ValidationModel()
                     {
                         State = ValidationState.FreeReportValid,
                         Message = "User can use their free report."
                     };
                 }
-                var activeSubOrderCount = orders.Where(x => x.DateReceived >= sub.StartDateTime && x.DateReceived <= sub.EndDateTime)
-                                                .Count();
 
-                if ((sub.SubscriptionType == SubscriptionType.Basic && activeSubOrderCount >= SubscriptionUtilities.BasicOrderCount) ||
-                    (sub.SubscriptionType == SubscriptionType.Premium && activeSubOrderCount >= SubscriptionUtilities.PremiumOrderCount) ||
-                    (sub.SubscriptionType == SubscriptionType.Enterprise && activeSubOrderCount >= SubscriptionUtilities.EnterpriseOrderCount))
+                // Add 1 to the calculation to take into account free report
+                var totalRemainingOrders = subs
+                    .Select(x => SubscriptionUtility.GetInfoFromSubType(x.SubscriptionType).OrderCount).Sum() - orders.Count() + 1;
+
+                if (totalRemainingOrders <= 0)
                 {
-                    return new ValidationResponse()
+                    return new ValidationModel()
                     {
                         State = ValidationState.NoReportsLeftInPeriod,
                         RemainingOrders = 0,
-                        Subscription = sub,
+                        Subscription = lastSub,
                         Message = "User has used all of their orders for this subscription period."
                     };
                 }
                 else
                 {
-                    var remainingCount = sub.SubscriptionType == SubscriptionType.Basic ? SubscriptionUtilities.BasicOrderCount - activeSubOrderCount :
-                                        (sub.SubscriptionType == SubscriptionType.Premium ? SubscriptionUtilities.PremiumOrderCount - activeSubOrderCount :
-                                        SubscriptionUtilities.EnterpriseOrderCount - activeSubOrderCount);
-                    return new ValidationResponse()
+                    return new ValidationModel()
                     {
                         State = ValidationState.SubscriptionReportValid,
-                        Subscription = sub,
-                        RemainingOrders = remainingCount,
+                        Subscription = lastSub,
+                        RemainingOrders = totalRemainingOrders,
                     };
                 }
             }
@@ -91,7 +88,7 @@ namespace MobileClient.Services
         }
     }
 
-    public class ValidationResponse
+    public class ValidationModel
     {
         public ValidationState State { get; set; }
         public string Message { get; set; }

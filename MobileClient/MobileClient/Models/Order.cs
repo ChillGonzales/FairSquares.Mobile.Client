@@ -20,6 +20,12 @@ namespace MobileClient.Models
         public int? Price { get; set; }
         public string ChargeId { get; set; }
         public string CouponCodeId { get; set; }
+        public PlatformType? PlatformType { get; set; }
+    }
+    public enum PlatformType
+    {
+        Android = 0,
+        iOS = 1
     }
     public enum RoofOption
     {

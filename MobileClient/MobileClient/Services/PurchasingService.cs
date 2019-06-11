@@ -13,19 +13,20 @@ namespace MobileClient.Services
     public class PurchasingService : IPurchasingService
     {
         private readonly ILogger<PurchasingService> _logger;
+        private readonly IInAppBilling _billing;
 
-        public PurchasingService(ILogger<PurchasingService> logger)
+        public PurchasingService(IInAppBilling billing, ILogger<PurchasingService> logger)
         {
             _logger = logger;
+            _billing = billing;
         }
 
         public async Task<InAppBillingPurchase> PurchaseSubscription(string name, string payload)
         {
-            var billing = CrossInAppBilling.Current;
             bool connected = false;
             try
             {
-                connected = await billing.ConnectAsync(ItemType.Subscription);
+                connected = await _billing.ConnectAsync(ItemType.Subscription);
             }
             catch (Exception ex)
             {
@@ -44,12 +45,10 @@ namespace MobileClient.Services
             try
             {
                 //check purchases
-                purchase = await billing.PurchaseAsync(name, ItemType.Subscription, payload);
+                purchase = await _billing.PurchaseAsync(name, ItemType.Subscription, payload);
             }
             catch (InAppBillingPurchaseException purchaseEx)
             {
-                // Billing Exception handle this based on the type
-                _logger.LogError("Billing error occurred.", purchaseEx, name, payload);
                 var errorMsg = "";
                 switch (purchaseEx.PurchaseError)
                 {
@@ -87,6 +86,13 @@ namespace MobileClient.Services
                         errorMsg = "An error occurred while purchasing subscription. Please contact Fair Squares support.";
                         break;
                 }
+                try
+                {
+                    if (purchaseEx.PurchaseError != PurchaseError.UserCancelled)
+                        _logger.LogError($"Error type: '{purchaseEx.PurchaseError.ToString()}'. Error Message displayed to user: '{errorMsg}'.", 
+                            purchaseEx, name, payload);
+                }
+                catch { }
                 throw new InvalidOperationException(errorMsg, purchaseEx);
             }
             catch (Exception ex)
@@ -97,7 +103,7 @@ namespace MobileClient.Services
             }
             finally
             {
-                await billing.DisconnectAsync();
+                await _billing.DisconnectAsync();
             }
             if (purchase == null)
             {
@@ -110,13 +116,12 @@ namespace MobileClient.Services
 
         public async Task<IEnumerable<InAppBillingPurchase>> GetPurchases()
         {
-            var billing = CrossInAppBilling.Current;
             bool connected = false;
             try
             {
-                connected = await billing.ConnectAsync(ItemType.Subscription);
+                connected = await _billing.ConnectAsync(ItemType.Subscription);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 var message = $"Error occurred while try to connect to billing service.";
                 throw new InvalidOperationException(message);
@@ -129,7 +134,7 @@ namespace MobileClient.Services
             try
             {
                 // fetch purchases
-                return await billing.GetPurchasesAsync(ItemType.Subscription) ?? Enumerable.Empty<InAppBillingPurchase>();
+                return await _billing.GetPurchasesAsync(ItemType.Subscription) ?? Enumerable.Empty<InAppBillingPurchase>();
             }
             catch (InAppBillingPurchaseException purchaseEx)
             {
@@ -180,7 +185,7 @@ namespace MobileClient.Services
             }
             finally
             {
-                await billing.DisconnectAsync();
+                await _billing.DisconnectAsync();
             }
         }
     }

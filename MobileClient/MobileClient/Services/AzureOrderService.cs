@@ -14,11 +14,11 @@ namespace MobileClient.Services
         private readonly string _apiKey;
         private HttpClient _http; 
 
-        public AzureOrderService(string baseEndpoint, string apiKey)
+        public AzureOrderService(HttpClient http, string baseEndpoint, string apiKey)
         {
             _baseEndpoint = baseEndpoint;
             _apiKey = apiKey;
-            _http = new HttpClient();
+            _http = http;
         }
 
         public async Task<string> AddOrder(Order order)
@@ -31,7 +31,7 @@ namespace MobileClient.Services
             }
             else
             {
-                return result.Content.ReadAsStringAsync().Result;
+                return await result.Content.ReadAsStringAsync();
             }
         }
 
@@ -44,7 +44,7 @@ namespace MobileClient.Services
             }
             else
             {
-                return JsonConvert.DeserializeObject<IEnumerable<Order>>(result.Content.ReadAsStringAsync().Result);
+                return JsonConvert.DeserializeObject<IEnumerable<Order>>(await result.Content.ReadAsStringAsync());
             }
         }
     }
