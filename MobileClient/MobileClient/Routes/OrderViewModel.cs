@@ -291,7 +291,7 @@ namespace MobileClient.Routes
             set
             {
                 _selectedStateIndex = value;
-                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SelectedOptionIndex)));
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SelectedStateIndex)));
             }
         }
         public string Zip

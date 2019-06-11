@@ -69,7 +69,14 @@ namespace MobileClient.Routes
             _nav = nav;
             _baseNavAction = baseNavAction;
             OnAppearingBehavior = new Command(async () => await SetViewState());
-            _messagingCenter.Subscribe<App>(this, "CacheInvalidated", async x => await this.SetViewState());
+            _messagingCenter.Subscribe<App>(this, "CacheInvalidated", async x =>
+            {
+                try
+                {
+                    await this.SetViewState();
+                }
+                catch { }
+            });
             ExampleReportCommand = new Command(async () =>
             {
                 try
