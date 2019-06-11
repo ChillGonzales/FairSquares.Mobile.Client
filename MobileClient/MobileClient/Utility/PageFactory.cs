@@ -32,7 +32,7 @@ namespace MobileClient.Utility
                 case PageType.Purchase:
                     return new Purchase(stateArgs[0] as ValidationModel);
                 case PageType.PurchaseOptions:
-                    return new PurchaseOptions();
+                    return new PurchaseOptions(stateArgs[0] as ValidationModel);
                 case PageType.SingleReportPurchase:
                     return new SingleReportPurchase();
                 case PageType.Feedback:

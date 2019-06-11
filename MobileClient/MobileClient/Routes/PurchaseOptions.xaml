@@ -18,7 +18,8 @@
                         VerticalOptions="Start" 
                         HorizontalOptions="CenterAndExpand" />
                     <Button Text="Single Report Details"
-                        WidthRequest="250"
+                        Command="{Binding SingleReportCommand}"
+                        WidthRequest="150"
                         StyleClass="Success" />
                 </StackLayout>
             </Frame>
@@ -28,7 +29,8 @@
                         VerticalOptions="Start" 
                         HorizontalOptions="CenterAndExpand" />
                     <Button Text="Subscription Details" 
-                        WidthRequest="250"
+                        Command="{Binding SubscriptionCommand}"
+                        WidthRequest="150"
                         StyleClass="Success" />
                 </StackLayout>
             </Frame>

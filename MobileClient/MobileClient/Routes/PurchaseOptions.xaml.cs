@@ -1,4 +1,6 @@
-﻿using System;
+﻿using MobileClient.Services;
+using MobileClient.Utility;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,9 +14,10 @@ namespace MobileClient.Routes
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class PurchaseOptions : ContentPage
     {
-        public PurchaseOptions()
+        public PurchaseOptions(ValidationModel validation)
         {
             InitializeComponent();
+            BindingContext = new PurchaseOptionsViewModel(validation, this.Navigation, App.Container.GetInstance<IPageFactory>());
         }
     }
 }

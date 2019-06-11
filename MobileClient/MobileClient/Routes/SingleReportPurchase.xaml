@@ -6,10 +6,72 @@
              mc:Ignorable="d"
              x:Class="MobileClient.Routes.SingleReportPurchase">
     <ContentPage.Content>
-        <StackLayout>
-            <Label Text="Welcome to Xamarin.Forms!"
-                VerticalOptions="CenterAndExpand" 
-                HorizontalOptions="CenterAndExpand" />
-        </StackLayout>
+        <ScrollView>
+            <StackLayout Orientation="Vertical" Margin="5">
+                <Label Text="Get an additional report anytime you need it."
+                   FontSize="Large"
+                   FontAttributes="Bold"
+                   HorizontalOptions="CenterAndExpand"
+                   HeightRequest="50"
+                   VerticalOptions="Center" />
+                <Label HeightRequest="25" />
+
+                <Frame OutlineColor="Black">
+                    <StackLayout>
+                        <Label Text="{Binding MarketingDescText}"
+                           IsVisible="{Binding MarketingDescVisible}"
+                           FontSize="Medium"
+                           FontAttributes="Bold"
+                           VerticalOptions="Start"
+                           HorizontalOptions="CenterAndExpand" />
+                        <Label Text="{Binding ReportsDescText}"
+                           IsVisible="{Binding ReportsDescVisible}"
+                           FontSize="Medium"
+                           VerticalOptions="Start"
+                           HorizontalOptions="CenterAndExpand" />
+                        <Label Text="{Binding CostDescText}"
+                           IsVisible="{Binding CostDescVisible}"
+                           FontSize="Medium"
+                           VerticalOptions="Start"
+                           HorizontalOptions="CenterAndExpand" />
+                        <Label Text="{Binding CostComparisonText}"
+                           IsVisible="{Binding CostComparisonVisible}"
+                           FontSize="Medium"
+                           VerticalOptions="Start"
+                           HorizontalOptions="CenterAndExpand" />
+                        <Label HeightRequest="50" />
+                        <AbsoluteLayout HorizontalOptions="Fill" VerticalOptions="Fill">
+                            <Button Text="{Binding PurchaseButtonText}"
+                                Command="{Binding PurchaseButtonCommand}"
+                                IsEnabled="{Binding PurchaseButtonEnabled}"
+                                StyleClass="Success"
+                                AbsoluteLayout.LayoutFlags="PositionProportional"
+                                AbsoluteLayout.LayoutBounds="0.5, 0.5, 250, 50" />
+                            <ActivityIndicator IsRunning="{Binding LoadAnimationRunning}"
+                                           IsVisible="{Binding LoadAnimationVisible}"
+                                           Color="White"
+                                           AbsoluteLayout.LayoutFlags="PositionProportional"
+                                           AbsoluteLayout.LayoutBounds="0.5,0.5,-1,-1" />
+                        </AbsoluteLayout>
+                    </StackLayout>
+                </Frame>
+                <Label HeightRequest="10"/>
+
+                <!--Stupid Apple Legalese-->
+                <Label VerticalOptions="Center"
+                   HorizontalOptions="Center">
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text="{Binding LegalText}" FontSize="Small" FontAttributes="Italic" />
+                            <Span Text = "see our terms and conditions on our website here." TextDecorations="Underline" FontSize="Small" FontAttributes="Italic">
+                                <Span.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding LegalLinkCommand}" NumberOfTapsRequired="1" />
+                                </Span.GestureRecognizers>
+                            </Span>
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+            </StackLayout>
+        </ScrollView>
     </ContentPage.Content>
 </ContentPage>
