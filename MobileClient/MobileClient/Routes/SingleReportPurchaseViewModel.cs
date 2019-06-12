@@ -1,5 +1,7 @@
-﻿using MobileClient.Models;
+﻿using MobileClient.Authentication;
+using MobileClient.Models;
 using MobileClient.Services;
+using Plugin.InAppBilling.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -27,11 +29,20 @@ namespace MobileClient.Routes
         private string _legalText;
         private readonly ValidationModel _validation;
         private readonly Action<Uri> _openUri;
+        private readonly ICurrentUserService _userCache;
+        private readonly IPurchasingService _purchaseService;
 
-        public SingleReportPurchaseViewModel(ValidationModel validation, Action<Uri> openUri)
+        public SingleReportPurchaseViewModel(ValidationModel validation, 
+                                             Action<Uri> openUri,
+                                             IPurchasingService purchaseService,
+                                             ICurrentUserService userCache)
         {
             _validation = validation;
             _openUri = openUri;
+            _userCache = userCache;
+            _purchaseService = purchaseService;
+
+            SetViewState(validation);
         }
 
         private async Task SetViewState(ValidationModel validation)
@@ -82,36 +93,35 @@ namespace MobileClient.Routes
             }
         }
 
-        private async Task PurchaseItem(string subCode)
+        private async Task PurchaseItem(string itemCode)
         {
             if (_userCache.GetLoggedInAccount() == null)
             {
-                throw new InvalidOperationException("User must be logged in to purchase a subscription.");
+                throw new InvalidOperationException("User must be logged in to purchase a report.");
             }
+
 #if RELEASE
-            var sub = await _purchaseService.PurchaseItem(subCode, ItemType.Subscription, "payload");
+            var purchase = await _purchaseService.PurchaseItem(itemCode, ItemType.InAppPurchase, "payload");
 #else
-            var sub = new InAppBillingPurchase()
+            var purchase = new InAppBillingPurchase()
             {
                 PurchaseToken = "PurchaseToken",
-                ProductId = subCode,
+                ProductId = itemCode,
                 Id = "12345"
             };
             await Task.Delay(5000);
 #endif
-            if (sub == null)
+            if (purchase == null)
                 throw new InvalidOperationException($"Something went wrong when attempting to purchase. Please try again.");
 
-            var model = new Models.SubscriptionModel()
+            var model = new Models.PurchasedReportModel()
             {
-                PurchaseId = sub.Id,
-                PurchaseToken = sub.PurchaseToken,
-                SubscriptionType = SubscriptionUtility.GetTypeFromProductId(sub.ProductId),
-                StartDateTime = DateTimeOffset.Now,
+                PurchaseId = purchase.Id,
+                PurchaseToken = purchase.PurchaseToken,
                 PurchasedDateTime = DateTimeOffset.Now,
-                EndDateTime = DateTimeOffset.Now.AddMonths(1),
                 PurchaseSource = Device.RuntimePlatform == Device.Android ? Models.PurchaseSource.GooglePlay : Models.PurchaseSource.AppStore,
-                UserId = _userCache.GetLoggedInAccount().UserId
+                UserId = _userCache.GetLoggedInAccount().UserId,
+                Email = 
             };
             _subCache.Put(_userCache.GetLoggedInAccount().UserId, model);
 #if RELEASE
