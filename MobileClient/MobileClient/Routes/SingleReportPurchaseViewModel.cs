@@ -1,6 +1,7 @@
 ﻿using MobileClient.Authentication;
 using MobileClient.Models;
 using MobileClient.Services;
+using MobileClient.Utilities;
 using Plugin.InAppBilling.Abstractions;
 using System;
 using System.Collections.Generic;
@@ -29,18 +30,24 @@ namespace MobileClient.Routes
         private string _legalText;
         private readonly ValidationModel _validation;
         private readonly Action<Uri> _openUri;
+        private readonly string _runtimePlatform;
         private readonly ICurrentUserService _userCache;
         private readonly IPurchasingService _purchaseService;
+        private readonly IPurchasedReportService _prService;
 
-        public SingleReportPurchaseViewModel(ValidationModel validation, 
+        public SingleReportPurchaseViewModel(ValidationModel validation,
                                              Action<Uri> openUri,
+                                             string runtimePlatform,
+                                             IPurchasedReportService prService,
                                              IPurchasingService purchaseService,
                                              ICurrentUserService userCache)
         {
             _validation = validation;
             _openUri = openUri;
+            _runtimePlatform = runtimePlatform;
             _userCache = userCache;
             _purchaseService = purchaseService;
+            _prService = prService;
 
             SetViewState(validation);
         }
@@ -99,7 +106,6 @@ namespace MobileClient.Routes
             {
                 throw new InvalidOperationException("User must be logged in to purchase a report.");
             }
-
 #if RELEASE
             var purchase = await _purchaseService.PurchaseItem(itemCode, ItemType.InAppPurchase, "payload");
 #else
@@ -121,38 +127,32 @@ namespace MobileClient.Routes
                 PurchasedDateTime = DateTimeOffset.Now,
                 PurchaseSource = Device.RuntimePlatform == Device.Android ? Models.PurchaseSource.GooglePlay : Models.PurchaseSource.AppStore,
                 UserId = _userCache.GetLoggedInAccount().UserId,
-                Email = 
+                Email = _userCache.GetLoggedInAccount().Email
             };
-            _subCache.Put(_userCache.GetLoggedInAccount().UserId, model);
-#if RELEASE
-                _subService.AddSubscription(model);
-#endif
+            _prService.AddPurchasedReport(model);
         }
 
-        private string GetLegalJargon(SubscriptionType selected, ValidationModel validation)
+        private string GetLegalJargon(ValidationModel validation)
         {
-            string costDesc = "";
-            string periodText = (new[] { ValidationState.FreeReportValid, ValidationState.NoSubscriptionAndTrialValid }.Contains(validation.State)
-                                && selected == SubscriptionType.Basic)
-                                ? "at the end of the trial on"
-                                : "upon";
             string platformText = _runtimePlatform == Device.Android ? "Play Store" : "iTunes";
-            switch (selected)
+            var costDesc = $"${SubscriptionUtility.IndvReportNoSubPrice.ToString()}";
+            if (validation.Subscription != null)
             {
-                case SubscriptionType.Premium:
-                    costDesc = $"${SubscriptionUtility.PremiumPrice.ToString()} monthly";
-                    break;
-                case SubscriptionType.Enterprise:
-                    costDesc = $"${SubscriptionUtility.EnterprisePrice.ToString()} monthly";
-                    break;
-                default:
-                    costDesc = $"${SubscriptionUtility.BasicPrice.ToString()} monthly";
-                    break;
+                var info = SubscriptionUtility.GetInfoFromSubType(validation.Subscription.SubscriptionType);
+                switch (validation.Subscription.SubscriptionType)
+                {
+                    case SubscriptionType.Premium:
+                        costDesc = $"${SubscriptionUtility.IndvReportPremiumPrice.ToString()}";
+                        break;
+                    case SubscriptionType.Enterprise:
+                        costDesc = $"${SubscriptionUtility.IndvReportEnterprisePrice.ToString()}";
+                        break;
+                    default:
+                        costDesc = $"${SubscriptionUtility.IndvReportBasicPrice.ToString()}";
+                        break;
+                }
             }
-            return $@"A {costDesc} purchase will be applied to your {platformText} account {periodText} confirmation. " +
-                    $@"Subscriptions will automatically renew unless canceled within 24-hours before the end of the current period. " +
-                    $@"You can cancel anytime with your {platformText} account settings. " +
-                    $@"Any unused portion of a free trial will be forfeited if you purchase a subscription. " +
+            return $@"A {costDesc} purchase will be applied to your {platformText} account upon confirmation. " +
                     $@"For more information, ";
         }
 

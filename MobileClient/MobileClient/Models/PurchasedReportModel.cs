@@ -12,5 +12,6 @@ namespace MobileClient.Models
         public string PurchaseId { get; set; }
         public PurchaseSource PurchaseSource { get; set; }
         public string PurchaseToken { get; set; }
+        public string Email { get; set; }
     }
 }
