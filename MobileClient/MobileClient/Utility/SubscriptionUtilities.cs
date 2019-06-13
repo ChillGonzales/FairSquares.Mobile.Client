@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using MobileClient.Models;
+using MobileClient.Services;
 using Plugin.InAppBilling.Abstractions;
 using Xamarin.Forms;
 
@@ -108,6 +109,36 @@ namespace MobileClient.Utilities
                     };
             }
         }
+        public static SingleReportInfo GetSingleReportInfo(ValidationModel validation)
+        {
+            if (validation.Subscription == null)
+                return new SingleReportInfo()
+                {
+                    Code = INDV_REPORT_NO_SUB,
+                    Price = IndvReportNoSubPrice
+                };
+            switch (validation.Subscription.SubscriptionType)
+            {
+                case SubscriptionType.Premium:
+                    return new SingleReportInfo()
+                    {
+                        Code = INDV_REPORT_PREMIUM,
+                        Price = IndvReportPremiumPrice
+                    };
+                case SubscriptionType.Enterprise:
+                    return new SingleReportInfo()
+                    {
+                        Code = INDV_REPORT_ENTERPRISE,
+                        Price = IndvReportEnterprisePrice
+                    };
+                default:
+                    return new SingleReportInfo()
+                    {
+                        Code = INDV_REPORT_BASIC,
+                        Price = IndvReportBasicPrice
+                    };
+            }
+        }
         public static bool ValidatePurchaseType(string name, ItemType iapType)
         {
             if (new[] { SUB_NAME_BASIC, SUB_NAME_PREMIUM, SUB_NAME_ENTERPRISE }.Contains(name) && iapType == ItemType.Subscription)
@@ -119,6 +150,11 @@ namespace MobileClient.Utilities
         }
     }
 
+    public class SingleReportInfo
+    {
+        public double Price { get; set; }
+        public string Code { get; set; }
+    }
     public class SubscriptionInfo
     {
         public int OrderCount { get; set; }

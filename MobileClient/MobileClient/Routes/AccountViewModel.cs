@@ -31,8 +31,8 @@ namespace MobileClient.Routes
         private string _logoutText;
         private bool _subscriptionButtonEnabled;
 
-        public AccountViewModel(ICurrentUserService userCache, 
-                                IOrderValidationService orderValidator, 
+        public AccountViewModel(ICurrentUserService userCache,
+                                IOrderValidationService orderValidator,
                                 INavigation navigation,
                                 IPageFactory pageFactory,
                                 Action<string> changeLogInStyleClass,
@@ -116,7 +116,10 @@ namespace MobileClient.Routes
                 return;
             }
             var validity = await _orderValidator.ValidateOrderRequest(user);
-            if (validity.State == ValidationState.NoReportsLeftInPeriod || validity.State == ValidationState.SubscriptionReportValid)
+            if (new[] { ValidationState.NoReportsLeftInPeriod,
+                       ValidationState.SubscriptionReportValid,
+                       ValidationState.FreeReportValid,
+                       ValidationState.NoSubscriptionAndReportValid }.Contains(validity.State))
             {
                 SubscriptionLabel = $"Reports remaining: {validity.RemainingOrders.ToString()}";
                 _changeSubStyleClass("Info");
@@ -145,12 +148,12 @@ namespace MobileClient.Routes
                 }
                 else
                 {
-                    await _navigation.PushAsync(_pageFactory.GetPage(PageType.PurchaseOptions));
+                    await _navigation.PushAsync(_pageFactory.GetPage(PageType.PurchaseOptions, validation));
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error occurred attempting to purchase subscription.{ex.ToString()}");
+                _logger.LogError($"Error occurred while navigating to purchase options page.{ex.ToString()}");
             }
         }
 

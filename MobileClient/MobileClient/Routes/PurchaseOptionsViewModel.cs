@@ -23,7 +23,7 @@ namespace MobileClient.Routes
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        public ICommand SingleReportCommand => new Command(async () => await _nav.PushAsync(_pageFactory.GetPage(PageType.SingleReportPurchase)));
+        public ICommand SingleReportCommand => new Command(async () => await _nav.PushAsync(_pageFactory.GetPage(PageType.SingleReportPurchase, _validation)));
         public ICommand SubscriptionCommand => new Command(async () => await _nav.PushAsync(_pageFactory.GetPage(PageType.Purchase, _validation)));
     }
 }

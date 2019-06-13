@@ -2,6 +2,7 @@
 using MobileClient.Models;
 using MobileClient.Services;
 using MobileClient.Utilities;
+using MobileClient.ViewModels;
 using Plugin.InAppBilling.Abstractions;
 using System;
 using System.Collections.Generic;
@@ -30,6 +31,9 @@ namespace MobileClient.Routes
         private string _legalText;
         private readonly ValidationModel _validation;
         private readonly Action<Uri> _openUri;
+        private readonly INavigation _nav;
+        private readonly Action<BaseNavPageType> _navigateFromMenu;
+        private readonly IToastService _alertService;
         private readonly string _runtimePlatform;
         private readonly ICurrentUserService _userCache;
         private readonly IPurchasingService _purchaseService;
@@ -38,12 +42,18 @@ namespace MobileClient.Routes
         public SingleReportPurchaseViewModel(ValidationModel validation,
                                              Action<Uri> openUri,
                                              string runtimePlatform,
+                                             Action<BaseNavPageType> navigateFromMenu,
+                                             INavigation nav,
+                                             IToastService alertService,
                                              IPurchasedReportService prService,
                                              IPurchasingService purchaseService,
                                              ICurrentUserService userCache)
         {
             _validation = validation;
             _openUri = openUri;
+            _nav = nav;
+            _navigateFromMenu = navigateFromMenu;
+            _alertService = alertService;
             _runtimePlatform = runtimePlatform;
             _userCache = userCache;
             _purchaseService = purchaseService;
@@ -54,7 +64,15 @@ namespace MobileClient.Routes
 
         private async Task SetViewState(ValidationModel validation)
         {
-
+            PurchaseButtonText = $"Purchase Report";
+            LegalText = GetLegalJargon(validation);
+            ReportsDescVisible = true;
+            CostDescVisible = true;
+            PurchaseButtonEnabled = true;
+            MarketingDescVisible = true;
+            MarketingDescText = $"Purchase one additional report.";
+            ReportsDescText = $"Adds one available report to use to your account. No expiration, no hassle.";
+            CostDescText = $"${SubscriptionUtility.GetSingleReportInfo(validation).Price}";
         }
 
         private async Task PurchaseButtonClicked()
@@ -64,29 +82,22 @@ namespace MobileClient.Routes
             PurchaseButtonEnabled = false;
             try
             {
-                SubscriptionType selected = SubscriptionType.Basic;
+                var code = SubscriptionUtility.GetSingleReportInfo(_validation).Code;
                 try
                 {
-                    selected = _subscriptionSource[_selectedSubscriptionIndex];
-                }
-                catch { }
-
-                var subCode = SubscriptionUtility.GetInfoFromSubType(selected).SubscriptionCode;
-                try
-                {
-                    await PurchaseSubscription(subCode);
+                    await PurchaseItem(code);
                     Device.BeginInvokeOnMainThread(async () => await _nav.PopAsync());
-                    _alertService.LongToast($"Thank you for your purchase!");
+                    _alertService.ShortToast($"Thank you for your purchase!");
                     _navigateFromMenu(BaseNavPageType.Order);
                 }
                 catch (Exception ex)
                 {
-                    _alertService.LongToast($"Failed to purchase subscription. {ex.Message}");
+                    _alertService.LongToast($"Failed to purchase report. {ex.Message}");
                 }
             }
             catch (Exception ex)
             {
-                _alertService.LongToast($"Something went wrong when trying to purchase subscription. {ex.Message}");
+                _alertService.LongToast($"Something went wrong when trying to purchase report. {ex.Message}");
             }
             finally
             {
