@@ -303,7 +303,9 @@ namespace MobileClient.Routes
                 if (value?.OrderId == _orderListSelectedItem?.OrderId)
                     return;
                 _orderListSelectedItem = value;
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                 HandleSelectedItemChange(value);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(OrderListSelectedItem)));
             }
         }

@@ -76,7 +76,7 @@ namespace Tests.Routes
                 UserId = "123"
             };
             _userCache.Setup(x => x.GetLoggedInAccount()).Returns(user);
-            _validator.Setup(x => x.ValidateOrderRequest(user))
+            _validator.Setup(x => x.ValidateOrderRequest(user, It.IsAny<bool>()))
                 .ReturnsAsync(new ValidationModel()
                 {
                     State = ValidationState.FreeReportValid
@@ -88,7 +88,7 @@ namespace Tests.Routes
                     _loginStyleAction,
                     _subStyleAction,
                     _logger.Object);
-            Assert.AreEqual("Success", _subStyle);
+            Assert.AreEqual("Info", _subStyle);
             Assert.AreEqual("Danger", _loginStyle);
             Assert.AreEqual("Purchase a monthly subscription that fits your needs.", account.SubscriptionLabel);
             Assert.AreEqual(true, account.SubscriptionButtonEnabled);
@@ -114,7 +114,7 @@ namespace Tests.Routes
             _pageFac.Setup(x => x.GetPage(PageType.ManageSubscription, It.IsAny<ValidationModel>()))
                 .Returns(null as ManageSubscription);
             _nav.Setup(x => x.PushAsync(It.IsAny<ManageSubscription>()));
-            _validator.Setup(x => x.ValidateOrderRequest(user))
+            _validator.Setup(x => x.ValidateOrderRequest(user, It.IsAny<bool>()))
                 .ReturnsAsync(new ValidationModel()
                 {
                     State = ValidationState.SubscriptionReportValid,

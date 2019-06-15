@@ -85,7 +85,19 @@ namespace MobileClient.Routes
             });
 
             Task.Run(async () => await SetSubState(user)).Wait();
-            SubscriptionCommand = new Command(async () => await SubscriptionPressed());
+            SubscriptionCommand = new Command(async () =>
+            {
+                try
+                {
+                    SubscriptionButtonEnabled = false;
+                    await SubscriptionPressed();
+                }
+                catch { }
+                finally
+                {
+                    SubscriptionButtonEnabled = true;
+                }
+            });
             FeedbackCommand = new Command(async () => await _navigation.PushAsync(_pageFactory.GetPage(PageType.Feedback)));
         }
 
@@ -130,7 +142,7 @@ namespace MobileClient.Routes
             {
                 SubscriptionLabel = "View our purchasing options and choose the right one for you.";
                 _changeSubStyleClass("Success");
-                SubscriptionButtonText = "Learn More";
+                SubscriptionButtonText = "View Options";
                 SubscriptionButtonEnabled = true;
             }
         }

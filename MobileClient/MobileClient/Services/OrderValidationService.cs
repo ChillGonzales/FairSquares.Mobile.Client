@@ -14,27 +14,57 @@ namespace MobileClient.Services
         private readonly IOrderService _orderService;
         private readonly ISubscriptionService _subService;
         private readonly IPurchasedReportService _prService;
+        private readonly ICache<Order> _orderCache;
+        private readonly ICache<SubscriptionModel> _subCache;
+        private readonly ICache<PurchasedReportModel> _prCache;
         private readonly ILogger<OrderValidationService> _logger;
 
         public OrderValidationService(IOrderService orderService,
                                       ISubscriptionService subService,
                                       IPurchasedReportService prService,
+                                      ICache<Order> orderCache,
+                                      ICache<SubscriptionModel> subCache,
+                                      ICache<PurchasedReportModel> prCache,
                                       ILogger<OrderValidationService> logger)
         {
             _orderService = orderService;
             _subService = subService;
             _prService = prService;
+            _orderCache = orderCache;
+            _subCache = subCache;
+            _prCache = prCache;
             _logger = logger;
         }
 
-        public async Task<ValidationModel> ValidateOrderRequest(AccountModel user)
+        public async Task<ValidationModel> ValidateOrderRequest(AccountModel user, bool useCached = true)
         {
             try
             {
-                var subs = _subService.GetSubscriptions(user.UserId).OrderBy(x => x.StartDateTime);
-                var lastSub = subs.LastOrDefault();
-                var purchased = _prService.GetPurchasedReports(user.UserId);
-                var orders = await _orderService.GetMemberOrders(user.UserId);
+                IOrderedEnumerable<SubscriptionModel> subs = null;
+                List<PurchasedReportModel> purchased = null;
+                IEnumerable<Models.Order> orders = null;
+                SubscriptionModel lastSub = null;
+                if (useCached)
+                {
+                    subs = _subCache.GetAll().Select(x => x.Value).OrderBy(x => x.StartDateTime);
+                    lastSub = subs.LastOrDefault();
+                    purchased = _prCache.GetAll().Select(x => x.Value).ToList();
+                    orders = _orderCache.GetAll().Select(x => x.Value);
+                }
+                else
+                {
+                    subs = _subService.GetSubscriptions(user.UserId).OrderBy(x => x.StartDateTime);
+                    lastSub = subs.LastOrDefault();
+                    purchased = _prService.GetPurchasedReports(user.UserId);
+                    orders = await _orderService.GetMemberOrders(user.UserId);
+                    try
+                    {
+                        _subCache.Put(subs.ToDictionary(x => x.PurchaseId, x => x));
+                        _prCache.Put(purchased.ToDictionary(x => x.PurchaseId, x => x));
+                        _orderCache.Put(orders.ToDictionary(x => x.OrderId, x => x));
+                    }
+                    catch { }
+                }
 
                 if (!SubscriptionUtility.SubscriptionActive(lastSub) && !orders.Any())
                 {
@@ -78,7 +108,7 @@ namespace MobileClient.Services
 
                 // Add 1 to the calculation to take into account free report
                 var totalRemainingOrders = subs
-                    .Select(x => SubscriptionUtility.GetInfoFromSubType(x.SubscriptionType).OrderCount).Sum() + 1 
+                    .Select(x => SubscriptionUtility.GetInfoFromSubType(x.SubscriptionType).OrderCount).Sum() + 1
                                                                                                               + purchased.Count()
                                                                                                               - orders.Count();
 

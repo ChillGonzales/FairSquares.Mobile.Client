@@ -1,5 +1,7 @@
 ﻿using MobileClient.Authentication;
+using MobileClient.Models;
 using MobileClient.Services;
+using MobileClient.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,7 +28,9 @@ namespace MobileClient.Routes
                                                                App.Container.GetInstance<IToastService>(),
                                                                App.Container.GetInstance<IPurchasedReportService>(),
                                                                App.Container.GetInstance<IPurchasingService>(),
-                                                               App.Container.GetInstance<ICurrentUserService>());
+                                                               App.Container.GetInstance<ICurrentUserService>(),
+                                                               App.Container.GetInstance<ICache<List<PurchasedReportModel>>>(),
+                                                               App.Container.GetInstance<ILogger<SingleReportPurchaseViewModel>>());
         }
     }
 }

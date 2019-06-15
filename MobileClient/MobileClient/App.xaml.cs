@@ -56,8 +56,8 @@ namespace MobileClient
                                                             true);
                 var userService = new CurrentUserService();
                 var notifyService = new NotificationService(new HttpClient(), _notifyEndpoint, _apiKey);
-                var emailLogger = new EmailLogger<PurchasingService>(notifyService, userService);
-                var purchaseService = new PurchasingService(CrossInAppBilling.Current, emailLogger);
+                var purchaseEmailLogger = new EmailLogger<PurchasingService>(notifyService, userService);
+                var purchaseService = new PurchasingService(CrossInAppBilling.Current, purchaseEmailLogger);
                 authenticator.Completed += (s, e) =>
                 {
                     if (e.IsAuthenticated)
@@ -68,12 +68,18 @@ namespace MobileClient
 
                 // Setup caches and begin process of filling them.
                 var dbBasePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-                var propertyCache = new LocalSqlCache<PropertyModel>(Path.Combine(dbBasePath, "property.db3"), new DebugLogger<LocalSqlCache<PropertyModel>>());
-                var orderCache = new LocalSqlCache<Models.Order>(Path.Combine(dbBasePath, "order.db3"), new DebugLogger<LocalSqlCache<Models.Order>>());
-                var imageCache = new LocalSqlCache<ImageModel>(Path.Combine(dbBasePath, "images.db3"), new DebugLogger<LocalSqlCache<ImageModel>>());
-                var subCache = new LocalSqlCache<SubscriptionModel>(Path.Combine(dbBasePath, "subs.db3"), new DebugLogger<LocalSqlCache<SubscriptionModel>>());
-                var settingsCache = new LocalSqlCache<SettingsModel>(Path.Combine(dbBasePath, "sets.db3"), new DebugLogger<LocalSqlCache<SettingsModel>>());
-                var prCache = new LocalSqlCache<PurchasedReportModel>(Path.Combine(dbBasePath, "purchasedreports.db3"), new DebugLogger<LocalSqlCache<PurchasedReportModel>>());
+                var propertyCache = new LocalSqlCache<PropertyModel>(Path.Combine(dbBasePath, "property.db3"), 
+                    new DebugLogger<LocalSqlCache<PropertyModel>>());
+                var orderCache = new LocalSqlCache<Models.Order>(Path.Combine(dbBasePath, "order.db3"), 
+                    new DebugLogger<LocalSqlCache<Models.Order>>());
+                var imageCache = new LocalSqlCache<ImageModel>(Path.Combine(dbBasePath, "images.db3"), 
+                    new DebugLogger<LocalSqlCache<ImageModel>>());
+                var subCache = new LocalSqlCache<SubscriptionModel>(Path.Combine(dbBasePath, "subs.db3"), 
+                    new DebugLogger<LocalSqlCache<SubscriptionModel>>());
+                var settingsCache = new LocalSqlCache<SettingsModel>(Path.Combine(dbBasePath, "sets.db3"), 
+                    new DebugLogger<LocalSqlCache<SettingsModel>>());
+                var prCache = new LocalSqlCache<PurchasedReportModel>(Path.Combine(dbBasePath, "purchasedreports.db3"), 
+                    new DebugLogger<LocalSqlCache<PurchasedReportModel>>());
 
                 Action ClearCaches = () =>
                 {
@@ -94,7 +100,7 @@ namespace MobileClient
                         try
                         {
                             var prs = prService.GetPurchasedReports(userId);
-                            prCache.Put(prs.ToDictionary(x => userId, x => x));
+                            prCache.Put(prs.ToDictionary(x => x.PurchaseId, x => x));
                         }
                         catch (Exception ex)
                         {
@@ -138,38 +144,41 @@ namespace MobileClient
                             });
                             var subscriptionTask = Task.Run(async () =>
                             {
-                                // TODO: This should be somewhere else, not in the client.
-                                var sub = subService.GetSubscriptions(userId).OrderByDescending(x => x.StartDateTime).FirstOrDefault();
+                                // TODO: Refactor this so it can be tested.
+                                var allSubs = subService.GetSubscriptions(userId).OrderBy(x => x.StartDateTime).ToList();
+                                var recentSub = allSubs.LastOrDefault();
+                                var purchases = new List<InAppBillingPurchase>();
+                                SubscriptionModel newSub = null;
+
                                 // Check app store purchases to see if they auto-renewed
-                                if (sub != null && !SubscriptionUtility.SubscriptionActive(sub))
+                                if (recentSub != null && !SubscriptionUtility.SubscriptionActive(recentSub))
                                 {
-                                    var purchases = new List<InAppBillingPurchase>();
                                     try
                                     {
                                         purchases = (await purchaseService.GetPurchases(ItemType.Subscription)).ToList();
                                     }
                                     catch (Exception ex)
                                     {
-                                        emailLogger.LogError($"Error occurred while getting purchases. {ex.ToString()}");
+                                        purchaseEmailLogger.LogError($"Error occurred while getting purchases. {ex.ToString()}");
                                     }
                                     var mostRecent = purchases.OrderByDescending(x => x.TransactionDateUtc)?.FirstOrDefault();
                                     if (mostRecent != null)
                                     {
-                                        var newSub = SubscriptionUtility.GetModelFromIAP(mostRecent, userId, sub);
+                                        newSub = SubscriptionUtility.GetModelFromIAP(mostRecent, userId, recentSub);
                                         if (newSub != null)
                                         {
-                                            sub = newSub;
+                                            allSubs.Add(newSub);
                                             subService.AddSubscription(newSub);
                                         }
                                     }
                                 }
-                                if (sub == null)
+                                if (!allSubs.Any())
                                 {
                                     subCache.Clear();
                                 }
                                 else
                                 {
-                                    subCache.Update(new Dictionary<string, SubscriptionModel>() { { userId, sub } });
+                                    subCache.Put(allSubs.ToDictionary(x => x.PurchaseId, x => x));
                                 }
                             });
                             await Task.WhenAll(new[] { propTask, imgTask, subTask, subscriptionTask });
@@ -183,12 +192,14 @@ namespace MobileClient
                 };
 
                 var refresher = new CacheRefresher(new DebugLogger<CacheRefresher>(), RefreshCaches);
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                 refresher.RefreshCaches(userService.GetLoggedInAccount()?.UserId);
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 
-                userService.OnLoggedIn += (s, e) =>
+                userService.OnLoggedIn += async (s, e) =>
                 {
                     ClearCaches();
-                    refresher.RefreshCaches(e.Account.UserId);
+                    await refresher.RefreshCaches(e.Account.UserId);
                 };
                 userService.OnLoggedOut += (s, e) => ClearCaches();
 
@@ -197,7 +208,9 @@ namespace MobileClient
                 Container.Register<IPropertyService>(() => propertyService, Lifestyle.Singleton);
                 Container.Register<IImageService>(() => imageService, Lifestyle.Singleton);
                 Container.Register<INotificationService>(() => notifyService, Lifestyle.Singleton);
-                Container.Register(typeof(ILogger<>), typeof(DebugLogger<>), Lifestyle.Transient);
+                Container.Register<ILogger<SingleReportPurchaseViewModel>>(() =>
+                    new EmailLogger<SingleReportPurchaseViewModel>(notifyService, userService), Lifestyle.Singleton);
+                Container.RegisterConditional(typeof(ILogger<>), typeof(DebugLogger<>), c => !c.Handled);
                 Container.Register<OAuth2Authenticator>(() => authenticator, Lifestyle.Singleton);
                 Container.Register<AccountStore>(() => AccountStore.Create(), Lifestyle.Singleton);
                 Container.Register<ICurrentUserService>(() => userService, Lifestyle.Singleton);

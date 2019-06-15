@@ -206,7 +206,11 @@ namespace MobileClient.Routes
                 PurchaseSource = Device.RuntimePlatform == Device.Android ? Models.PurchaseSource.GooglePlay : Models.PurchaseSource.AppStore,
                 UserId = _userCache.GetLoggedInAccount().UserId
             };
-            _subCache.Put(_userCache.GetLoggedInAccount().UserId, model);
+            try
+            {
+                _subCache.Put(model.PurchaseId, model);
+            }
+            catch { }
             _subService.AddSubscription(model);
         }
 

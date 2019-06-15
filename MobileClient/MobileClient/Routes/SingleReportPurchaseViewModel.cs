@@ -3,6 +3,7 @@ using MobileClient.Models;
 using MobileClient.Services;
 using MobileClient.Utilities;
 using MobileClient.ViewModels;
+using Newtonsoft.Json;
 using Plugin.InAppBilling.Abstractions;
 using System;
 using System.Collections.Generic;
@@ -37,6 +38,8 @@ namespace MobileClient.Routes
         private readonly ICurrentUserService _userCache;
         private readonly IPurchasingService _purchaseService;
         private readonly IPurchasedReportService _prService;
+        private readonly ICache<List<PurchasedReportModel>> _prCache;
+        private readonly ILogger<SingleReportPurchaseViewModel> _emailLogger;
 
         public SingleReportPurchaseViewModel(ValidationModel validation,
                                              Action<Uri> openUri,
@@ -46,7 +49,9 @@ namespace MobileClient.Routes
                                              IToastService alertService,
                                              IPurchasedReportService prService,
                                              IPurchasingService purchaseService,
-                                             ICurrentUserService userCache)
+                                             ICurrentUserService userCache,
+                                             ICache<List<PurchasedReportModel>> prCache,
+                                             ILogger<SingleReportPurchaseViewModel> emailLogger)
         {
             _validation = validation;
             _openUri = openUri;
@@ -56,6 +61,8 @@ namespace MobileClient.Routes
             _userCache = userCache;
             _purchaseService = purchaseService;
             _prService = prService;
+            _prCache = prCache;
+            _emailLogger = emailLogger;
 
             SetViewState(validation);
         }
@@ -128,7 +135,22 @@ namespace MobileClient.Routes
                 UserId = _userCache.GetLoggedInAccount().UserId,
                 Email = _userCache.GetLoggedInAccount().Email
             };
-            _prService.AddPurchasedReport(model);
+            try
+            {
+                _prService.AddPurchasedReport(model);
+            }
+            catch (Exception ex)
+            {
+                _emailLogger.LogError($"Purchase succeeded but failed to add purchase to server.", JsonConvert.SerializeObject(model), ex.ToString());
+            }
+            try
+            {
+                var uid = _userCache.GetLoggedInAccount().UserId;
+                var prs = _prCache.Get(uid);
+                prs.Add(model);
+                _prCache.Put(uid, prs);
+            }
+            catch { }
         }
 
         private string GetLegalJargon(ValidationModel validation)
