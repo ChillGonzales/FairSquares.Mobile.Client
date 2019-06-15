@@ -32,7 +32,6 @@ namespace MobileClient.Routes
         private readonly ValidationModel _validation;
         private readonly Action<Uri> _openUri;
         private readonly INavigation _nav;
-        private readonly Action<BaseNavPageType> _navigateFromMenu;
         private readonly IToastService _alertService;
         private readonly string _runtimePlatform;
         private readonly ICurrentUserService _userCache;
@@ -52,7 +51,6 @@ namespace MobileClient.Routes
             _validation = validation;
             _openUri = openUri;
             _nav = nav;
-            _navigateFromMenu = navigateFromMenu;
             _alertService = alertService;
             _runtimePlatform = runtimePlatform;
             _userCache = userCache;
@@ -62,7 +60,7 @@ namespace MobileClient.Routes
             SetViewState(validation);
         }
 
-        private async Task SetViewState(ValidationModel validation)
+        private void SetViewState(ValidationModel validation)
         {
             PurchaseButtonText = $"Purchase Report";
             LegalText = GetLegalJargon(validation);
@@ -71,7 +69,7 @@ namespace MobileClient.Routes
             PurchaseButtonEnabled = true;
             MarketingDescVisible = true;
             MarketingDescText = $"Purchase one additional report.";
-            ReportsDescText = $"Adds one available report to use to your account. No expiration, no hassle.";
+            ReportsDescText = $"Adds one available report to your account.";
             CostDescText = $"${SubscriptionUtility.GetSingleReportInfo(validation).Price}";
         }
 
@@ -88,7 +86,7 @@ namespace MobileClient.Routes
                     await PurchaseItem(code);
                     Device.BeginInvokeOnMainThread(async () => await _nav.PopAsync());
                     _alertService.ShortToast($"Thank you for your purchase!");
-                    _navigateFromMenu(BaseNavPageType.Order);
+                    await this._nav.PopToRootAsync(true);
                 }
                 catch (Exception ex)
                 {
@@ -117,17 +115,7 @@ namespace MobileClient.Routes
             {
                 throw new InvalidOperationException("User must be logged in to purchase a report.");
             }
-#if RELEASE
             var purchase = await _purchaseService.PurchaseItem(itemCode, ItemType.InAppPurchase, "payload");
-#else
-            var purchase = new InAppBillingPurchase()
-            {
-                PurchaseToken = "PurchaseToken",
-                ProductId = itemCode,
-                Id = "12345"
-            };
-            await Task.Delay(5000);
-#endif
             if (purchase == null)
                 throw new InvalidOperationException($"Something went wrong when attempting to purchase. Please try again.");
 

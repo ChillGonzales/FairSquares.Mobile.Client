@@ -18,7 +18,7 @@ namespace MobileClient.Utilities
         public const string INDV_REPORT_BASIC = "basic_subscription_one_report";
         public const string INDV_REPORT_PREMIUM = "premium_subscription_one_report";
         public const string INDV_REPORT_ENTERPRISE = "enterprise_subscription_one_report";
-        public const double IndvReportNoSubPrice = 8.99;
+        public const double IndvReportNoSubPrice = 9.49;
         public const double IndvReportBasicPrice = 7.99;
         public const double IndvReportPremiumPrice = 5.99;
         public const double IndvReportEnterprisePrice = 3.99;

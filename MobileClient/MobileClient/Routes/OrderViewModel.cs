@@ -42,6 +42,8 @@ namespace MobileClient.Routes
         private string _comments;
         private string _errorMessage;
         private bool _submitButtonEnabled = true;
+        private string _purchaseOptionsText;
+        private bool _purchaseOptionsVisible;
 
         public OrderViewModel(IOrderValidationService validator,
                               ICurrentUserService userCache,
@@ -90,18 +92,22 @@ namespace MobileClient.Routes
                     CannotSubmitHeaderText = "You've been busy!";
                     CannotSubmitLabelText = $"Sorry, you have used all of your reports for this month.";
                     CannotSubmitLayoutVisible = true;
+                    PurchaseOptionsText = $"Click below to view options for getting additional reports.";
+                    PurchaseOptionsVisible = true;
                     break;
                 case ValidationState.NoSubscriptionAndTrialValid:
                     MainLayoutVisible = false;
                     CannotSubmitHeaderText = "Thanks for trying Fair Squares!";
-                    CannotSubmitLabelText = $"Please go to the Account Tab to claim your free one month trial before continuing.";
+                    CannotSubmitLabelText = $"Please claim your free one month subscription trial, or click below to view other options.";
                     CannotSubmitLayoutVisible = true;
+                    PurchaseOptionsVisible = false;
                     break;
                 case ValidationState.NoSubscriptionAndTrialAlreadyUsed:
                     MainLayoutVisible = false;
                     CannotSubmitHeaderText = "Thanks for trying Fair Squares!";
-                    CannotSubmitLabelText = $"Please purchase a subscription from the Account Tab before continuing.";
+                    CannotSubmitLabelText = $"Click below to view options for getting more reports.";
                     CannotSubmitLayoutVisible = true;
+                    PurchaseOptionsVisible = false;
                     break;
                 default:
                     MainLayoutVisible = true;
@@ -356,6 +362,32 @@ namespace MobileClient.Routes
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SubmitButtonEnabled)));
             }
         }
+        public string PurchaseOptionsText
+        {
+            get
+            {
+                return _purchaseOptionsText;
+            }
+            set
+            {
+                _purchaseOptionsText = value;
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PurchaseOptionsText)));
+            }
+        }
+        public bool PurchaseOptionsVisible
+        {
+            get
+            {
+                return _purchaseOptionsVisible;
+            }
+            set
+            {
+                _purchaseOptionsVisible = value;
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PurchaseOptionsVisible)));
+            }
+        }
+        public ICommand PurchaseOptionsCommand => new Command(async () => 
+            await _nav.PushAsync(_pageFactory.GetPage(PageType.PurchaseOptions, await _orderValidator.ValidateOrderRequest(_userService.GetLoggedInAccount()))));
 
         private readonly List<OptionViewModel> Options = new List<OptionViewModel>()
         {

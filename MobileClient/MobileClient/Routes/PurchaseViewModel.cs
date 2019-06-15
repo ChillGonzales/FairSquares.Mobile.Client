@@ -32,8 +32,7 @@ namespace MobileClient.Routes
         private List<SubscriptionType> _subscriptionSource = new List<SubscriptionType>()
         {
             SubscriptionType.Basic,
-            SubscriptionType.Premium,
-            SubscriptionType.Enterprise
+            SubscriptionType.Premium
         };
 
         // Local binding vars
@@ -51,6 +50,8 @@ namespace MobileClient.Routes
         private bool _loadAnimationRunning;
         private bool _loadAnimationVisible;
         private string _legalText;
+        private string _singleReportText;
+        private bool _singleReportVisible;
 
         public PurchaseViewModel(IToastService alertService,
                                  IPurchasingService purchaseService,
@@ -190,17 +191,7 @@ namespace MobileClient.Routes
             {
                 throw new InvalidOperationException("User must be logged in to purchase a subscription.");
             }
-#if RELEASE
             var sub = await _purchaseService.PurchaseItem(subCode, ItemType.Subscription, "payload");
-#else
-            var sub = new InAppBillingPurchase()
-            {
-                PurchaseToken = "PurchaseToken",
-                ProductId = subCode,
-                Id = "12345"
-            };
-            await Task.Delay(5000);
-#endif
             if (sub == null)
                 throw new InvalidOperationException($"Something went wrong when attempting to purchase. Please try again.");
 
@@ -216,9 +207,7 @@ namespace MobileClient.Routes
                 UserId = _userCache.GetLoggedInAccount().UserId
             };
             _subCache.Put(_userCache.GetLoggedInAccount().UserId, model);
-#if RELEASE
-                _subService.AddSubscription(model);
-#endif
+            _subService.AddSubscription(model);
         }
 
         private string GetLegalJargon(SubscriptionType selected, ValidationModel validation)
@@ -360,6 +349,30 @@ namespace MobileClient.Routes
             {
                 _avgCostVisible = value;
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AvgCostVisible)));
+            }
+        }
+        public string SingleReportText
+        {
+            get
+            {
+                return _singleReportText;
+            }
+            set
+            {
+                _singleReportText = value;
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SingleReportText)));
+            }
+        }
+        public bool SingleReportVisible
+        {
+            get
+            {
+                return _singleReportVisible;
+            }
+            set
+            {
+                _singleReportVisible = value;
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SingleReportVisible)));
             }
         }
         public string PurchaseButtonText

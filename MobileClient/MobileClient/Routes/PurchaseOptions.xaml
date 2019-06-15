@@ -6,34 +6,42 @@
              mc:Ignorable="d"
              x:Class="MobileClient.Routes.PurchaseOptions">
     <ContentPage.Content>
-        <StackLayout>
+        <StackLayout Orientation="Vertical" Margin="5">
             <Label Text="Choose between a single report or a subscription plan."
                 FontSize="Medium"
                 FontAttributes="Bold"
                 VerticalOptions="Start" 
                 HorizontalOptions="CenterAndExpand" />
-            <Frame BorderColor="Black">
-                <StackLayout>
-                    <Label Text="Single reports offer you flexibility at a slightly higher rate."
-                        VerticalOptions="Start" 
-                        HorizontalOptions="CenterAndExpand" />
-                    <Button Text="Single Report Details"
-                        Command="{Binding SingleReportCommand}"
-                        WidthRequest="150"
-                        StyleClass="Success" />
-                </StackLayout>
-            </Frame>
-            <Frame BorderColor="Black">
-                <StackLayout>
-                    <Label Text="Subscriptions give you the best deal, and give you access to additional single reports at your subscription rate."
-                        VerticalOptions="Start" 
-                        HorizontalOptions="CenterAndExpand" />
-                    <Button Text="Subscription Details" 
-                        Command="{Binding SubscriptionCommand}"
-                        WidthRequest="150"
-                        StyleClass="Success" />
-                </StackLayout>
-            </Frame>
+            <Label HeightRequest="10" />
+            <StackLayout Orientation="Vertical">
+                <Frame BorderColor="Black"
+                       VerticalOptions="End">
+                    <StackLayout>
+                        <Label Text="Single reports offer you flexibility at a slightly higher rate."
+                            FontAttributes="Bold"
+                            VerticalOptions="Center" 
+                            HorizontalOptions="CenterAndExpand" />
+                        <Button Text="Single Report Details"
+                            Command="{Binding SingleReportCommand}"
+                            WidthRequest="150"
+                            StyleClass="Success" />
+                    </StackLayout>
+                </Frame>
+                <Label HeightRequest="10" />
+                <Frame BorderColor="Black"
+                       VerticalOptions="Start">
+                    <StackLayout>
+                        <Label Text="Subscriptions give you the best deal, and give you access to additional single reports at your subscription rate."
+                            FontAttributes="Bold"
+                            VerticalOptions="Center" 
+                            HorizontalOptions="CenterAndExpand" />
+                        <Button Text="Subscription Details" 
+                            Command="{Binding SubscriptionCommand}"
+                            WidthRequest="150"
+                            StyleClass="Success" />
+                    </StackLayout>
+                </Frame>
+            </StackLayout>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

@@ -48,7 +48,7 @@
                     StyleClass="Success"
                     VerticalOptions="Start"
                     HorizontalOptions="CenterAndExpand" />
-                <Label Text="Get Orders"
+                <Label Text="Manage Reports"
                    Grid.Row="4"
                    FontSize="Medium"
                    FontAttributes="Bold"

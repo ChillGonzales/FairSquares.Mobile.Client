@@ -49,6 +49,11 @@
                            FontSize="Medium"
                            VerticalOptions="Start"
                            HorizontalOptions="CenterAndExpand" />
+                        <Label Text="{Binding SingleReportText}"
+                           IsVisible="{Binding SingleReportVisible}"
+                           FontSize="Medium"
+                           VerticalOptions="Start"
+                           HorizontalOptions="CenterAndExpand" />
                         <Label HeightRequest="50" />
                         <AbsoluteLayout HorizontalOptions="Fill" VerticalOptions="Fill">
                             <Button Text="{Binding PurchaseButtonText}"

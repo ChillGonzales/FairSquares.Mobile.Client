@@ -14,6 +14,7 @@ namespace Tests
     {
         private Mock<IOrderService> _orderService;
         private Mock<ISubscriptionService> _subService;
+        private Mock<IPurchasedReportService> _prService;
         private Mock<ILogger<OrderValidationService>> _logger;
 
         [SetUp]
@@ -21,10 +22,12 @@ namespace Tests
         {
             _orderService = new Mock<IOrderService>();
             _subService = new Mock<ISubscriptionService>();
+            _prService = new Mock<IPurchasedReportService>();
             _logger = new Mock<ILogger<OrderValidationService>>();
             _orderService.Setup(x => x.GetMemberOrders(It.IsAny<string>()))
                 .Returns(Task.FromResult(new List<Order>() { new Order() { OrderId = "1" } } as IEnumerable<Order>));
             _subService.Setup(x => x.GetSubscriptions(It.IsAny<string>())).Returns(new List<SubscriptionModel>());
+            _prService.Setup(x => x.GetPurchasedReports(It.IsAny<string>())).Returns(new List<PurchasedReportModel>());
         }
 
         [Test]
@@ -32,7 +35,7 @@ namespace Tests
         {
             var orders = new Mock<IOrderService>();
             orders.Setup(x => x.GetMemberOrders(It.IsAny<string>())).Returns(Task.FromResult(Enumerable.Empty<Order>()));
-            var valSvc = new OrderValidationService(orders.Object, _subService.Object, _logger.Object);
+            var valSvc = new OrderValidationService(orders.Object, _subService.Object, _prService.Object, _logger.Object);
 
             var result = await valSvc.ValidateOrderRequest(new MobileClient.Authentication.AccountModel() { UserId = "1234" });
             Assert.AreEqual(ValidationState.FreeReportValid, result.State);
@@ -43,7 +46,7 @@ namespace Tests
         [Test]
         public async Task WhenNoSubscriptionAndOneOrder_FreeTrialAvailable()
         {
-            var valSvc = new OrderValidationService(_orderService.Object, _subService.Object, _logger.Object);
+            var valSvc = new OrderValidationService(_orderService.Object, _subService.Object, _prService.Object, _logger.Object);
 
             var result = await valSvc.ValidateOrderRequest(new MobileClient.Authentication.AccountModel() { UserId = "1234" });
             Assert.AreEqual(ValidationState.NoSubscriptionAndTrialValid, result.State);
@@ -58,7 +61,7 @@ namespace Tests
             sub.Setup(x => x.GetSubscriptions(It.IsAny<string>()))
                 .Returns(new List<SubscriptionModel>() { new SubscriptionModel() { EndDateTime = DateTimeOffset.Now.AddDays(-3) } });
 
-            var valSvc = new OrderValidationService(_orderService.Object, sub.Object, _logger.Object);
+            var valSvc = new OrderValidationService(_orderService.Object, sub.Object, _prService.Object, _logger.Object);
             var result = await valSvc.ValidateOrderRequest(new MobileClient.Authentication.AccountModel() { UserId = "1234" });
             Assert.AreEqual(ValidationState.NoSubscriptionAndTrialAlreadyUsed, result.State);
             sub.VerifyAll();
@@ -87,7 +90,7 @@ namespace Tests
                 .Returns(Task.FromResult(
                     Enumerable.Range(0, orderCount + 1).Select(x => new Order() { DateReceived = DateTimeOffset.Now.AddDays(-2) })));
 
-            var valSvc = new OrderValidationService(order.Object, sub.Object, _logger.Object);
+            var valSvc = new OrderValidationService(order.Object, sub.Object, _prService.Object, _logger.Object);
             var result = await valSvc.ValidateOrderRequest(new MobileClient.Authentication.AccountModel() { UserId = "12345" });
             Assert.AreEqual(ValidationState.SubscriptionReportValid, result.State);
             Assert.AreEqual(SubscriptionUtility.GetInfoFromSubType(type).OrderCount - orderCount, result.RemainingOrders);
@@ -120,7 +123,7 @@ namespace Tests
                     Enumerable.Range(0, SubscriptionUtility.GetInfoFromSubType(type).OrderCount + 1)
                     .Select(x => new Order() { DateReceived = DateTimeOffset.Now.AddDays(-2) })));
 
-            var valSvc = new OrderValidationService(order.Object, sub.Object, _logger.Object);
+            var valSvc = new OrderValidationService(order.Object, sub.Object, _prService.Object, _logger.Object);
             var result = await valSvc.ValidateOrderRequest(new MobileClient.Authentication.AccountModel() { UserId = "234" });
             Assert.AreEqual(ValidationState.NoReportsLeftInPeriod, result.State);
             sub.VerifyAll();
@@ -173,7 +176,7 @@ namespace Tests
                     Fulfilled = true,
                     DateReceived = DateTimeOffset.Now.AddDays(-2)
                 }));
-            var valSvc = new OrderValidationService(order.Object, sub.Object, _logger.Object);
+            var valSvc = new OrderValidationService(order.Object, sub.Object, _prService.Object, _logger.Object);
             var result = await valSvc.ValidateOrderRequest(new MobileClient.Authentication.AccountModel() { UserId = "234" });
             var expectedCount = purchasedOrderCount - totalOrders > 0 ? purchasedOrderCount - totalOrders : 0;
             Assert.AreEqual(expectedCount, result.RemainingOrders);

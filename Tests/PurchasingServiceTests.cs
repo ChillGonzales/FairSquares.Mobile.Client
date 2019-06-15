@@ -41,7 +41,7 @@ namespace Tests
         {
             var svc = GetService();
             var name = SubscriptionUtility.GetInfoFromSubType(type).SubscriptionCode;
-            var purchase = await svc.PurchaseSubscription(name, "");
+            var purchase = await svc.PurchaseItem(name, ItemType.Subscription, "");
             _billing.Verify(x => x.ConnectAsync(ItemType.Subscription), Times.Once);
             _billing.Verify(x => x.DisconnectAsync(), Times.Once);
             _billing.Verify(x => x.PurchaseAsync(name, ItemType.Subscription, "", null), Times.Once);

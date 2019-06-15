@@ -59,7 +59,7 @@ namespace Tests.Routes
             Assert.AreEqual("Please log in to continue", account.Email);
             Assert.AreEqual("Log In", account.LogOutText);
             Assert.AreEqual("Manage", account.SubscriptionButtonText);
-            Assert.AreEqual("Log in to manage your subscription.", account.SubscriptionLabel);
+            Assert.AreEqual("Please log in first.", account.SubscriptionLabel);
             account.LogOutCommand.Execute(null);
             account.ToolbarInfoCommand.Execute(null);
             _pageFac.Verify(x => x.GetPage(PageType.Landing), Times.Once);

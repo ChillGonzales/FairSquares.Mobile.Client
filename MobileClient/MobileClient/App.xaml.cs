@@ -73,6 +73,7 @@ namespace MobileClient
                 var imageCache = new LocalSqlCache<ImageModel>(Path.Combine(dbBasePath, "images.db3"), new DebugLogger<LocalSqlCache<ImageModel>>());
                 var subCache = new LocalSqlCache<SubscriptionModel>(Path.Combine(dbBasePath, "subs.db3"), new DebugLogger<LocalSqlCache<SubscriptionModel>>());
                 var settingsCache = new LocalSqlCache<SettingsModel>(Path.Combine(dbBasePath, "sets.db3"), new DebugLogger<LocalSqlCache<SettingsModel>>());
+                var prCache = new LocalSqlCache<PurchasedReportModel>(Path.Combine(dbBasePath, "purchasedreports.db3"), new DebugLogger<LocalSqlCache<PurchasedReportModel>>());
 
                 Action ClearCaches = () =>
                 {
@@ -82,87 +83,104 @@ namespace MobileClient
                         propertyCache.Clear();
                         imageCache.Clear();
                         subCache.Clear();
+                        prCache.Clear();
                     }
                     catch { }
                 };
-                Func<string, Task> RefreshCaches = userId => Task.Run(async () =>
+                Func<string, Task> RefreshCaches = userId =>
                 {
-                    try
+                    var prTask = Task.Run(() =>
                     {
-                        var orders = await orderService.GetMemberOrders(userId);
-                        var unCached = orders.Except(orderCache.GetAll().Select(x => x.Value).ToList(), new OrderEqualityComparer()).ToList();
-                        orderCache.Update(orders.ToDictionary(x => x.OrderId, x => x));
-                        var subTask = Task.Run(() =>
+                        try
                         {
-                            try
-                            {
-                                DependencyService.Get<IMessagingSubscriber>().Subscribe(orders.Select(x => x.OrderId).ToList());
-                            }
-                            catch { }
-                        });
-                        var propTask = Task.Run(async () =>
+                            var prs = prService.GetPurchasedReports(userId);
+                            prCache.Put(prs.ToDictionary(x => userId, x => x));
+                        }
+                        catch (Exception ex)
                         {
-                            if (!orders.Any())
-                            {
-                                propertyCache.Clear();
-                                return;
-                            }
-                            var properties = await propertyService.GetProperties(unCached.Select(x => x.OrderId).ToList());
-                            propertyCache.Update(properties);
-                        });
-                        var imgTask = Task.Run(() =>
+                            Debug.WriteLine($"Failed to get purchased reports. {ex.ToString()}");
+                        }
+                    });
+                    var orderTask = Task.Run(async () =>
+                    {
+                        try
                         {
-                            if (!orders.Any())
+                            var orders = await orderService.GetMemberOrders(userId);
+                            var unCached = orders.Except(orderCache.GetAll().Select(x => x.Value).ToList(), new OrderEqualityComparer()).ToList();
+                            orderCache.Put(orders.ToDictionary(x => x.OrderId, x => x));
+                            var subTask = Task.Run(() =>
                             {
-                                imageCache.Clear();
-                                return;
-                            }
-                            var images = imageService.GetImages(unCached.Select(x => x.OrderId).ToList());
-                            imageCache.Update(images);
-                        });
-                        var subscriptionTask = Task.Run(async () =>
-                        {
-                            // TODO: This should be somewhere else, not in the client.
-                            var sub = subService.GetSubscriptions(userId).OrderByDescending(x => x.StartDateTime).FirstOrDefault();
-                            // Check app store purchases to see if they auto-renewed
-                            if (sub != null && !SubscriptionUtility.SubscriptionActive(sub))
-                            {
-                                var purchases = new List<InAppBillingPurchase>();
                                 try
                                 {
-                                    purchases = (await purchaseService.GetPurchases(ItemType.Subscription)).ToList();
+                                    DependencyService.Get<IMessagingSubscriber>().Subscribe(orders.Select(x => x.OrderId).ToList());
                                 }
-                                catch (Exception ex)
+                                catch { }
+                            });
+                            var propTask = Task.Run(async () =>
+                            {
+                                if (!orders.Any())
                                 {
-                                    emailLogger.LogError($"Error occurred while getting purchases. {ex.ToString()}");
+                                    propertyCache.Clear();
+                                    return;
                                 }
-                                var mostRecent = purchases.OrderByDescending(x => x.TransactionDateUtc)?.FirstOrDefault();
-                                if (mostRecent != null)
+                                var properties = await propertyService.GetProperties(unCached.Select(x => x.OrderId).ToList());
+                                propertyCache.Update(properties);
+                            });
+                            var imgTask = Task.Run(() =>
+                            {
+                                if (!orders.Any())
                                 {
-                                    var newSub = SubscriptionUtility.GetModelFromIAP(mostRecent, userId, sub);
-                                    if (newSub != null)
+                                    imageCache.Clear();
+                                    return;
+                                }
+                                var images = imageService.GetImages(unCached.Select(x => x.OrderId).ToList());
+                                imageCache.Update(images);
+                            });
+                            var subscriptionTask = Task.Run(async () =>
+                            {
+                                // TODO: This should be somewhere else, not in the client.
+                                var sub = subService.GetSubscriptions(userId).OrderByDescending(x => x.StartDateTime).FirstOrDefault();
+                                // Check app store purchases to see if they auto-renewed
+                                if (sub != null && !SubscriptionUtility.SubscriptionActive(sub))
+                                {
+                                    var purchases = new List<InAppBillingPurchase>();
+                                    try
                                     {
-                                        sub = newSub;
-                                        subService.AddSubscription(newSub);
+                                        purchases = (await purchaseService.GetPurchases(ItemType.Subscription)).ToList();
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        emailLogger.LogError($"Error occurred while getting purchases. {ex.ToString()}");
+                                    }
+                                    var mostRecent = purchases.OrderByDescending(x => x.TransactionDateUtc)?.FirstOrDefault();
+                                    if (mostRecent != null)
+                                    {
+                                        var newSub = SubscriptionUtility.GetModelFromIAP(mostRecent, userId, sub);
+                                        if (newSub != null)
+                                        {
+                                            sub = newSub;
+                                            subService.AddSubscription(newSub);
+                                        }
                                     }
                                 }
-                            }
-                            if (sub == null)
-                            {
-                                subCache.Clear();
-                            }
-                            else
-                            {
-                                subCache.Update(new Dictionary<string, SubscriptionModel>() { { userId, sub } });
-                            }
-                        });
-                        await Task.WhenAll(new[] { propTask, imgTask, subTask, subscriptionTask });
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine($"Failed to fill caches.\n{ex.ToString()}");
-                    }
-                });
+                                if (sub == null)
+                                {
+                                    subCache.Clear();
+                                }
+                                else
+                                {
+                                    subCache.Update(new Dictionary<string, SubscriptionModel>() { { userId, sub } });
+                                }
+                            });
+                            await Task.WhenAll(new[] { propTask, imgTask, subTask, subscriptionTask });
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine($"Failed to fill caches.\n{ex.ToString()}");
+                        }
+                    });
+                    return Task.WhenAll(new[] { prTask, orderTask });
+                };
 
                 var refresher = new CacheRefresher(new DebugLogger<CacheRefresher>(), RefreshCaches);
                 refresher.RefreshCaches(userService.GetLoggedInAccount()?.UserId);
@@ -199,6 +217,7 @@ namespace MobileClient
                 Container.Register<ICache<ImageModel>>(() => imageCache, Lifestyle.Singleton);
                 Container.Register<ICache<SubscriptionModel>>(() => subCache, Lifestyle.Singleton);
                 Container.Register<ICache<SettingsModel>>(() => settingsCache, Lifestyle.Singleton);
+                Container.Register<ICache<PurchasedReportModel>>(() => prCache, Lifestyle.Singleton);
                 Container.RegisterConditional(typeof(ICache<>), typeof(MemoryCache<>), c => !c.Handled);
             }
             catch (Exception ex)
