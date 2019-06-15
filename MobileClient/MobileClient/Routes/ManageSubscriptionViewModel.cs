@@ -1,4 +1,6 @@
 ﻿using MobileClient.Services;
+using MobileClient.Utilities;
+using MobileClient.Utility;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,19 +15,30 @@ namespace MobileClient.Routes
         private readonly ValidationModel _model;
         private readonly string _runtimePlatform;
         private readonly Action<Uri> _openUri;
+        private readonly INavigation _nav;
+        private readonly IPageFactory _pageFactory;
         private string _subscriptionTypeLabel;
         private string _remainingOrdersLabel;
         private string _endDateLabel;
         private string _disclaimerLabel;
+        private string _getMoreReportsLabel;
 
-        public ManageSubscriptionViewModel(ValidationModel model, string runtimePlatform, Action<Uri> openUri)
+        public ManageSubscriptionViewModel(ValidationModel model, 
+                                           string runtimePlatform, 
+                                           Action<Uri> openUri, 
+                                           INavigation nav,
+                                           IPageFactory pageFactory)
         {
             _model = model;
             _runtimePlatform = runtimePlatform;
             _openUri = openUri;
+            _nav = nav;
+            _pageFactory = pageFactory;
             SubscriptionTypeLabel = "   " + _model.Subscription.SubscriptionType.ToString();
             RemainingOrdersLabel = "   " + _model.RemainingOrders.ToString();
             EndDateLabel = "   " + _model.Subscription.EndDateTime.ToString("dddd, dd MMMM yyyy");
+            GetMoreReportsLabel = $"Purchase additional reports at a reduced price of ${SubscriptionUtility.GetSingleReportInfo(_model).Price} per report.";
+            GetMoreReportsCommand = new Command(async () => await _nav.PushAsync(_pageFactory.GetPage(PageType.SingleReportPurchase, _model)));
             var compName = _runtimePlatform == Device.Android ? "Google" : "Apple";
             var supportUri = _runtimePlatform == Device.Android ? "https://support.google.com/googleplay/answer/7018481" :
                                 "https://support.apple.com/en-us/HT202039#subscriptions";
@@ -84,5 +97,18 @@ namespace MobileClient.Routes
             }
         }
         public ICommand CancelSubCommand { get; set; }
+        public string GetMoreReportsLabel
+        {
+            get
+            {
+                return _getMoreReportsLabel;
+            }
+            set
+            {
+                _getMoreReportsLabel = value;
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GetMoreReportsLabel)));
+            }
+        }
+        public ICommand GetMoreReportsCommand { get; private set; }
     }
 }

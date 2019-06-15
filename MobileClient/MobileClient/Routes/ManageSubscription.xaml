@@ -33,6 +33,16 @@
                     VerticalOptions="Start"
                     HorizontalOptions="Start" />
                 <Label HeightRequest="25" />
+                <Label Text="{Binding GetMoreReportsLabel}"
+                    VerticalOptions="Start"
+                    HorizontalOptions="CenterAndExpand" />
+                <Button Text="Get More Reports"
+                    Command="{Binding GetMoreReportsCommand}"
+                    StyleClass="Success"
+                    WidthRequest="300"
+                    VerticalOptions="Start"
+                    HorizontalOptions="Center" />
+                <Label HeightRequest="25" />
                 <Button Text="Cancel Subscription"
                     Command="{Binding CancelSubCommand}"
                     StyleClass="Danger"
@@ -40,6 +50,7 @@
                     VerticalOptions="Start"
                     HorizontalOptions="Center" />
                 <Label Text="{Binding DisclaimerLabel}"
+                    FontAttributes="Italic"
                     VerticalOptions="Start"
                     HorizontalOptions="CenterAndExpand" />
             </StackLayout>

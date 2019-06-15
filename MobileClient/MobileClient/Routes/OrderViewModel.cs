@@ -87,6 +87,14 @@ namespace MobileClient.Routes
                 return;
             }
             var validation = await _orderValidator.ValidateOrderRequest(user);
+            var activeSub = SubscriptionUtility.SubscriptionActive(validation.Subscription);
+            PurchaseOptionsCommand = new Command(async () =>
+            {
+                if (activeSub)
+                    await _nav.PushAsync(_pageFactory.GetPage(PageType.SingleReportPurchase, validation));
+                else
+                    await _nav.PushAsync(_pageFactory.GetPage(PageType.PurchaseOptions, validation));
+            });
             switch (validation.State)
             {
                 case ValidationState.NoReportsLeftInPeriod:
@@ -94,7 +102,8 @@ namespace MobileClient.Routes
                     CannotSubmitHeaderText = "You've been busy!";
                     CannotSubmitLabelText = $"Sorry, you have used all of your reports for this month.";
                     CannotSubmitLayoutVisible = true;
-                    PurchaseOptionsText = $"Click below to view options for getting additional reports.";
+                    PurchaseOptionsText = $"Click below to purchase an additional report at a reduced price of " +
+                        $"${SubscriptionUtility.GetSingleReportInfo(validation).Price}.";
                     PurchaseOptionsVisible = true;
                     break;
                 case ValidationState.NoSubscriptionAndTrialValid:
@@ -388,8 +397,7 @@ namespace MobileClient.Routes
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PurchaseOptionsVisible)));
             }
         }
-        public ICommand PurchaseOptionsCommand => new Command(async () => 
-            await _nav.PushAsync(_pageFactory.GetPage(PageType.PurchaseOptions, await _orderValidator.ValidateOrderRequest(_userService.GetLoggedInAccount()))));
+        public ICommand PurchaseOptionsCommand { get; private set; }
 
         private readonly List<OptionViewModel> Options = new List<OptionViewModel>()
         {

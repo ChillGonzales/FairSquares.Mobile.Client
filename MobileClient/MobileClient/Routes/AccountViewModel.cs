@@ -42,6 +42,7 @@ namespace MobileClient.Routes
             _navigation = navigation;
             _pageFactory = pageFactory;
             _userCache = userCache;
+            _logger = logger;
             _userCache.OnLoggedIn += async (s, e) =>
             {
                 SetAccountState(e.Account);
@@ -66,7 +67,7 @@ namespace MobileClient.Routes
             SetInitialState(user);
         }
 
-        private void SetInitialState(AccountModel user)
+        private async Task SetInitialState(AccountModel user)
         {
             ToolbarInfoCommand = new Command(async () => await _navigation.PushAsync(_pageFactory.GetPage(PageType.Instruction, false)));
             SetAccountState(user);
@@ -83,14 +84,18 @@ namespace MobileClient.Routes
                     await SetSubState(null);
                 }
             });
-
-            Task.Run(async () => await SetSubState(user)).Wait();
             SubscriptionCommand = new Command(async () =>
             {
+                if (_userCache.GetLoggedInAccount() == null)
+                    return;
+                var valid = await _orderValidator.ValidateOrderRequest(_userCache.GetLoggedInAccount());
                 try
                 {
                     SubscriptionButtonEnabled = false;
-                    await SubscriptionPressed();
+                    if (SubscriptionUtility.SubscriptionActive(valid.Subscription))
+                        await _navigation.PushAsync(_pageFactory.GetPage(PageType.ManageSubscription, valid));
+                    else
+                        await _navigation.PushAsync(_pageFactory.GetPage(PageType.PurchaseOptions, valid));
                 }
                 catch { }
                 finally
@@ -98,6 +103,7 @@ namespace MobileClient.Routes
                     SubscriptionButtonEnabled = true;
                 }
             });
+            await SetSubState(user, true);
             FeedbackCommand = new Command(async () => await _navigation.PushAsync(_pageFactory.GetPage(PageType.Feedback)));
         }
 
@@ -117,55 +123,29 @@ namespace MobileClient.Routes
             }
         }
 
-        private async Task SetSubState(AccountModel user)
+        private async Task SetSubState(AccountModel user, bool startUp = false)
         {
             if (user == null)
             {
-                SubscriptionLabel = $"Please log in first.";
+                SubscriptionLabel = $"Please log in first to view purchasing options.";
                 _changeSubStyleClass("Success");
-                SubscriptionButtonText = "Manage";
+                SubscriptionButtonText = "View Options";
                 SubscriptionButtonEnabled = false;
                 return;
             }
-            var validity = await _orderValidator.ValidateOrderRequest(user);
-            if (new[] { ValidationState.NoReportsLeftInPeriod,
-                       ValidationState.SubscriptionReportValid,
-                       ValidationState.FreeReportValid,
-                       ValidationState.NoSubscriptionAndReportValid }.Contains(validity.State))
+            var validity = await _orderValidator.ValidateOrderRequest(user, !startUp);
+            var activeSub = SubscriptionUtility.SubscriptionActive(validity.Subscription);
+            _changeSubStyleClass(activeSub ? "Info" : "Success");
+            SubscriptionButtonText = activeSub ? "Manage" : "View Options";
+            SubscriptionButtonEnabled = true;
+            if (validity.RemainingOrders > 0)
             {
                 SubscriptionLabel = $"Reports remaining: {validity.RemainingOrders.ToString()}";
-                _changeSubStyleClass("Info");
-                SubscriptionButtonText = "Manage";
-                SubscriptionButtonEnabled = true;
             }
             else
             {
-                SubscriptionLabel = "View our purchasing options and choose the right one for you.";
-                _changeSubStyleClass("Success");
-                SubscriptionButtonText = "View Options";
-                SubscriptionButtonEnabled = true;
-            }
-        }
-
-        private async Task SubscriptionPressed()
-        {
-            if (_userCache.GetLoggedInAccount() == null)
-                return;
-            try
-            {
-                var validation = await _orderValidator.ValidateOrderRequest(_userCache.GetLoggedInAccount());
-                if (new[] { ValidationState.SubscriptionReportValid, ValidationState.NoReportsLeftInPeriod }.Contains(validation.State))
-                {
-                    await _navigation.PushAsync(_pageFactory.GetPage(PageType.ManageSubscription, validation));
-                }
-                else
-                {
-                    await _navigation.PushAsync(_pageFactory.GetPage(PageType.PurchaseOptions, validation));
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error occurred while navigating to purchase options page.{ex.ToString()}");
+                SubscriptionLabel = $"No reports remaining. " +
+                    $"{(activeSub ? "Purchase additional reports at a reduced price." : "Click below to view purchase options.")}";
             }
         }
 
