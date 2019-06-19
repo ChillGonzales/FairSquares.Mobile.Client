@@ -38,7 +38,7 @@ namespace MobileClient.Routes
         private readonly ICurrentUserService _userCache;
         private readonly IPurchasingService _purchaseService;
         private readonly IPurchasedReportService _prService;
-        private readonly ICache<List<PurchasedReportModel>> _prCache;
+        private readonly ICache<PurchasedReportModel> _prCache;
         private readonly ILogger<SingleReportPurchaseViewModel> _emailLogger;
 
         public SingleReportPurchaseViewModel(ValidationModel validation,
@@ -50,7 +50,7 @@ namespace MobileClient.Routes
                                              IPurchasedReportService prService,
                                              IPurchasingService purchaseService,
                                              ICurrentUserService userCache,
-                                             ICache<List<PurchasedReportModel>> prCache,
+                                             ICache<PurchasedReportModel> prCache,
                                              ILogger<SingleReportPurchaseViewModel> emailLogger)
         {
             _validation = validation;
@@ -91,9 +91,8 @@ namespace MobileClient.Routes
                 try
                 {
                     await PurchaseItem(code);
-                    Device.BeginInvokeOnMainThread(async () => await _nav.PopAsync());
                     _alertService.ShortToast($"Thank you for your purchase!");
-                    await this._nav.PopToRootAsync(true);
+                    await this._nav.PopToRootAsync();
                 }
                 catch (Exception ex)
                 {
@@ -145,10 +144,7 @@ namespace MobileClient.Routes
             }
             try
             {
-                var uid = _userCache.GetLoggedInAccount().UserId;
-                var prs = _prCache.Get(uid);
-                prs.Add(model);
-                _prCache.Put(uid, prs);
+                _prCache.Put(model.PurchaseId, model);
             }
             catch { }
         }

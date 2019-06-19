@@ -29,7 +29,7 @@ namespace MobileClient.Routes
                                                                App.Container.GetInstance<IPurchasedReportService>(),
                                                                App.Container.GetInstance<IPurchasingService>(),
                                                                App.Container.GetInstance<ICurrentUserService>(),
-                                                               App.Container.GetInstance<ICache<List<PurchasedReportModel>>>(),
+                                                               App.Container.GetInstance<ICache<PurchasedReportModel>>(),
                                                                App.Container.GetInstance<ILogger<SingleReportPurchaseViewModel>>());
         }
     }
