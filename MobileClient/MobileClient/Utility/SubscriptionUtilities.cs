@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using MobileClient.Authentication;
 using MobileClient.Models;
 using MobileClient.Services;
 using Plugin.InAppBilling.Abstractions;
@@ -14,11 +15,11 @@ namespace MobileClient.Utilities
         public const string SUB_NAME_PREMIUM = "premium_subscription_monthly";
         public const string SUB_NAME_BASIC = "basic_subscription_monthly";
         public const string SUB_NAME_ENTERPRISE = "enterprise_subscription_monthly";
-        public const string INDV_REPORT_NO_SUB = "no_subscription_one_report";
-        public const string INDV_REPORT_BASIC = "basic_subscription_one_report";
-        public const string INDV_REPORT_PREMIUM = "premium_subscription_one_report";
-        public const string INDV_REPORT_ENTERPRISE = "enterprise_subscription_one_report";
-        public const double IndvReportNoSubPrice = 9.49;
+        public const string INDV_REPORT_NO_SUB = "no_sub_one_report";
+        public const string INDV_REPORT_BASIC = "basic_sub_one_report";
+        public const string INDV_REPORT_PREMIUM = "premium_sub_one_report";
+        public const string INDV_REPORT_ENTERPRISE = "enterprise_sub_one_report";
+        public const double IndvReportNoSubPrice = 9.99;
         public const double IndvReportBasicPrice = 7.99;
         public const double IndvReportPremiumPrice = 5.99;
         public const double IndvReportEnterprisePrice = 3.99;
@@ -33,7 +34,7 @@ namespace MobileClient.Utilities
         {
             return model != null && model.EndDateTime > DateTimeOffset.Now;
         }
-        public static SubscriptionModel GetModelFromIAP(InAppBillingPurchase purchase, string userId, SubscriptionModel previousSub)
+        public static SubscriptionModel GetModelFromIAP(InAppBillingPurchase purchase, AccountModel user, SubscriptionModel previousSub)
         {
             var start = ResolveStartDate(purchase.TransactionDateUtc, previousSub);
             // This is for the case when the last purchase was for the last active month and they have not renewed.
@@ -48,7 +49,8 @@ namespace MobileClient.Utilities
                 PurchasedDateTime = purchase.TransactionDateUtc,
                 PurchaseSource = Device.RuntimePlatform == Device.Android ? PurchaseSource.GooglePlay : PurchaseSource.AppStore,
                 SubscriptionType = GetTypeFromProductId(purchase.ProductId),
-                UserId = userId
+                UserId = user.UserId,
+                Email = user.Email
             };
         }
         public static DateTimeOffset? ResolveStartDate(DateTime transactionDate, SubscriptionModel previousSub)

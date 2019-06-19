@@ -85,6 +85,7 @@
                     VerticalOptions="Start"
                     HorizontalOptions="StartAndExpand" />
                 <Button Command="{Binding FeedbackCommand}"
+                    IsEnabled="{Binding FeedbackButtonEnabled}"
                     Text="Send Feedback"
                     Grid.Row="10"
                     Grid.Column="0"

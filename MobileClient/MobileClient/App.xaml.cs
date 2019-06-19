@@ -93,8 +93,9 @@ namespace MobileClient
                     }
                     catch { }
                 };
-                Func<string, Task> RefreshCaches = userId =>
+                Func<AccountModel, Task> RefreshCaches = user =>
                 {
+                    var userId = user.UserId;
                     var prTask = Task.Run(() =>
                     {
                         try
@@ -164,7 +165,7 @@ namespace MobileClient
                                     var mostRecent = purchases.OrderByDescending(x => x.TransactionDateUtc)?.FirstOrDefault();
                                     if (mostRecent != null)
                                     {
-                                        newSub = SubscriptionUtility.GetModelFromIAP(mostRecent, userId, recentSub);
+                                        newSub = SubscriptionUtility.GetModelFromIAP(mostRecent, user, recentSub);
                                         if (newSub != null)
                                         {
                                             allSubs.Add(newSub);
@@ -193,13 +194,13 @@ namespace MobileClient
 
                 var refresher = new CacheRefresher(new DebugLogger<CacheRefresher>(), RefreshCaches);
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-                refresher.RefreshCaches(userService.GetLoggedInAccount()?.UserId);
+                refresher.RefreshCaches(userService.GetLoggedInAccount());
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 
                 userService.OnLoggedIn += async (s, e) =>
                 {
                     ClearCaches();
-                    await refresher.RefreshCaches(e.Account.UserId);
+                    await refresher.RefreshCaches(e.Account);
                 };
                 userService.OnLoggedOut += (s, e) => ClearCaches();
 

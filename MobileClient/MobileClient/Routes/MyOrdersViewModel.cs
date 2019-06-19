@@ -100,7 +100,7 @@ namespace MobileClient.Routes
                 try
                 {
                     OrderListRefreshing = true;
-                    await _cacheRefresher.RefreshCaches(_userService.GetLoggedInAccount()?.UserId);
+                    await _cacheRefresher.RefreshCaches(_userService.GetLoggedInAccount());
                     SetListViewSource(_orderCache.GetAll().Select(x => x.Value).ToList());
                     OrderListRefreshing = false;
                 }

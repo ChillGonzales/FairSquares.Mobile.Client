@@ -9,7 +9,6 @@
                    FontSize="Large"
                    FontAttributes="Bold"
                    HorizontalOptions="CenterAndExpand"
-                   HeightRequest="50"
                    VerticalOptions="Center" />
                 <Label HeightRequest="25" />
 
@@ -54,7 +53,7 @@
                            FontSize="Medium"
                            VerticalOptions="Start"
                            HorizontalOptions="CenterAndExpand" />
-                        <Label HeightRequest="50" />
+                        <Label HeightRequest="30" />
                         <AbsoluteLayout HorizontalOptions="Fill" VerticalOptions="Fill">
                             <Button Text="{Binding PurchaseButtonText}"
                                 Command="{Binding PurchaseButtonCommand}"

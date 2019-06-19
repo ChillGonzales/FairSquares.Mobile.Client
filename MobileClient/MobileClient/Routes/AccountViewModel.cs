@@ -30,6 +30,7 @@ namespace MobileClient.Routes
         private string _subscriptionButtonText;
         private string _logoutText;
         private bool _subscriptionButtonEnabled;
+        private bool _feedbackButtonEnabled = true;
 
         public AccountViewModel(ICurrentUserService userCache,
                                 IOrderValidationService orderValidator,
@@ -70,7 +71,6 @@ namespace MobileClient.Routes
         private async Task SetInitialState(AccountModel user)
         {
             ToolbarInfoCommand = new Command(async () => await _navigation.PushAsync(_pageFactory.GetPage(PageType.Instruction, false)));
-            SetAccountState(user);
             LogOutCommand = new Command(async () =>
             {
                 if (_userCache.GetLoggedInAccount() == null)
@@ -103,8 +103,35 @@ namespace MobileClient.Routes
                     SubscriptionButtonEnabled = true;
                 }
             });
-            await SetSubState(user, true);
-            FeedbackCommand = new Command(async () => await _navigation.PushAsync(_pageFactory.GetPage(PageType.Feedback)));
+            FeedbackCommand = new Command(async () =>
+            {
+                try
+                {
+                    FeedbackButtonEnabled = false;
+                    await _navigation.PushAsync(_pageFactory.GetPage(PageType.Feedback));
+                }
+                catch { }
+                finally
+                {
+                    FeedbackButtonEnabled = true;
+                }
+            });
+            try
+            {
+                SetAccountState(user);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error setting account state on load.", ex);
+            }
+            try
+            {
+                await SetSubState(user, true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error setting subscription state on load.", ex);
+            }
         }
 
         private void SetAccountState(AccountModel user)
@@ -215,6 +242,18 @@ namespace MobileClient.Routes
             }
         }
         public ICommand FeedbackCommand { get; private set; }
+        public bool FeedbackButtonEnabled
+        {
+            get
+            {
+                return _feedbackButtonEnabled;
+            }
+            set
+            {
+                _feedbackButtonEnabled = value;
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FeedbackButtonEnabled)));
+            }
+        }
         #endregion
     }
 }

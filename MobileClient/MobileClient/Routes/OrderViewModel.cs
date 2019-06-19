@@ -88,13 +88,9 @@ namespace MobileClient.Routes
             }
             var validation = await _orderValidator.ValidateOrderRequest(user);
             var activeSub = SubscriptionUtility.SubscriptionActive(validation.Subscription);
-            PurchaseOptionsCommand = new Command(async () =>
-            {
-                if (activeSub)
-                    await _nav.PushAsync(_pageFactory.GetPage(PageType.SingleReportPurchase, validation));
-                else
-                    await _nav.PushAsync(_pageFactory.GetPage(PageType.PurchaseOptions, validation));
-            });
+            PurchaseOptionsCommand = activeSub ?
+                new Command(async () => await _nav.PushAsync(_pageFactory.GetPage(PageType.SingleReportPurchase, validation))) :
+                new Command(async () => await _nav.PushAsync(_pageFactory.GetPage(PageType.PurchaseOptions, validation)));
             switch (validation.State)
             {
                 case ValidationState.NoReportsLeftInPeriod:

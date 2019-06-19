@@ -11,27 +11,18 @@ namespace MobileClient.Services
 {
     public class OrderValidationService : IOrderValidationService
     {
-        private readonly IOrderService _orderService;
-        private readonly ISubscriptionService _subService;
-        private readonly IPurchasedReportService _prService;
         private readonly ICache<Order> _orderCache;
         private readonly ICache<SubscriptionModel> _subCache;
         private readonly ICache<PurchasedReportModel> _prCache;
         private readonly ICacheRefresher _cacheRefresher;
         private readonly ILogger<OrderValidationService> _logger;
 
-        public OrderValidationService(IOrderService orderService,
-                                      ISubscriptionService subService,
-                                      IPurchasedReportService prService,
-                                      ICacheRefresher cacheRefresher,
+        public OrderValidationService(ICacheRefresher cacheRefresher,
                                       ICache<Order> orderCache,
                                       ICache<SubscriptionModel> subCache,
                                       ICache<PurchasedReportModel> prCache,
                                       ILogger<OrderValidationService> logger)
         {
-            _orderService = orderService;
-            _subService = subService;
-            _prService = prService;
             _cacheRefresher = cacheRefresher;
             _orderCache = orderCache;
             _subCache = subCache;
@@ -48,7 +39,7 @@ namespace MobileClient.Services
                 IEnumerable<Models.Order> orders = null;
                 SubscriptionModel lastSub = null;
                 if (!useCached)
-                    await _cacheRefresher.RefreshCaches(user.UserId);
+                    await _cacheRefresher.RefreshCaches(user);
                 subs = _subCache.GetAll().Select(x => x.Value).OrderBy(x => x.StartDateTime).ToList();
                 lastSub = subs.LastOrDefault();
                 purchased = _prCache.GetAll().Select(x => x.Value).ToList();

@@ -115,14 +115,14 @@ namespace MobileClient.Routes
                     MarketingDescText = $"A 25% Cost Savings!";
                     ReportsDescText = $"{SubscriptionUtility.PremiumOrderCount} reports per month";
                     CostDescText = $"${SubscriptionUtility.PremiumPrice} per month";
-                    AvgCostText = $"Value of $6.25 per report";
+                    AvgCostText = $"Unlocks access to purchase additional reports at a reduced price of ${SubscriptionUtility.IndvReportPremiumPrice} per report.";
                     break;
                 case SubscriptionType.Enterprise:
                     MarketingDescVisible = true;
                     MarketingDescText = $"Over 50% in Cost Savings!";
                     ReportsDescText = $"{SubscriptionUtility.EnterpriseOrderCount} reports per month";
                     CostDescText = $"${SubscriptionUtility.EnterprisePrice} per month";
-                    AvgCostText = $"Value of $4.00 per report";
+                    AvgCostText = $"Unlocks access to purchase additional reports at a reduced price of ${SubscriptionUtility.IndvReportEnterprisePrice} per report.";
                     break;
                 default:
                     if (new[] { ValidationState.NoSubscriptionAndTrialValid, ValidationState.FreeReportValid }.Contains(validation.State))
@@ -137,7 +137,7 @@ namespace MobileClient.Routes
                         CostDescText = $"${SubscriptionUtility.BasicPrice} per month";
                     }
                     ReportsDescText = $"{SubscriptionUtility.BasicOrderCount} reports per month";
-                    AvgCostText = $"Value of $8.33 per report";
+                    AvgCostText = $"Unlocks access to purchase additional reports at a reduced price of ${SubscriptionUtility.IndvReportBasicPrice} per report.";
                     break;
             }
         }
@@ -204,7 +204,8 @@ namespace MobileClient.Routes
                 PurchasedDateTime = DateTimeOffset.Now,
                 EndDateTime = DateTimeOffset.Now.AddMonths(1),
                 PurchaseSource = Device.RuntimePlatform == Device.Android ? Models.PurchaseSource.GooglePlay : Models.PurchaseSource.AppStore,
-                UserId = _userCache.GetLoggedInAccount().UserId
+                UserId = _userCache.GetLoggedInAccount().UserId,
+                Email = _userCache.GetLoggedInAccount().Email
             };
             try
             {
