@@ -17,7 +17,7 @@ namespace MobileClient.Routes
         public PurchaseOptions(ValidationModel validation)
         {
             InitializeComponent();
-            BindingContext = new PurchaseOptionsViewModel(validation, this.Navigation, App.Container.GetInstance<IPageFactory>());
+            BindingContext = new PurchaseOptionsViewModel(validation, new MainThreadNavigator(this.Navigation), App.Container.GetInstance<IPageFactory>());
         }
     }
 }

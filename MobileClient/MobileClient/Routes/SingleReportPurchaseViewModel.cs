@@ -2,6 +2,7 @@
 using MobileClient.Models;
 using MobileClient.Services;
 using MobileClient.Utilities;
+using MobileClient.Utility;
 using MobileClient.ViewModels;
 using Newtonsoft.Json;
 using Plugin.InAppBilling.Abstractions;
@@ -32,7 +33,7 @@ namespace MobileClient.Routes
         private string _legalText;
         private readonly ValidationModel _validation;
         private readonly Action<Uri> _openUri;
-        private readonly INavigation _nav;
+        private readonly MainThreadNavigator _nav;
         private readonly IToastService _alertService;
         private readonly string _runtimePlatform;
         private readonly ICurrentUserService _userCache;
@@ -45,7 +46,7 @@ namespace MobileClient.Routes
                                              Action<Uri> openUri,
                                              string runtimePlatform,
                                              Action<BaseNavPageType> navigateFromMenu,
-                                             INavigation nav,
+                                             MainThreadNavigator nav,
                                              IToastService alertService,
                                              IPurchasedReportService prService,
                                              IPurchasingService purchaseService,
@@ -92,7 +93,7 @@ namespace MobileClient.Routes
                 {
                     await PurchaseItem(code);
                     _alertService.ShortToast($"Thank you for your purchase!");
-                    await this._nav.PopToRootAsync();
+                    _nav.Pop();
                 }
                 catch (Exception ex)
                 {

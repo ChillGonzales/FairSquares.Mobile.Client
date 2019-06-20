@@ -18,22 +18,22 @@ namespace MobileClient.Routes
         public readonly ICommand NavigateTo;
         private readonly ICache<SettingsModel> _settings;
         private readonly IPageFactory _pageFactory;
-        private readonly INavigation _nav;
+        private readonly MainThreadNavigator _nav;
         private bool _dialogShown;
 
         public BaseTabViewModel(ICache<SettingsModel> settings,
                                 IPageFactory pageFactory,
-                                INavigation nav)
+                                MainThreadNavigator nav)
         {
             _settings = settings;
             _pageFactory = pageFactory;
             _nav = nav;
-            OnAppearingBehavior = new Command(async () =>
+            OnAppearingBehavior = new Command(() =>
             {
                 if (!_dialogShown && (!_settings.GetAll().Any() || _settings.Get("").DisplayWelcomeMessage))
                 {
                     _dialogShown = true;
-                    await _nav.PushAsync(_pageFactory.GetPage(PageType.Instruction, true));
+                    _nav.Push(_pageFactory.GetPage(PageType.Instruction, true));
                 }
             });
         }

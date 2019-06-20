@@ -1,6 +1,7 @@
 ﻿using MobileClient.Authentication;
 using MobileClient.Services;
 using MobileClient.Utilities;
+using MobileClient.Utility;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -16,23 +17,23 @@ namespace MobileClient.Routes
         private readonly INotificationService _notifier;
         private readonly ICurrentUserService _userCache;
         private readonly IToastService _toast;
-        private readonly INavigation _nav;
+        private readonly MainThreadNavigator _nav;
         private string _feedbackEntry;
 
         public FeedbackViewModel(INotificationService notifier,
                                  ICurrentUserService userCache,
                                  IToastService toast,
-                                 INavigation nav)
+                                 MainThreadNavigator nav)
         {
             _notifier = notifier;
             _userCache = userCache;
             _toast = toast;
             _nav = nav;
 
-            SubmitCommand = new Command(async () => await SubmitFeedback(_feedbackEntry));
+            SubmitCommand = new Command(() => SubmitFeedback(_feedbackEntry));
         }
 
-        private async Task SubmitFeedback(string feedback)
+        private void SubmitFeedback(string feedback)
         {
             if (string.IsNullOrWhiteSpace(feedback))
             {
@@ -52,7 +53,7 @@ namespace MobileClient.Routes
                 _toast.ShortToast($"Thank you for your feedback!");
             }
             catch { }
-            await _nav.PopAsync();
+            _nav.Pop();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -24,12 +24,13 @@ namespace MobileClient.Routes
         private readonly ICache<PropertyModel> _propertyCache;
         private readonly ICache<ImageModel> _imageCache;
         private readonly ILogger<MyOrdersViewModel> _logger;
+        private readonly Action<Action> _uiInvoke;
         private readonly ICacheRefresher _cacheRefresher;
         private readonly IOrderValidationService _validationService;
         private readonly IPageFactory _pageFactory;
         private readonly ICurrentUserService _userService;
         private readonly IMessagingCenter _messagingCenter;
-        private readonly INavigation _nav;
+        private readonly MainThreadNavigator _nav;
         private readonly Action<BaseNavPageType> _baseNavAction;
         private bool _loadingLayoutVisible;
         private bool _loadingAnimVisible;
@@ -52,8 +53,9 @@ namespace MobileClient.Routes
                                  IOrderValidationService validator,
                                  IPageFactory pageFactory,
                                  ICurrentUserService userService,
-                                 INavigation nav,
+                                 MainThreadNavigator nav,
                                  IMessagingCenter messagingCenter,
+                                 Action<Action> uiInvoke,
                                  Action<BaseNavPageType> baseNavAction)
         {
             _orderService = orderSvc;
@@ -61,6 +63,7 @@ namespace MobileClient.Routes
             _propertyCache = propertyCache;
             _imageCache = imageCache;
             _logger = logger;
+            _uiInvoke = uiInvoke;
             _cacheRefresher = cacheRefresher;
             _validationService = validator;
             _pageFactory = pageFactory;
@@ -77,7 +80,7 @@ namespace MobileClient.Routes
                 }
                 catch { }
             });
-            ExampleReportCommand = new Command(async () =>
+            ExampleReportCommand = new Command(() =>
             {
                 try
                 {
@@ -88,7 +91,7 @@ namespace MobileClient.Routes
                         Image = Convert.FromBase64String(Examples.ExampleImage)
                     });
                     _propertyCache.Put(order.OrderId, JsonConvert.DeserializeObject<PropertyModel>(Examples.ExampleProperty));
-                    await _nav.PushAsync(_pageFactory.GetPage(PageType.OrderDetail, order));
+                    _nav.Push(_pageFactory.GetPage(PageType.OrderDetail, order));
                 }
                 catch (Exception ex)
                 {
@@ -165,21 +168,21 @@ namespace MobileClient.Routes
                 TextColor = Color.Black,
                 OrderId = x.OrderId
             }));
-            OrdersSource = new List<OrderGroup>() { fulGroup, penGroup };
+            _uiInvoke(() => OrdersSource = new List<OrderGroup>() { fulGroup, penGroup });
         }
 
-        private async Task HandleSelectedItemChange(OrderViewCell selected)
+        private void HandleSelectedItemChange(OrderViewCell selected)
         {
             if (selected == null)
                 return;
             var id = selected.OrderId;
-            await _nav.PushAsync(_pageFactory.GetPage(PageType.OrderDetail, _orderCache.Get(id)));
+            _nav.Push(_pageFactory.GetPage(PageType.OrderDetail, _orderCache.Get(id)));
             OrderListSelectedItem = null;
         }
 
         // Bound properties
         public event PropertyChangedEventHandler PropertyChanged;
-        public ICommand ToolbarInfoCommand => new Command(async () => await _nav.PushAsync(_pageFactory.GetPage(PageType.Instruction, false)));
+        public ICommand ToolbarInfoCommand => new Command(() => _nav.Push(_pageFactory.GetPage(PageType.Instruction, false)));
         public bool LoadingLayoutVisible
         {
             get
@@ -240,7 +243,7 @@ namespace MobileClient.Routes
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LoginLayoutVisible)));
             }
         }
-        public ICommand LoginCommand => new Command(async () => await _nav.PushAsync(_pageFactory.GetPage(PageType.Landing)));
+        public ICommand LoginCommand => new Command(() => _nav.Push(_pageFactory.GetPage(PageType.Landing)));
         public bool FreeReportLayoutVisible
         {
             get
@@ -303,9 +306,7 @@ namespace MobileClient.Routes
                 if (value?.OrderId == _orderListSelectedItem?.OrderId)
                     return;
                 _orderListSelectedItem = value;
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                 HandleSelectedItemChange(value);
-#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(OrderListSelectedItem)));
             }
         }

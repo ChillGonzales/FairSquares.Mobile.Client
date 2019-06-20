@@ -1,6 +1,7 @@
 ﻿using MobileClient.Authentication;
 using MobileClient.Services;
 using MobileClient.Utilities;
+using MobileClient.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,7 @@ namespace MobileClient.Routes
             BindingContext = new FeedbackViewModel(App.Container.GetInstance<INotificationService>(),
                                                    App.Container.GetInstance<ICurrentUserService>(),
                                                    App.Container.GetInstance<IToastService>(),
-                                                   this.Navigation);
+                                                   new MainThreadNavigator(this.Navigation));
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using MobileClient.Models;
 using MobileClient.Utilities;
+using MobileClient.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +18,7 @@ namespace MobileClient.Routes
         public Instruction(bool showDismissButton)
         {
             InitializeComponent();
-            BindingContext = new InstructionViewModel(this.Navigation, App.Container.GetInstance<ICache<SettingsModel>>(), showDismissButton);
+            BindingContext = new InstructionViewModel(new MainThreadNavigator(this.Navigation), App.Container.GetInstance<ICache<SettingsModel>>(), showDismissButton);
         }
     }
 }

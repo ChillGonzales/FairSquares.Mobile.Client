@@ -24,7 +24,7 @@ namespace MobileClient.Routes
             CurrentPage = MyOrdersTab;
             var vm = new BaseTabViewModel(App.Container.GetInstance<ICache<SettingsModel>>(),
                                           App.Container.GetInstance<IPageFactory>(),
-                                          CurrentPage.Navigation);
+                                          new MainThreadNavigator(CurrentPage.Navigation));
             _onAppearing = vm.OnAppearingBehavior;
             BindingContext = vm;
         }

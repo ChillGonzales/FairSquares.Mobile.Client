@@ -20,7 +20,7 @@ namespace MobileClient.Routes
                                                 App.Container.GetInstance<IOrderService>(),
                                                 App.Container.GetInstance<IToastService>(),
                                                 App.Container.GetInstance<IPageFactory>(),
-                                                this.Navigation,
+                                                new MainThreadNavigator(this.Navigation),
                                                 App.Container.GetInstance<IMessagingSubscriber>(),
                                                 Device.RuntimePlatform,
                                                 (s1, s2, s3, s4) => DisplayAlert(s1, s2, s3, s4),

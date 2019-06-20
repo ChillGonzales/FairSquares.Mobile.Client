@@ -15,7 +15,7 @@ namespace MobileClient.Routes
         private readonly ValidationModel _model;
         private readonly string _runtimePlatform;
         private readonly Action<Uri> _openUri;
-        private readonly INavigation _nav;
+        private readonly MainThreadNavigator _nav;
         private readonly IPageFactory _pageFactory;
         private string _subscriptionTypeLabel;
         private string _remainingOrdersLabel;
@@ -26,7 +26,7 @@ namespace MobileClient.Routes
         public ManageSubscriptionViewModel(ValidationModel model, 
                                            string runtimePlatform, 
                                            Action<Uri> openUri, 
-                                           INavigation nav,
+                                           MainThreadNavigator nav,
                                            IPageFactory pageFactory)
         {
             _model = model;
@@ -38,7 +38,7 @@ namespace MobileClient.Routes
             RemainingOrdersLabel = "   " + _model.RemainingOrders.ToString();
             EndDateLabel = "   " + _model.Subscription.EndDateTime.ToString("dddd, dd MMMM yyyy");
             GetMoreReportsLabel = $"Purchase additional reports at a reduced price of ${SubscriptionUtility.GetSingleReportInfo(_model).Price} per report.";
-            GetMoreReportsCommand = new Command(async () => await _nav.PushAsync(_pageFactory.GetPage(PageType.SingleReportPurchase, _model)));
+            GetMoreReportsCommand = new Command(() => _nav.Push(_pageFactory.GetPage(PageType.SingleReportPurchase, _model)));
             var compName = _runtimePlatform == Device.Android ? "Google" : "Apple";
             var supportUri = _runtimePlatform == Device.Android ? "https://support.google.com/googleplay/answer/7018481" :
                                 "https://support.apple.com/en-us/HT202039#subscriptions";

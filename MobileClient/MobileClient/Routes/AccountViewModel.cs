@@ -18,7 +18,7 @@ namespace MobileClient.Routes
     public class AccountViewModel : INotifyPropertyChanged
     {
         public readonly ICommand OnAppearingBehavior;
-        private readonly INavigation _navigation;
+        private readonly MainThreadNavigator _navigation;
         private readonly IPageFactory _pageFactory;
         private readonly ICurrentUserService _userCache;
         private readonly IOrderValidationService _orderValidator;
@@ -34,7 +34,7 @@ namespace MobileClient.Routes
 
         public AccountViewModel(ICurrentUserService userCache,
                                 IOrderValidationService orderValidator,
-                                INavigation navigation,
+                                MainThreadNavigator navigation,
                                 IPageFactory pageFactory,
                                 Action<string> changeLogInStyleClass,
                                 Action<string> changeSubStyleClass,
@@ -70,12 +70,12 @@ namespace MobileClient.Routes
 
         private async Task SetInitialState(AccountModel user)
         {
-            ToolbarInfoCommand = new Command(async () => await _navigation.PushAsync(_pageFactory.GetPage(PageType.Instruction, false)));
+            ToolbarInfoCommand = new Command(() => _navigation.Push(_pageFactory.GetPage(PageType.Instruction, false)));
             LogOutCommand = new Command(async () =>
             {
                 if (_userCache.GetLoggedInAccount() == null)
                 {
-                    await _navigation.PushAsync(_pageFactory.GetPage(PageType.Landing));
+                    _navigation.PushModal(_pageFactory.GetPage(PageType.Landing));
                 }
                 else
                 {
@@ -93,9 +93,9 @@ namespace MobileClient.Routes
                 {
                     SubscriptionButtonEnabled = false;
                     if (SubscriptionUtility.SubscriptionActive(valid.Subscription))
-                        await _navigation.PushAsync(_pageFactory.GetPage(PageType.ManageSubscription, valid));
+                        _navigation.Push(_pageFactory.GetPage(PageType.ManageSubscription, valid));
                     else
-                        await _navigation.PushAsync(_pageFactory.GetPage(PageType.PurchaseOptions, valid));
+                        _navigation.Push(_pageFactory.GetPage(PageType.PurchaseOptions, valid));
                 }
                 catch { }
                 finally
@@ -103,12 +103,12 @@ namespace MobileClient.Routes
                     SubscriptionButtonEnabled = true;
                 }
             });
-            FeedbackCommand = new Command(async () =>
+            FeedbackCommand = new Command(() =>
             {
                 try
                 {
                     FeedbackButtonEnabled = false;
-                    await _navigation.PushAsync(_pageFactory.GetPage(PageType.Feedback));
+                    _navigation.Push(_pageFactory.GetPage(PageType.Feedback));
                 }
                 catch { }
                 finally
@@ -172,7 +172,7 @@ namespace MobileClient.Routes
             else
             {
                 SubscriptionLabel = $"No reports remaining. " +
-                    $"{(activeSub ? "Purchase additional reports at a reduced price." : "Click below to view purchase options.")}";
+                    $"{(activeSub ? "Additional reports can be purchased at a reduced price. Click below to find out more." : "Click below to view purchase options.")}";
             }
         }
 

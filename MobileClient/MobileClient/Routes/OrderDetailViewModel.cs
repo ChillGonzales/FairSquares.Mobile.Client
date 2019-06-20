@@ -19,16 +19,16 @@ namespace MobileClient.Routes
 {
     public class OrderDetailViewModel : INotifyPropertyChanged
     {
-        private Models.Order _order;
+        private readonly Models.Order _order;
         private PropertyModel _property;
         private ImageModel _image;
-        private ICache<PropertyModel> _propertyCache;
-        private ICache<ImageModel> _imageCache;
-        private IPropertyService _propertyService;
-        private IPageFactory _pageFactory;
-        private IImageService _imageService;
-        private IToastService _toastService;
-        private readonly INavigation _nav;
+        private readonly ICache<PropertyModel> _propertyCache;
+        private readonly ICache<ImageModel> _imageCache;
+        private readonly IPropertyService _propertyService;
+        private readonly IPageFactory _pageFactory;
+        private readonly IImageService _imageService;
+        private readonly IToastService _toastService;
+        private readonly MainThreadNavigator _nav;
         private readonly Func<string, string, string, Task> _alertAction;
         private RecalculatedPropertyModel _recalculated;
         private bool _loadingAnimRunning;
@@ -54,7 +54,7 @@ namespace MobileClient.Routes
                                     IPropertyService propService,
                                     IImageService imgService,
                                     IToastService toast,
-                                    INavigation nav,
+                                    MainThreadNavigator nav,
                                     IPageFactory pageFactory,
                                     Func<string, string, string, Task> alertAction,
                                     ILogger<OrderDetailViewModel> logger)
@@ -341,10 +341,10 @@ namespace MobileClient.Routes
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ImageEnabled)));
             }
         }
-        public ICommand ImageTapCommand => new Command(async () =>
+        public ICommand ImageTapCommand => new Command(() =>
         {
             ImageEnabled = false;
-            await _nav.PushAsync(_pageFactory.GetPage(PageType.ImagePopup, (StreamImageSource)ImageSource));
+            _nav.Push(_pageFactory.GetPage(PageType.ImagePopup, (StreamImageSource)ImageSource));
             ImageEnabled = true;
         });
         public string Squares

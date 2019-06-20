@@ -1,6 +1,7 @@
 ﻿using MobileClient.Authentication;
 using MobileClient.Services;
 using MobileClient.Utilities;
+using MobileClient.Utility;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,14 +16,14 @@ namespace MobileClient.Routes
     {
         private readonly OAuth2Authenticator _auth;
         private readonly IToastService _toastService;
-        private readonly INavigation _nav;
+        private readonly MainThreadNavigator _nav;
         private bool _loadingAnimRunning;
         private bool _loadingAnimVisible;
         private bool _loginLayoutVisible;
 
         public LandingViewModel(OAuth2Authenticator auth, 
                                 IToastService toastService,
-                                INavigation nav)
+                                MainThreadNavigator nav)
         {
             _auth = auth;
             _toastService = toastService;
@@ -35,7 +36,7 @@ namespace MobileClient.Routes
 
         private void Auth_Completed(object sender, AuthenticatorCompletedEventArgs e)
         {
-            _nav.PopAsync();
+            _nav.Pop();
         }
         private void Auth_Error(object sender, AuthenticatorErrorEventArgs e)
         {

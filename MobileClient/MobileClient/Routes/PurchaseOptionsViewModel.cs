@@ -13,14 +13,14 @@ namespace MobileClient.Routes
 {
     public class PurchaseOptionsViewModel : INotifyPropertyChanged
     {
-        private readonly INavigation _nav;
+        private readonly MainThreadNavigator _nav;
         private readonly ValidationModel _validation;
         private readonly IPageFactory _pageFactory;
         private string _singleReportPrice;
         private string _subscriptionPrice;
         private bool _isFreeTrialVisible;
 
-        public PurchaseOptionsViewModel(ValidationModel validation, INavigation nav, IPageFactory pageFactory)
+        public PurchaseOptionsViewModel(ValidationModel validation, MainThreadNavigator nav, IPageFactory pageFactory)
         {
             _validation = validation;
             _nav = nav;
@@ -31,8 +31,8 @@ namespace MobileClient.Routes
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        public ICommand SingleReportCommand => new Command(async () => await _nav.PushAsync(_pageFactory.GetPage(PageType.SingleReportPurchase, _validation)));
-        public ICommand SubscriptionCommand => new Command(async () => await _nav.PushAsync(_pageFactory.GetPage(PageType.Purchase, _validation)));
+        public ICommand SingleReportCommand => new Command(() => _nav.Push(_pageFactory.GetPage(PageType.SingleReportPurchase, _validation)));
+        public ICommand SubscriptionCommand => new Command(() => _nav.Push(_pageFactory.GetPage(PageType.Purchase, _validation)));
         public string SingleReportPrice
         {
             get

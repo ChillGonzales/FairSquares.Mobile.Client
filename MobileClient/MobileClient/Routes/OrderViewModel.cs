@@ -21,7 +21,7 @@ namespace MobileClient.Routes
         private readonly ICurrentUserService _userService;
         private readonly IOrderService _orderService;
         private readonly IToastService _toast;
-        private readonly INavigation _nav;
+        private readonly MainThreadNavigator _nav;
         private readonly IPageFactory _pageFactory;
         private readonly ICache<Models.Order> _orderCache;
         private readonly Func<string, string, string, string, Task<bool>> _alertTask;
@@ -50,7 +50,7 @@ namespace MobileClient.Routes
                               IOrderService orderService,
                               IToastService toast,
                               IPageFactory pageFactory,
-                              INavigation nav,
+                              MainThreadNavigator nav,
                               IMessagingSubscriber topicSubscriber,
                               string deviceType,
                               Func<string, string, string, string, Task<bool>> alertTask,
@@ -88,9 +88,14 @@ namespace MobileClient.Routes
             }
             var validation = await _orderValidator.ValidateOrderRequest(user);
             var activeSub = SubscriptionUtility.SubscriptionActive(validation.Subscription);
-            PurchaseOptionsCommand = activeSub ?
-                new Command(async () => await _nav.PushAsync(_pageFactory.GetPage(PageType.SingleReportPurchase, validation))) :
-                new Command(async () => await _nav.PushAsync(_pageFactory.GetPage(PageType.PurchaseOptions, validation)));
+            PurchaseOptionsCommand = new Command(async () =>
+            {
+                var val = await _orderValidator.ValidateOrderRequest(user);
+                if (SubscriptionUtility.SubscriptionActive(val.Subscription))
+                    _nav.Push(_pageFactory.GetPage(PageType.SingleReportPurchase, val));
+                else
+                    _nav.Push(_pageFactory.GetPage(PageType.PurchaseOptions, val));
+            });
             switch (validation.State)
             {
                 case ValidationState.NoReportsLeftInPeriod:
@@ -98,8 +103,8 @@ namespace MobileClient.Routes
                     CannotSubmitHeaderText = "You've been busy!";
                     CannotSubmitLabelText = $"Sorry, you have used all of your reports for this month.";
                     CannotSubmitLayoutVisible = true;
-                    PurchaseOptionsText = $"Click below to purchase an additional report at a reduced price of " +
-                        $"${SubscriptionUtility.GetSingleReportInfo(validation).Price}.";
+                    PurchaseOptionsText = $"Additional reports can be purchased at a reduced price of " +
+                        $"${SubscriptionUtility.GetSingleReportInfo(validation).Price} per report.";
                     PurchaseOptionsVisible = true;
                     break;
                 case ValidationState.NoSubscriptionAndTrialValid:
@@ -149,7 +154,7 @@ namespace MobileClient.Routes
                         SubmitButtonEnabled = true;
                         return;
                     }
-                    await _nav.PushAsync(_pageFactory.GetPage(PageType.Landing));
+                    _nav.Push(_pageFactory.GetPage(PageType.Landing));
                     SubmitButtonEnabled = true;
                     return;
                 }
@@ -293,7 +298,7 @@ namespace MobileClient.Routes
             }
         }
         public List<string> StatesSource => States.Select(x => x.Text).ToList();
-        public ICommand ToolbarInfo_Command => new Command(async () => await _nav.PushAsync(_pageFactory.GetPage(PageType.Instruction, false)));
+        public ICommand ToolbarInfo_Command => new Command(() => _nav.Push(_pageFactory.GetPage(PageType.Instruction, false)));
         public ICommand OnAppearingBehavior => new Command(async () => await SetVisualStateForValidation());
         public int SelectedStateIndex
         {

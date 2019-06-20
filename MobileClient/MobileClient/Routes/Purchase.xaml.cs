@@ -2,6 +2,7 @@
 using MobileClient.Models;
 using MobileClient.Services;
 using MobileClient.Utilities;
+using MobileClient.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +25,7 @@ namespace MobileClient.Routes
                                                    App.Container.GetInstance<ICache<SubscriptionModel>>(),
                                                    App.Container.GetInstance<ISubscriptionService>(),
                                                    App.Container.GetInstance<ICurrentUserService>(),
-                                                   this.Navigation,
+                                                   new MainThreadNavigator(this.Navigation),
                                                    model,
                                                    Device.RuntimePlatform,
                                                    page => (Application.Current.MainPage as BaseTab).NavigateToTab(page),

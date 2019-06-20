@@ -27,7 +27,7 @@ namespace MobileClient.Routes
         private readonly string _runtimePlatform;
         private readonly Action<Uri> _openUri;
         private readonly Func<string, string, string, string, Task<bool>> _displayAlert;
-        private readonly INavigation _nav;
+        private readonly MainThreadNavigator _nav;
         private readonly Action<BaseNavPageType> _navigateFromMenu;
         private List<SubscriptionType> _subscriptionSource = new List<SubscriptionType>()
         {
@@ -58,7 +58,7 @@ namespace MobileClient.Routes
                                  ICache<SubscriptionModel> subCache,
                                  ISubscriptionService subService,
                                  ICurrentUserService userCache,
-                                 INavigation nav,
+                                 MainThreadNavigator nav,
                                  ValidationModel validationModel,
                                  string runtimePlatform,
                                  Action<BaseNavPageType> navigateFromMenu,
@@ -160,7 +160,7 @@ namespace MobileClient.Routes
                 try
                 {
                     await PurchaseSubscription(subCode);
-                    Device.BeginInvokeOnMainThread(async () => await _nav.PopAsync());
+                    _nav.Pop();
                     _alertService.LongToast($"Thank you for your purchase!");
                     _navigateFromMenu(BaseNavPageType.Order);
                 }

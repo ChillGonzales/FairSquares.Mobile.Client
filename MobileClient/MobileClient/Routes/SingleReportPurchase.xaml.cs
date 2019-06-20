@@ -2,6 +2,7 @@
 using MobileClient.Models;
 using MobileClient.Services;
 using MobileClient.Utilities;
+using MobileClient.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +25,7 @@ namespace MobileClient.Routes
                                                                x => Device.OpenUri(x),
                                                                Device.RuntimePlatform,
                                                                x => (App.Current.MainPage as BaseTab).NavigateToTab(x),
-                                                               this.Navigation,
+                                                               new MainThreadNavigator(this.Navigation),
                                                                App.Container.GetInstance<IToastService>(),
                                                                App.Container.GetInstance<IPurchasedReportService>(),
                                                                App.Container.GetInstance<IPurchasingService>(),
