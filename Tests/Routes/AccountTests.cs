@@ -20,6 +20,7 @@ namespace Tests.Routes
         private Mock<IOrderValidationService> _validator;
         private Mock<ILogger<AccountViewModel>> _logger;
         private Mock<INavigation> _nav;
+        private MainThreadNavigator _mnNav;
         private Mock<IPageFactory> _pageFac;
         private string _loginStyle;
         private string _subStyle;
@@ -35,6 +36,7 @@ namespace Tests.Routes
             _nav = new Mock<INavigation>();
             _logger = new Mock<ILogger<AccountViewModel>>();
             _pageFac = new Mock<IPageFactory>();
+            _mnNav = new MainThreadNavigator(_nav.Object);
             _loginStyle = "";
             _subStyle = "";
             _loginStyleAction = x => _loginStyle = x;
@@ -48,7 +50,7 @@ namespace Tests.Routes
             _pageFac.Setup(x => x.GetPage(PageType.Instruction, false)).Returns(null as Instruction);
             var account = new AccountViewModel(_userCache.Object,
                     _validator.Object,
-                    _nav.Object,
+                    _mnNav,
                     _pageFac.Object,
                     _loginStyleAction,
                     _subStyleAction,
@@ -83,7 +85,7 @@ namespace Tests.Routes
                 });
             var account = new AccountViewModel(_userCache.Object,
                     _validator.Object,
-                    _nav.Object,
+                    _mnNav,
                     _pageFac.Object,
                     _loginStyleAction,
                     _subStyleAction,
@@ -122,7 +124,7 @@ namespace Tests.Routes
                 });
             var acct = new AccountViewModel(_userCache.Object,
                 _validator.Object,
-                _nav.Object,
+                _mnNav,
                 _pageFac.Object,
                 _loginStyleAction,
                 _subStyleAction,

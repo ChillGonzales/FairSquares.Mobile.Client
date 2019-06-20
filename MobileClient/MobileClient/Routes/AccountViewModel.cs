@@ -75,7 +75,7 @@ namespace MobileClient.Routes
             {
                 if (_userCache.GetLoggedInAccount() == null)
                 {
-                    _navigation.PushModal(_pageFactory.GetPage(PageType.Landing));
+                    _navigation.Push(_pageFactory.GetPage(PageType.Landing));
                 }
                 else
                 {
@@ -108,7 +108,7 @@ namespace MobileClient.Routes
                 try
                 {
                     FeedbackButtonEnabled = false;
-                    _navigation.Push(_pageFactory.GetPage(PageType.Feedback));
+                    _navigation.Push(_pageFactory.GetPage(PageType.Feedback, _navigation));
                 }
                 catch { }
                 finally

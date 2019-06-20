@@ -31,6 +31,8 @@ namespace MobileClient.Utility
                     return new OrderDetail(stateArgs[0] as Models.Order);
                 case PageType.Purchase:
                     return new Purchase(stateArgs[0] as ValidationModel);
+                case PageType.Order:
+                    return new Order();
                 case PageType.PurchaseOptions:
                     return new PurchaseOptions(stateArgs[0] as ValidationModel);
                 case PageType.SingleReportPurchase:

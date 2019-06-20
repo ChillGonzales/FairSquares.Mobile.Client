@@ -184,7 +184,6 @@ namespace MobileClient.Routes
             newOrder.OrderId = await _orderService.AddOrder(newOrder);
             _topicSubscriber.Subscribe(new List<string>() { newOrder.OrderId });
             _orderCache.Put(newOrder.OrderId, newOrder);
-            _toast.ShortToast($"Your address has been submitted!");
 
             // Clear all fields
             AddressLine1 = "";

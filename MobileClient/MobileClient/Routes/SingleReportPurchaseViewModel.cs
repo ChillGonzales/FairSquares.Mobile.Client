@@ -92,7 +92,6 @@ namespace MobileClient.Routes
                 try
                 {
                     await PurchaseItem(code);
-                    _alertService.ShortToast($"Thank you for your purchase!");
                     _nav.Pop();
                 }
                 catch (Exception ex)

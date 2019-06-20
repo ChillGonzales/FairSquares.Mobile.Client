@@ -21,7 +21,6 @@ namespace MobileClient.Routes
             InitializeComponent();
             BindingContext = new FeedbackViewModel(App.Container.GetInstance<INotificationService>(),
                                                    App.Container.GetInstance<ICurrentUserService>(),
-                                                   App.Container.GetInstance<IToastService>(),
                                                    new MainThreadNavigator(this.Navigation));
         }
     }

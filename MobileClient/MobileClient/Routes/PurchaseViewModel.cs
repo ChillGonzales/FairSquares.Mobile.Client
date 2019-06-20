@@ -161,7 +161,6 @@ namespace MobileClient.Routes
                 {
                     await PurchaseSubscription(subCode);
                     _nav.Pop();
-                    _alertService.LongToast($"Thank you for your purchase!");
                     _navigateFromMenu(BaseNavPageType.Order);
                 }
                 catch (Exception ex)
