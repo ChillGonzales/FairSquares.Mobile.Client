@@ -41,11 +41,13 @@ namespace MobileClient
             try
             {
                 Container = new Container();
+                var analyticsSvc = DependencyService.Get<IAnalyticsService>();
+                var userService = new CurrentUserService();
                 var orderService = new AzureOrderService(new HttpClient(), _orderEndpoint, _apiKey);
-                var propertyService = new PropertyService(new HttpClient(), _propertyEndpoint, new DebugLogger<PropertyService>());
-                var imageService = new BlobImageService(new HttpClient(), _blobEndpoint, new DebugLogger<BlobImageService>());
-                var subService = new SubscriptionService(new HttpClient(), _subEndpoint, new DebugLogger<SubscriptionService>());
-                var prService = new PurchasedReportService(new HttpClient(), _purchasedReportsEndpoint, new DebugLogger<PurchasedReportService>());
+                var propertyService = new PropertyService(new HttpClient(), _propertyEndpoint, new AnalyticsLogger<PropertyService>(analyticsSvc, userService));
+                var imageService = new BlobImageService(new HttpClient(), _blobEndpoint, new AnalyticsLogger<BlobImageService>(analyticsSvc, userService));
+                var subService = new SubscriptionService(new HttpClient(), _subEndpoint, new AnalyticsLogger<SubscriptionService>(analyticsSvc, userService));
+                var prService = new PurchasedReportService(new HttpClient(), _purchasedReportsEndpoint, new AnalyticsLogger<PurchasedReportService>(analyticsSvc, userService));
                 var authenticator = new OAuth2Authenticator(Configuration.ClientId,
                                                             null,
                                                             Configuration.Scope,
@@ -54,7 +56,6 @@ namespace MobileClient
                                                             new Uri(GoogleAccessTokenUrl),
                                                             null,
                                                             true);
-                var userService = new CurrentUserService();
                 var notifyService = new NotificationService(new HttpClient(), _notifyEndpoint, _apiKey);
                 var purchaseEmailLogger = new EmailLogger<PurchasingService>(notifyService, userService);
                 var purchaseService = new PurchasingService(CrossInAppBilling.Current, purchaseEmailLogger);
@@ -69,17 +70,17 @@ namespace MobileClient
                 // Setup caches and begin process of filling them.
                 var dbBasePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
                 var propertyCache = new LocalSqlCache<PropertyModel>(Path.Combine(dbBasePath, "property.db3"), 
-                    new DebugLogger<LocalSqlCache<PropertyModel>>());
+                    new AnalyticsLogger<LocalSqlCache<PropertyModel>>(analyticsSvc, userService));
                 var orderCache = new LocalSqlCache<Models.Order>(Path.Combine(dbBasePath, "order.db3"), 
-                    new DebugLogger<LocalSqlCache<Models.Order>>());
+                    new AnalyticsLogger<LocalSqlCache<Models.Order>>(analyticsSvc, userService));
                 var imageCache = new LocalSqlCache<ImageModel>(Path.Combine(dbBasePath, "images.db3"), 
-                    new DebugLogger<LocalSqlCache<ImageModel>>());
+                    new AnalyticsLogger<LocalSqlCache<ImageModel>>(analyticsSvc, userService));
                 var subCache = new LocalSqlCache<SubscriptionModel>(Path.Combine(dbBasePath, "subs.db3"), 
-                    new DebugLogger<LocalSqlCache<SubscriptionModel>>());
+                    new AnalyticsLogger<LocalSqlCache<SubscriptionModel>>(analyticsSvc, userService));
                 var settingsCache = new LocalSqlCache<SettingsModel>(Path.Combine(dbBasePath, "sets.db3"), 
-                    new DebugLogger<LocalSqlCache<SettingsModel>>());
+                    new AnalyticsLogger<LocalSqlCache<SettingsModel>>(analyticsSvc, userService));
                 var prCache = new LocalSqlCache<PurchasedReportModel>(Path.Combine(dbBasePath, "purchasedreports.db3"), 
-                    new DebugLogger<LocalSqlCache<PurchasedReportModel>>());
+                    new AnalyticsLogger<LocalSqlCache<PurchasedReportModel>>(analyticsSvc, userService));
 
                 Action ClearCaches = () =>
                 {
@@ -192,7 +193,7 @@ namespace MobileClient
                     return Task.WhenAll(new[] { prTask, orderTask });
                 };
 
-                var refresher = new CacheRefresher(new DebugLogger<CacheRefresher>(), RefreshCaches);
+                var refresher = new CacheRefresher(new AnalyticsLogger<CacheRefresher>(analyticsSvc, userService), RefreshCaches);
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                 refresher.RefreshCaches(userService.GetLoggedInAccount());
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
@@ -211,7 +212,7 @@ namespace MobileClient
                 Container.Register<INotificationService>(() => notifyService, Lifestyle.Singleton);
                 Container.Register<ILogger<SingleReportPurchaseViewModel>>(() =>
                     new EmailLogger<SingleReportPurchaseViewModel>(notifyService, userService), Lifestyle.Singleton);
-                Container.RegisterConditional(typeof(ILogger<>), typeof(DebugLogger<>), c => !c.Handled);
+                Container.RegisterConditional(typeof(ILogger<>), typeof(AnalyticsLogger<>), c => !c.Handled);
                 Container.Register<OAuth2Authenticator>(() => authenticator, Lifestyle.Singleton);
                 Container.Register<AccountStore>(() => AccountStore.Create(), Lifestyle.Singleton);
                 Container.Register<ICurrentUserService>(() => userService, Lifestyle.Singleton);
@@ -224,6 +225,7 @@ namespace MobileClient
                 Container.Register<IMessagingSubscriber>(() => DependencyService.Get<IMessagingSubscriber>(), Lifestyle.Singleton);
                 Container.Register<IMessagingCenter>(() => MessagingCenter.Instance, Lifestyle.Singleton);
                 Container.Register<IPurchasedReportService>(() => prService, Lifestyle.Singleton);
+                Container.Register<IAnalyticsService>(() => analyticsSvc, Lifestyle.Singleton);
 
                 // Finish registering created caches
                 Container.Register<ICache<PropertyModel>>(() => propertyCache, Lifestyle.Singleton);
@@ -243,8 +245,15 @@ namespace MobileClient
 
         public App()
         {
-            InitializeComponent();
-            MainPage = new BaseTab();
+            try
+            {
+                InitializeComponent();
+                MainPage = new BaseTab();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+            }
         }
 
         protected override void OnStart()

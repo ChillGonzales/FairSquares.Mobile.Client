@@ -17,15 +17,18 @@ namespace MobileClient.Routes
         private readonly INotificationService _notifier;
         private readonly ICurrentUserService _userCache;
         private readonly MainThreadNavigator _nav;
+        private readonly ILogger<FeedbackViewModel> _logger;
         private string _feedbackEntry;
 
         public FeedbackViewModel(INotificationService notifier,
                                  ICurrentUserService userCache,
+                                 ILogger<FeedbackViewModel> logger,
                                  MainThreadNavigator nav)
         {
             _notifier = notifier;
             _userCache = userCache;
             _nav = nav;
+            _logger = logger;
 
             SubmitCommand = new Command(() => SubmitFeedback(_feedbackEntry));
         }
@@ -48,7 +51,10 @@ namespace MobileClient.Routes
                     Subject = "Feedback from " + user?.Email
                 });
             }
-            catch { }
+            catch (Exception ex)
+            {
+                _logger.LogError("Failed to submit feedback.", ex, $"Feedback: {feedback}");
+            }
             _nav.Pop();
         }
 

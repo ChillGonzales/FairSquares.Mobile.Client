@@ -3,6 +3,7 @@ using MobileClient.Models;
 using MobileClient.Routes;
 using MobileClient.Services;
 using MobileClient.Utilities;
+using MobileClient.Utility;
 using MobileClient.ViewModels;
 using Moq;
 using NUnit.Framework;
@@ -23,6 +24,7 @@ namespace Tests.Routes
         private Mock<ISubscriptionService> _subService;
         private Mock<ICurrentUserService> _userCache;
         private Mock<INavigation> _nav;
+        private MainThreadNavigator _mnNav;
         private ValidationModel _validationModel;
         private string _runtimePlatform;
         private Action<BaseNavPageType> _navigateFromMenu;
@@ -40,6 +42,7 @@ namespace Tests.Routes
             _subService = new Mock<ISubscriptionService>();
             _userCache = new Mock<ICurrentUserService>();
             _nav = new Mock<INavigation>();
+            _mnNav = new MainThreadNavigator(_nav.Object);
             _validationModel = new ValidationModel()
             {
                 RemainingOrders = 0,
@@ -59,7 +62,7 @@ namespace Tests.Routes
                                            _subCache.Object,
                                            _subService.Object,
                                            _userCache.Object,
-                                           _nav.Object,
+                                           _mnNav,
                                            _validationModel,
                                            _runtimePlatform,
                                            _navigateFromMenu,

@@ -16,6 +16,7 @@ namespace MobileClient.Routes
         private readonly string _runtimePlatform;
         private readonly Action<Uri> _openUri;
         private readonly MainThreadNavigator _nav;
+        private readonly ILogger<ManageSubscriptionViewModel> _logger;
         private readonly IPageFactory _pageFactory;
         private string _subscriptionTypeLabel;
         private string _remainingOrdersLabel;
@@ -23,27 +24,36 @@ namespace MobileClient.Routes
         private string _disclaimerLabel;
         private string _getMoreReportsLabel;
 
-        public ManageSubscriptionViewModel(ValidationModel model, 
-                                           string runtimePlatform, 
-                                           Action<Uri> openUri, 
+        public ManageSubscriptionViewModel(ValidationModel model,
+                                           string runtimePlatform,
+                                           Action<Uri> openUri,
                                            MainThreadNavigator nav,
+                                           ILogger<ManageSubscriptionViewModel> logger,
                                            IPageFactory pageFactory)
         {
             _model = model;
             _runtimePlatform = runtimePlatform;
             _openUri = openUri;
             _nav = nav;
+            _logger = logger;
             _pageFactory = pageFactory;
-            SubscriptionTypeLabel = "   " + _model.Subscription.SubscriptionType.ToString();
-            RemainingOrdersLabel = "   " + _model.RemainingOrders.ToString();
-            EndDateLabel = "   " + _model.Subscription.EndDateTime.ToString("dddd, dd MMMM yyyy");
-            GetMoreReportsLabel = $"Purchase additional reports at a reduced price of ${SubscriptionUtility.GetSingleReportInfo(_model).Price} per report.";
-            GetMoreReportsCommand = new Command(() => _nav.Push(_pageFactory.GetPage(PageType.SingleReportPurchase, _model)));
-            var compName = _runtimePlatform == Device.Android ? "Google" : "Apple";
-            var supportUri = _runtimePlatform == Device.Android ? "https://support.google.com/googleplay/answer/7018481" :
-                                "https://support.apple.com/en-us/HT202039#subscriptions";
-            DisclaimerLabel = $"NOTE: {compName} does not allow subscriptions to be cancelled through the app. This button will open a web browser with instructions on how to cancel from your device.";
-            CancelSubCommand = new Command(() => _openUri(new Uri(supportUri)));
+            try
+            {
+                SubscriptionTypeLabel = "   " + _model.Subscription.SubscriptionType.ToString();
+                RemainingOrdersLabel = "   " + _model.RemainingOrders.ToString();
+                EndDateLabel = "   " + _model.Subscription.EndDateTime.ToString("dddd, dd MMMM yyyy");
+                GetMoreReportsLabel = $"Purchase additional reports at a reduced price of ${SubscriptionUtility.GetSingleReportInfo(_model).Price} per report.";
+                GetMoreReportsCommand = new Command(() => _nav.Push(_pageFactory.GetPage(PageType.SingleReportPurchase, _model)));
+                var compName = _runtimePlatform == Device.Android ? "Google" : "Apple";
+                var supportUri = _runtimePlatform == Device.Android ? "https://support.google.com/googleplay/answer/7018481" :
+                                    "https://support.apple.com/en-us/HT202039#subscriptions";
+                DisclaimerLabel = $"NOTE: {compName} does not allow subscriptions to be cancelled through the app. This button will open a web browser with instructions on how to cancel from your device.";
+                CancelSubCommand = new Command(() => _openUri(new Uri(supportUri)));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Failed to load manage subscription page.", ex);
+            }
         }
 
         // Bound properties

@@ -72,14 +72,7 @@ namespace MobileClient.Routes
             _nav = nav;
             _baseNavAction = baseNavAction;
             OnAppearingBehavior = new Command(async () => await SetViewState());
-            _messagingCenter.Subscribe<App>(this, "CacheInvalidated", async x =>
-            {
-                try
-                {
-                    await this.SetViewState();
-                }
-                catch { }
-            });
+            _messagingCenter.Subscribe<App>(this, "CacheInvalidated", async x => await this.SetViewState());
             ExampleReportCommand = new Command(() =>
             {
                 try
@@ -118,65 +111,86 @@ namespace MobileClient.Routes
         private async Task SetViewState()
         {
             var orders = new List<Models.Order>();
-            var user = _userService.GetLoggedInAccount();
-            if (_cacheRefresher.Invalidated)
+            try
             {
-                MainLayoutVisible = false;
-                LoadingLayoutVisible = true;
-                LoadingAnimRunning = true;
+                var user = _userService.GetLoggedInAccount();
+                if (_cacheRefresher.Invalidated)
+                {
+                    MainLayoutVisible = false;
+                    LoadingLayoutVisible = true;
+                    LoadingAnimRunning = true;
+                    if (user != null)
+                    {
+                        var fresh = await _orderService.GetMemberOrders(user.UserId);
+                        _orderCache.Put(fresh.ToDictionary(x => x.OrderId, x => x));
+                    }
+                    MainLayoutVisible = true;
+                    LoadingLayoutVisible = false;
+                    LoadingAnimRunning = false;
+                    _cacheRefresher.Revalidate();
+                }
+                orders = _orderCache.GetAll().Select(x => x.Value).ToList();
+                var anyOrders = orders.Any();
+                MainLayoutVisible = anyOrders;
+                NoOrderLayoutVisible = !anyOrders;
                 if (user != null)
                 {
-                    var fresh = await _orderService.GetMemberOrders(user.UserId);
-                    _orderCache.Put(fresh.ToDictionary(x => x.OrderId, x => x));
+                    var validation = await _validationService.ValidateOrderRequest(user);
+                    FreeReportLayoutVisible = validation.State == ValidationState.FreeReportValid;
+                    LoginLayoutVisible = false;
                 }
-                MainLayoutVisible = true;
-                LoadingLayoutVisible = false;
-                LoadingAnimRunning = false;
-                _cacheRefresher.Revalidate();
+                else
+                {
+                    FreeReportLayoutVisible = false;
+                    LoginLayoutVisible = true;
+                }
             }
-            orders = _orderCache.GetAll().Select(x => x.Value).ToList();
-            var anyOrders = orders.Any();
-            MainLayoutVisible = anyOrders;
-            NoOrderLayoutVisible = !anyOrders;
-            if (user != null)
+            catch (Exception ex)
             {
-                var validation = await _validationService.ValidateOrderRequest(user);
-                FreeReportLayoutVisible = validation.State == ValidationState.FreeReportValid;
-                LoginLayoutVisible = false;
-            }
-            else
-            {
-                FreeReportLayoutVisible = false;
-                LoginLayoutVisible = true;
+                _logger.LogError($"Failed to set view state.", ex);
             }
             SetListViewSource(orders);
         }
 
         private void SetListViewSource(List<Models.Order> orders)
         {
-            var fulGroup = new OrderGroup() { Title = "Completed" };
-            fulGroup.AddRange(orders.Where(x => x.Fulfilled).Select(x => new OrderViewCell()
+            try
             {
-                Text = $"(#{x.OrderId}) {x.StreetAddress.Split('\n')[0]}",
-                TextColor = Color.Black,
-                OrderId = x.OrderId
-            }));
-            var penGroup = new OrderGroup() { Title = "Pending" };
-            penGroup.AddRange(orders.Where(x => !x.Fulfilled).Select(x => new OrderViewCell()
+                var fulGroup = new OrderGroup() { Title = "Completed" };
+                fulGroup.AddRange(orders.Where(x => x.Fulfilled).Select(x => new OrderViewCell()
+                {
+                    Text = $"(#{x.OrderId}) {x.StreetAddress.Split('\n')[0]}",
+                    TextColor = Color.Black,
+                    OrderId = x.OrderId
+                }));
+                var penGroup = new OrderGroup() { Title = "Pending" };
+                penGroup.AddRange(orders.Where(x => !x.Fulfilled).Select(x => new OrderViewCell()
+                {
+                    Text = $"(#{x.OrderId}) {x.StreetAddress.Split('\n')[0]}",
+                    TextColor = Color.Black,
+                    OrderId = x.OrderId
+                }));
+                _uiInvoke(() => OrdersSource = new List<OrderGroup>() { fulGroup, penGroup });
+            }
+            catch (Exception ex)
             {
-                Text = $"(#{x.OrderId}) {x.StreetAddress.Split('\n')[0]}",
-                TextColor = Color.Black,
-                OrderId = x.OrderId
-            }));
-            _uiInvoke(() => OrdersSource = new List<OrderGroup>() { fulGroup, penGroup });
+                _logger.LogError($"Failed to set list view source", ex);
+            }
         }
 
         private void HandleSelectedItemChange(OrderViewCell selected)
         {
-            if (selected == null)
-                return;
-            var id = selected.OrderId;
-            _nav.Push(_pageFactory.GetPage(PageType.OrderDetail, _orderCache.Get(id)));
+            try
+            {
+                if (selected == null)
+                    return;
+                var id = selected.OrderId;
+                _nav.Push(_pageFactory.GetPage(PageType.OrderDetail, _orderCache.Get(id)));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Failed to handle selected item change event.", ex);
+            }
             OrderListSelectedItem = null;
         }
 

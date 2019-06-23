@@ -101,76 +101,93 @@ namespace MobileClient.Routes
 
         private void SetUIMeasurements()
         {
-            // Recalculate roof totals for current property
-            CalculateCurrentTotals(_property);
-
-            // Materialize view
-            _recalculated = GetViewModelFromProperty(_property);
-
-            // Set GUI and event handlers
-            var stream = new StreamImageSource();
-            stream.Stream = (x) =>
+            try
             {
-                return Task.FromResult<Stream>(new MemoryStream(_image.Image));
-            };
-            OrderId = $"Order ID: {_order.OrderId}";
-            PredominantPitch = $"{_recalculated.CurrentPitch}:12";
-            NumberOfRoofs = $"Number of Roofs Measured: {_recalculated.Roofs.Count()}";
-            NumberOfPitches = $"Number of Distinct Pitches Measured: {_recalculated.PitchCount}";
-            ImageSource = stream;
-            Address = StringUtility.RemoveEmptyLines(_property.Address);
-            Area = $"{Convert.ToInt64(_property.Roofs.Sum(x => x.TotalArea)).ToString()} sq. ft.";
-            Squares = $"Total Squares: {_property.Roofs.Sum(x => x.TotalSquares).ToString()} squares";
+                // Recalculate roof totals for current property
+                CalculateCurrentTotals(_property);
+
+                // Materialize view
+                _recalculated = GetViewModelFromProperty(_property);
+
+                // Set GUI and event handlers
+                var stream = new StreamImageSource();
+                stream.Stream = (x) =>
+                {
+                    return Task.FromResult<Stream>(new MemoryStream(_image.Image));
+                };
+                OrderId = $"Order ID: {_order.OrderId}";
+                PredominantPitch = $"{_recalculated.CurrentPitch}:12";
+                NumberOfRoofs = $"Number of Roofs Measured: {_recalculated.Roofs.Count()}";
+                NumberOfPitches = $"Number of Distinct Pitches Measured: {_recalculated.PitchCount}";
+                ImageSource = stream;
+                Address = StringUtility.RemoveEmptyLines(_property.Address);
+                Area = $"{Convert.ToInt64(_property.Roofs.Sum(x => x.TotalArea)).ToString()} sq. ft.";
+                Squares = $"Total Squares: {_property.Roofs.Sum(x => x.TotalSquares).ToString()} squares";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Failed to set UI to new measurements.", ex);
+            }
             RefreshTableView(_property.Roofs.Sum(x => x.TotalArea));
         }
         private async Task LoadPropertyAndImage()
         {
-            if ((_property == null || _image == null) && _order.Fulfilled)
+            try
             {
-                // Try to download measurements when order is marked as fulfilled but measurements aren't found.
-                MainLayoutVisible = false;
-                StatusMessageVisible = false;
-                LoadingAnimVisible = true;
-                LoadingAnimRunning = true;
-                if (_property == null)
+
+                if ((_property == null || _image == null) && _order.Fulfilled)
                 {
-                    PropertyModel newModel = null;
-                    try
+                    // Try to download measurements when order is marked as fulfilled but measurements aren't found.
+                    MainLayoutVisible = false;
+                    StatusMessageVisible = false;
+                    LoadingAnimVisible = true;
+                    LoadingAnimRunning = true;
+                    if (_property == null)
                     {
-                        newModel = (await _propertyService.GetProperties(new List<string>() { _order.OrderId })).First().Value;
+                        PropertyModel newModel = null;
+                        try
+                        {
+                            newModel = (await _propertyService.GetProperties(new List<string>() { _order.OrderId })).First().Value;
+                        }
+                        catch { }
+                        if (newModel == null || string.IsNullOrWhiteSpace(newModel.OrderId))
+                        {
+                            _toastService.LongToast($"Your order is marked as completed but the measurements cannot be found. Please check your internet connection and try again.");
+                            _logger.LogError($"Order is marked as completed but no measurements found.", $"Order id: {newModel.OrderId}");
+                            return;
+                        }
+                        _propertyCache.Put(newModel.OrderId, newModel);
+                        _property = newModel;
                     }
-                    catch { }
-                    if (newModel == null || string.IsNullOrWhiteSpace(newModel.OrderId))
+                    if (_image == null)
                     {
-                        _toastService.LongToast($"Your order is marked as completed but the measurements cannot be found. Please check your internet connection and try again.");
-                        return;
+                        ImageModel image = null;
+                        try
+                        {
+                            image = _imageService.GetImages(new List<string>() { _order.OrderId }).First().Value;
+                        }
+                        catch { }
+                        if (image == null)
+                        {
+                            _toastService.LongToast($"Your order is marked as completed but the image cannot be found. Please check your internet connection.");
+                            _logger.LogError($"Order is marked as completed but no image found.", $"Order id: {_order.OrderId}");
+                        }
+                        else
+                        {
+                            _imageCache.Put(_order.OrderId, image);
+                            _image = image;
+                        }
                     }
-                    _propertyCache.Put(newModel.OrderId, newModel);
-                    _property = newModel;
+                    LoadingAnimVisible = false;
+                    LoadingAnimRunning = false;
+                    MainLayoutVisible = true;
                 }
-                if (_image == null)
-                {
-                    ImageModel image = null;
-                    try
-                    {
-                        image = _imageService.GetImages(new List<string>() { _order.OrderId }).First().Value;
-                    }
-                    catch { }
-                    if (image == null)
-                    {
-                        _toastService.LongToast($"Your order is marked as completed but the image cannot be found. Please check your internet connection.");
-                    }
-                    else
-                    {
-                        _imageCache.Put(_order.OrderId, image);
-                        _image = image;
-                    }
-                }
-                LoadingAnimVisible = false;
-                LoadingAnimRunning = false;
-                MainLayoutVisible = true;
-                SetUIMeasurements();
             }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Failed to load property and image.", ex);
+            }
+            SetUIMeasurements();
         }
         private void CalculateCurrentTotals(PropertyModel property)
         {
@@ -239,20 +256,27 @@ namespace MobileClient.Routes
         }
         private void RefreshTableView(double totalArea)
         {
-            SafetyStockSource = null;
-            var groups = new List<WasteGroup>();
-            var pcts = new[] { .05, .10, .15, .20 };
-            foreach (var pct in pcts)
+            try
             {
-                var group = new WasteGroup() { Title = pct.ToString("P0") + " Waste" };
-                group.Add(new WasteViewModel()
+                SafetyStockSource = null;
+                var groups = new List<WasteGroup>();
+                var pcts = new[] { .05, .10, .15, .20 };
+                foreach (var pct in pcts)
                 {
-                    Text = Math.Ceiling((totalArea * (1 + pct)) / 100).ToString() + " Squares",
-                    TextColor = Color.Green
-                });
-                groups.Add(group);
+                    var group = new WasteGroup() { Title = pct.ToString("P0") + " Waste" };
+                    group.Add(new WasteViewModel()
+                    {
+                        Text = Math.Ceiling((totalArea * (1 + pct)) / 100).ToString() + " Squares",
+                        TextColor = Color.Green
+                    });
+                    groups.Add(group);
+                }
+                SafetyStockSource = groups;
             }
-            SafetyStockSource = groups;
+            catch (Exception ex)
+            {
+                _logger.LogError("Failed to refresh safety stock table view.", ex);
+            }
         }
 
         // Bound properties

@@ -1,4 +1,5 @@
 ﻿using MobileClient.Services;
+using MobileClient.Utilities;
 using MobileClient.Utility;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,7 @@ namespace MobileClient.Routes
                                                              Device.RuntimePlatform, 
                                                              x => Device.OpenUri(x),
                                                              new MainThreadNavigator(this.Navigation),
+                                                             App.Container.GetInstance<ILogger<ManageSubscriptionViewModel>>(),
                                                              App.Container.GetInstance<IPageFactory>());
         }
     }

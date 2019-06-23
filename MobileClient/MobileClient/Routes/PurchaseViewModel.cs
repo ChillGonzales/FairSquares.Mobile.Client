@@ -160,8 +160,8 @@ namespace MobileClient.Routes
                 try
                 {
                     await PurchaseSubscription(subCode);
-                    _nav.Pop();
-                    _navigateFromMenu(BaseNavPageType.Order);
+                    _nav.PopToRoot();
+                    _alertService.ShortToast($"Thank you for your purchase!");
                 }
                 catch (Exception ex)
                 {

@@ -1,4 +1,5 @@
 ﻿using MobileClient.Services;
+using MobileClient.Utilities;
 using MobileClient.Utility;
 using Xamarin.Auth;
 using Xamarin.Forms;
@@ -14,6 +15,7 @@ namespace MobileClient.Routes
             InitializeComponent();
             BindingContext = new LandingViewModel(App.Container.GetInstance<OAuth2Authenticator>(),
                                                   App.Container.GetInstance<IToastService>(),
+                                                  App.Container.GetInstance<ILogger<LandingViewModel>>(),
                                                   new MainThreadNavigator(this.Navigation));
         }
     }

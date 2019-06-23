@@ -97,7 +97,10 @@ namespace MobileClient.Routes
                     else
                         _navigation.Push(_pageFactory.GetPage(PageType.PurchaseOptions, valid));
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    _logger.LogError("Failed to handle subscription click command.", ex);
+                }
                 finally
                 {
                     SubscriptionButtonEnabled = true;
@@ -110,69 +113,72 @@ namespace MobileClient.Routes
                     FeedbackButtonEnabled = false;
                     _navigation.Push(_pageFactory.GetPage(PageType.Feedback, _navigation));
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    _logger.LogError("Failed to handle feedback click command.", ex);
+                }
                 finally
                 {
                     FeedbackButtonEnabled = true;
                 }
             });
-            try
-            {
-                SetAccountState(user);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error setting account state on load.", ex);
-            }
-            try
-            {
-                await SetSubState(user, true);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error setting subscription state on load.", ex);
-            }
+            SetAccountState(user);
+            await SetSubState(user, true);
         }
 
         private void SetAccountState(AccountModel user)
         {
-            if (user == null)
+            try
             {
-                Email = "Please log in to continue";
-                _changeLoginStyleClass("Info");
-                LogOutText = "Log In";
+                if (user == null)
+                {
+                    Email = "Please log in to continue";
+                    _changeLoginStyleClass("Info");
+                    LogOutText = "Log In";
+                }
+                else
+                {
+                    Email = user.Email;
+                    _changeLoginStyleClass("Danger");
+                    LogOutText = "Sign Out";
+                }
             }
-            else
+            catch (Exception ex)
             {
-                Email = user.Email;
-                _changeLoginStyleClass("Danger");
-                LogOutText = "Sign Out";
+                _logger.LogError("Failed to set acccount state.", ex);
             }
         }
 
         private async Task SetSubState(AccountModel user, bool startUp = false)
         {
-            if (user == null)
+            try
             {
-                SubscriptionLabel = $"Please log in first to view purchasing options.";
-                _changeSubStyleClass("Success");
-                SubscriptionButtonText = "View Options";
-                SubscriptionButtonEnabled = false;
-                return;
+                if (user == null)
+                {
+                    SubscriptionLabel = $"Please log in first to view purchasing options.";
+                    _changeSubStyleClass("Success");
+                    SubscriptionButtonText = "View Options";
+                    SubscriptionButtonEnabled = false;
+                    return;
+                }
+                var validity = await _orderValidator.ValidateOrderRequest(user, !startUp);
+                var activeSub = SubscriptionUtility.SubscriptionActive(validity.Subscription);
+                _changeSubStyleClass(activeSub ? "Info" : "Success");
+                SubscriptionButtonText = activeSub ? "Manage" : "View Options";
+                SubscriptionButtonEnabled = true;
+                if (validity.RemainingOrders > 0)
+                {
+                    SubscriptionLabel = $"Reports remaining: {validity.RemainingOrders.ToString()}";
+                }
+                else
+                {
+                    SubscriptionLabel = $"No reports remaining. " +
+                        $"{(activeSub ? "Additional reports can be purchased at a reduced price. Click below to find out more." : "Click below to view purchase options.")}";
+                }
             }
-            var validity = await _orderValidator.ValidateOrderRequest(user, !startUp);
-            var activeSub = SubscriptionUtility.SubscriptionActive(validity.Subscription);
-            _changeSubStyleClass(activeSub ? "Info" : "Success");
-            SubscriptionButtonText = activeSub ? "Manage" : "View Options";
-            SubscriptionButtonEnabled = true;
-            if (validity.RemainingOrders > 0)
+            catch (Exception ex)
             {
-                SubscriptionLabel = $"Reports remaining: {validity.RemainingOrders.ToString()}";
-            }
-            else
-            {
-                SubscriptionLabel = $"No reports remaining. " +
-                    $"{(activeSub ? "Additional reports can be purchased at a reduced price. Click below to find out more." : "Click below to view purchase options.")}";
+                _logger.LogError("Failed to set subscription state.", ex);
             }
         }
 

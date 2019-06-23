@@ -28,6 +28,7 @@ namespace MobileClient.Routes
         private readonly IMessagingSubscriber _topicSubscriber;
         private readonly Action<BaseNavPageType> _baseNavigationAction;
         private readonly string _deviceType;
+        private readonly ILogger<OrderViewModel> _logger;
         private GridLength _errorMessageRowHeight;
         private bool _cannotSubmitLayoutVisible;
         private string _cannotSubmitHeaderText;
@@ -52,6 +53,7 @@ namespace MobileClient.Routes
                               IPageFactory pageFactory,
                               MainThreadNavigator nav,
                               IMessagingSubscriber topicSubscriber,
+                              ILogger<OrderViewModel> logger,
                               string deviceType,
                               Func<string, string, string, string, Task<bool>> alertTask,
                               Action<BaseNavPageType> baseNavigationAction,
@@ -68,6 +70,7 @@ namespace MobileClient.Routes
             _topicSubscriber = topicSubscriber;
             _baseNavigationAction = baseNavigationAction;
             _deviceType = deviceType;
+            _logger = logger;
 
             ErrorMessageRowHeight = 0;
             SelectedOptionIndex = 0;
@@ -79,52 +82,59 @@ namespace MobileClient.Routes
 
         private async Task SetVisualStateForValidation()
         {
-            var user = _userService.GetLoggedInAccount();
-            if (user == null)
+            try
             {
-                MainLayoutVisible = true;
-                CannotSubmitLayoutVisible = false;
-                return;
-            }
-            var validation = await _orderValidator.ValidateOrderRequest(user);
-            var activeSub = SubscriptionUtility.SubscriptionActive(validation.Subscription);
-            PurchaseOptionsCommand = new Command(async () =>
-            {
-                var val = await _orderValidator.ValidateOrderRequest(user);
-                if (SubscriptionUtility.SubscriptionActive(val.Subscription))
-                    _nav.Push(_pageFactory.GetPage(PageType.SingleReportPurchase, val));
-                else
-                    _nav.Push(_pageFactory.GetPage(PageType.PurchaseOptions, val));
-            });
-            switch (validation.State)
-            {
-                case ValidationState.NoReportsLeftInPeriod:
-                    MainLayoutVisible = false;
-                    CannotSubmitHeaderText = "You've been busy!";
-                    CannotSubmitLabelText = $"Sorry, you have used all of your reports for this month.";
-                    CannotSubmitLayoutVisible = true;
-                    PurchaseOptionsText = $"Additional reports can be purchased at a reduced price of " +
-                        $"${SubscriptionUtility.GetSingleReportInfo(validation).Price} per report.";
-                    PurchaseOptionsVisible = true;
-                    break;
-                case ValidationState.NoSubscriptionAndTrialValid:
-                    MainLayoutVisible = false;
-                    CannotSubmitHeaderText = "Thanks for trying Fair Squares!";
-                    CannotSubmitLabelText = $"Please claim your free one month subscription trial, or click below to view other options.";
-                    CannotSubmitLayoutVisible = true;
-                    PurchaseOptionsVisible = false;
-                    break;
-                case ValidationState.NoSubscriptionAndTrialAlreadyUsed:
-                    MainLayoutVisible = false;
-                    CannotSubmitHeaderText = "Thanks for trying Fair Squares!";
-                    CannotSubmitLabelText = $"Click below to view options for getting more reports.";
-                    CannotSubmitLayoutVisible = true;
-                    PurchaseOptionsVisible = false;
-                    break;
-                default:
+                var user = _userService.GetLoggedInAccount();
+                if (user == null)
+                {
                     MainLayoutVisible = true;
                     CannotSubmitLayoutVisible = false;
-                    break;
+                    return;
+                }
+                var validation = await _orderValidator.ValidateOrderRequest(user);
+                var activeSub = SubscriptionUtility.SubscriptionActive(validation.Subscription);
+                PurchaseOptionsCommand = new Command(async () =>
+                {
+                    var val = await _orderValidator.ValidateOrderRequest(user);
+                    if (SubscriptionUtility.SubscriptionActive(val.Subscription))
+                        _nav.Push(_pageFactory.GetPage(PageType.SingleReportPurchase, val));
+                    else
+                        _nav.Push(_pageFactory.GetPage(PageType.PurchaseOptions, val));
+                });
+                switch (validation.State)
+                {
+                    case ValidationState.NoReportsLeftInPeriod:
+                        MainLayoutVisible = false;
+                        CannotSubmitHeaderText = "You've been busy!";
+                        CannotSubmitLabelText = $"Sorry, you have used all of your reports for this month.";
+                        CannotSubmitLayoutVisible = true;
+                        PurchaseOptionsText = $"Additional reports can be purchased at a reduced price of " +
+                            $"${SubscriptionUtility.GetSingleReportInfo(validation).Price} per report.";
+                        PurchaseOptionsVisible = true;
+                        break;
+                    case ValidationState.NoSubscriptionAndTrialValid:
+                        MainLayoutVisible = false;
+                        CannotSubmitHeaderText = "Thanks for trying Fair Squares!";
+                        CannotSubmitLabelText = $"Please claim your free one month subscription trial, or click below to view other options.";
+                        CannotSubmitLayoutVisible = true;
+                        PurchaseOptionsVisible = false;
+                        break;
+                    case ValidationState.NoSubscriptionAndTrialAlreadyUsed:
+                        MainLayoutVisible = false;
+                        CannotSubmitHeaderText = "Thanks for trying Fair Squares!";
+                        CannotSubmitLabelText = $"Click below to view options for getting more reports.";
+                        CannotSubmitLayoutVisible = true;
+                        PurchaseOptionsVisible = false;
+                        break;
+                    default:
+                        MainLayoutVisible = true;
+                        CannotSubmitLayoutVisible = false;
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Failed to set visual state on load.", ex);
             }
         }
 
@@ -165,6 +175,7 @@ namespace MobileClient.Routes
                 ErrorMessageRowHeight = GridLength.Star;
                 SubmitButtonEnabled = true;
                 ErrorMessage = $"Failed to submit order with error {ex.ToString()}";
+                _logger.LogError($"Failed to submit order.", ex);
             }
         }
 

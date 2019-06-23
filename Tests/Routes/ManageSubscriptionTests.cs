@@ -1,5 +1,6 @@
 ﻿using MobileClient.Routes;
 using MobileClient.Services;
+using MobileClient.Utilities;
 using MobileClient.Utility;
 using Moq;
 using NUnit.Framework;
@@ -15,7 +16,9 @@ namespace Tests.Routes
     {
         ValidationModel _model;
         Mock<INavigation> _nav;
+        MainThreadNavigator _mnNav;
         Mock<IPageFactory> _pageFactory;
+        Mock<ILogger<ManageSubscriptionViewModel>> _logger;
         DateTimeOffset _endDateTime = DateTimeOffset.Now.AddDays(30);
 
         [SetUp]
@@ -32,6 +35,8 @@ namespace Tests.Routes
                 }
             };
             _nav = new Mock<INavigation>();
+            _mnNav = new MainThreadNavigator(_nav.Object);
+            _logger = new Mock<ILogger<ManageSubscriptionViewModel>>();
             _pageFactory = new Mock<IPageFactory>();
         }
         [Test]
@@ -39,7 +44,7 @@ namespace Tests.Routes
         {
             bool openUri = false;
             Action<Uri> act = x => openUri = true;
-            var manage = new ManageSubscriptionViewModel(_model, "Android", act, _nav.Object, _pageFactory.Object);
+            var manage = new ManageSubscriptionViewModel(_model, "Android", act, _mnNav, _logger.Object, _pageFactory.Object);
             Assert.AreEqual("   3", manage.RemainingOrdersLabel);
             Assert.AreEqual("   Basic", manage.SubscriptionTypeLabel);
             Assert.AreEqual("   " + _endDateTime.ToString("dddd, dd MMMM yyyy"), manage.EndDateLabel);
