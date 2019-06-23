@@ -237,6 +237,9 @@
     <PackageReference Include="Xamarin.Firebase.iOS.Core">
       <Version>5.1.3</Version>
     </PackageReference>
+    <PackageReference Include="Xamarin.Firebase.iOS.Crashlytics">
+      <Version>3.10.9</Version>
+    </PackageReference>
     <PackageReference Include="Xamarin.Firebase.iOS.InstanceID">
       <Version>3.2.1</Version>
     </PackageReference>

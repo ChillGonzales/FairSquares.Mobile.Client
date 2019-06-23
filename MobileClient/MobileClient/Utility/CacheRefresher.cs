@@ -29,7 +29,7 @@ namespace MobileClient.Utilities
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Failed to refresh caches.{ex.ToString()}");
+                _logger.LogError($"Failed to refresh caches.", ex);
             }
         }
 

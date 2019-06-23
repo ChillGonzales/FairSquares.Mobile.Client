@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using MobileClient.Utilities;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -12,6 +13,7 @@ namespace MobileClient.Authentication
     public class CurrentUserService : ICurrentUserService
     {
         private AccountModel _loggedIn;
+
         public event EventHandler<LoggedInEventArgs> OnLoggedIn;
         public event EventHandler OnLoggedOut;
 
@@ -40,13 +42,9 @@ namespace MobileClient.Authentication
 
         public void LogOut()
         {
-            try
-            {
-                var acct = SecureStorageStore.FindAccountsForServiceAsync(Configuration.GoogleServiceName)?.Result?.FirstOrDefault();
-                SecureStorageStore.SaveAsync(null, Configuration.GoogleServiceName).Wait();
-                _loggedIn = null;
-            } 
-            catch { }
+            var acct = SecureStorageStore.FindAccountsForServiceAsync(Configuration.GoogleServiceName)?.Result?.FirstOrDefault();
+            SecureStorageStore.SaveAsync(null, Configuration.GoogleServiceName).Wait();
+            _loggedIn = null;
             OnLoggedOut?.Invoke(this, new EventArgs());
         }
 

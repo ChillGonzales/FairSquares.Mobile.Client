@@ -46,6 +46,8 @@ namespace MobileClient.Droid
                 global::Xamarin.Auth.CustomTabsConfiguration.CustomTabsClosingMessage = null;
                 CrossCurrentActivity.Current.Init(this, savedInstanceState);
                 Plugin.CurrentActivity.CrossCurrentActivity.Current.Activity = this;
+                Fabric.Fabric.With(this, new Crashlytics.Crashlytics());
+                Crashlytics.Crashlytics.HandleManagedExceptions();
                 LoadApplication(new App());
                 var x = typeof(Xamarin.Forms.Themes.LightThemeResources);
                 x = typeof(Xamarin.Forms.Themes.Android.UnderlineEffect);

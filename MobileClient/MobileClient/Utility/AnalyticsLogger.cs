@@ -1,5 +1,6 @@
 ﻿using MobileClient.Authentication;
 using MobileClient.Utilities;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -28,7 +29,7 @@ namespace MobileClient.Utility
                 dict.Add("app_platform", Device.RuntimePlatform);
                 for (int i = 0; i < args.Length; i++)
                 {
-                    dict.Add($"metadata_{i}", args[i]?.ToString());
+                    dict.Add($"metadata_{i}", JsonConvert.SerializeObject(args[i]));
                 }
                 if (_userCache.GetLoggedInAccount() != null)
                     dict.Add("user_email", _userCache.GetLoggedInAccount().Email);

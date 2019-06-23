@@ -134,7 +134,6 @@ namespace MobileClient.Routes
         {
             try
             {
-
                 if ((_property == null || _image == null) && _order.Fulfilled)
                 {
                     // Try to download measurements when order is marked as fulfilled but measurements aren't found.
@@ -181,37 +180,52 @@ namespace MobileClient.Routes
                     LoadingAnimVisible = false;
                     LoadingAnimRunning = false;
                     MainLayoutVisible = true;
+                    SetUIMeasurements();
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Failed to load property and image.", ex);
             }
-            SetUIMeasurements();
         }
         private void CalculateCurrentTotals(PropertyModel property)
         {
-            foreach (var roof in property.Roofs)
+            try
             {
-                var response = RoofUtility.CalculateTotals(roof);
-                var rise = RoofUtility.GetPredominantPitchFromSections(roof.Sections);
-                roof.TotalArea = Math.Round(response.TotalArea, 0);
-                roof.TotalSquares = Math.Round(response.TotalSquaresCount, 0);
-                roof.PredominantPitchRise = rise;
+                foreach (var roof in property.Roofs)
+                {
+                    var response = RoofUtility.CalculateTotals(roof);
+                    var rise = RoofUtility.GetPredominantPitchFromSections(roof.Sections);
+                    roof.TotalArea = Math.Round(response.TotalArea, 0);
+                    roof.TotalSquares = Math.Round(response.TotalSquaresCount, 0);
+                    roof.PredominantPitchRise = rise;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Failed to calculate current totals.", ex);
             }
         }
         private RecalculatedPropertyModel GetViewModelFromProperty(PropertyModel property)
         {
-            var sections = _property.Roofs.SelectMany(x => x.Sections).ToList();
-            var overallPitch = RoofUtility.GetPredominantPitchFromSections(sections);
-            var count = RoofUtility.GetPitchCount(sections)?.PitchCount ?? 1;
-            return new RecalculatedPropertyModel(property)
+            try
             {
-                RecalculatedSections = property.Roofs.SelectMany(x => x.Sections).Where(x => x.PitchRise == overallPitch).ToList(),
-                CurrentPitch = overallPitch,
-                OriginalPitch = overallPitch,
-                PitchCount = count
-            };
+                var sections = _property.Roofs.SelectMany(x => x.Sections).ToList();
+                var overallPitch = RoofUtility.GetPredominantPitchFromSections(sections);
+                var count = RoofUtility.GetPitchCount(sections)?.PitchCount ?? 1;
+                return new RecalculatedPropertyModel(property)
+                {
+                    RecalculatedSections = property.Roofs.SelectMany(x => x.Sections).Where(x => x.PitchRise == overallPitch).ToList(),
+                    CurrentPitch = overallPitch,
+                    OriginalPitch = overallPitch,
+                    PitchCount = count
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Failed to get view model from property.", ex, property);
+                return null;
+            }
         }
         private void OnPitchValueChanged(int oldValue, int newValue)
         {
@@ -251,7 +265,7 @@ namespace MobileClient.Routes
             }
             catch (Exception ex)
             {
-                _logger.LogError("Failed to calculate pitch. " + ex.ToString());
+                _logger.LogError("Failed to calculate pitch. " + ex.ToString(), ex);
             }
         }
         private void RefreshTableView(double totalArea)

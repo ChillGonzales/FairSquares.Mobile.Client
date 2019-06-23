@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Firebase.CloudMessaging;
+using Firebase.Crashlytics;
 using Foundation;
 using UIKit;
 using UserNotifications;
@@ -33,7 +34,10 @@ namespace MobileClient.iOS
             // Firebase component initialize
             Firebase.Core.App.Configure();
             Messaging.SharedInstance.Delegate = this;
+            Crashlytics.Configure();
+            Fabric.Fabric.SharedSdk.Debug = true; // To enable debugging 
 
+#if RELEASE
             // Register your app for remote notifications.
             if (UIDevice.CurrentDevice.CheckSystemVersion(10, 0))
             {
@@ -41,7 +45,8 @@ namespace MobileClient.iOS
                 UNUserNotificationCenter.Current.Delegate = this;
 
                 var authOptions = UNAuthorizationOptions.Alert | UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound;
-                UNUserNotificationCenter.Current.RequestAuthorization(authOptions, (granted, error) => {
+                UNUserNotificationCenter.Current.RequestAuthorization(authOptions, (granted, error) =>
+                {
                     Console.WriteLine(granted);
                 });
             }
@@ -53,7 +58,7 @@ namespace MobileClient.iOS
                 UIApplication.SharedApplication.RegisterUserNotificationSettings(settings);
             }
             UIApplication.SharedApplication.RegisterForRemoteNotifications();
-
+#endif
             return base.FinishedLaunching(app, options);
         }
 
