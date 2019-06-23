@@ -161,7 +161,6 @@ namespace MobileClient.Routes
                 {
                     await PurchaseSubscription(subCode);
                     _nav.PopToRoot();
-                    _alertService.ShortToast($"Thank you for your purchase!");
                 }
                 catch (Exception ex)
                 {

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.FairSquares.MobileClient" android:installLocation="auto" android:versionCode="47" android:versionName="1.0.47">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.FairSquares.MobileClient" android:installLocation="auto" android:versionCode="48" android:versionName="1.0.48">
 	<uses-sdk android:minSdkVersion="23" android:targetSdkVersion="28" />
 	<application android:label="Fair Squares">
 		<receiver android:name="com.google.firebase.iid.FirebaseInstanceIdInternalReceiver" android:exported="false" />
