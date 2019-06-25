@@ -29,7 +29,8 @@ namespace MobileClient.Routes
                                                    model,
                                                    Device.RuntimePlatform,
                                                    page => (Application.Current.MainPage as BaseTab).NavigateToTab(page),
-                                                   (s1, s2, s3, s4) => DisplayAlert(s1, s2, s3, s4),
+                                                   new AlertUtility((s1, s2, s3, s4) => DisplayAlert(s1, s2, s3, s4),
+                                                   (s1, s2, s3) => DisplayAlert(s1, s2, s3)),
                                                    uri => Device.OpenUri(uri));
         }
     }

@@ -18,7 +18,7 @@ namespace MobileClient.Routes
 {
     public class PurchaseViewModel : INotifyPropertyChanged
     {
-        private readonly IToastService _alertService;
+        private readonly IToastService _toastService;
         private readonly IPurchasingService _purchaseService;
         private readonly ICache<SubscriptionModel> _subCache;
         private readonly ISubscriptionService _subService;
@@ -26,7 +26,7 @@ namespace MobileClient.Routes
         private readonly ValidationModel _validationModel;
         private readonly string _runtimePlatform;
         private readonly Action<Uri> _openUri;
-        private readonly Func<string, string, string, string, Task<bool>> _displayAlert;
+        private readonly AlertUtility _alertUtility;
         private readonly MainThreadNavigator _nav;
         private readonly Action<BaseNavPageType> _navigateFromMenu;
         private List<SubscriptionType> _subscriptionSource = new List<SubscriptionType>()
@@ -53,7 +53,7 @@ namespace MobileClient.Routes
         private string _singleReportText;
         private bool _singleReportVisible;
 
-        public PurchaseViewModel(IToastService alertService,
+        public PurchaseViewModel(IToastService toastService,
                                  IPurchasingService purchaseService,
                                  ICache<SubscriptionModel> subCache,
                                  ISubscriptionService subService,
@@ -62,10 +62,10 @@ namespace MobileClient.Routes
                                  ValidationModel validationModel,
                                  string runtimePlatform,
                                  Action<BaseNavPageType> navigateFromMenu,
-                                 Func<string, string, string, string, Task<bool>> displayAlert,
+                                 AlertUtility alertUtility,
                                  Action<Uri> openUri)
         {
-            _alertService = alertService;
+            _toastService = toastService;
             _purchaseService = purchaseService;
             _subCache = subCache;
             _subService = subService;
@@ -73,7 +73,7 @@ namespace MobileClient.Routes
             _validationModel = validationModel;
             _runtimePlatform = runtimePlatform;
             _openUri = openUri;
-            _displayAlert = displayAlert;
+            _alertUtility = alertUtility;
             _nav = nav;
             _navigateFromMenu = navigateFromMenu;
             LegalLinkCommand = new Command(() => _openUri(new Uri(Configuration.PrivacyPolicyUrl)));
@@ -160,16 +160,17 @@ namespace MobileClient.Routes
                 try
                 {
                     await PurchaseSubscription(subCode);
+                    await _alertUtility.Display("Purchase Complete", "Thank you for your purchase!", "Ok");
                     _nav.PopToRoot();
                 }
                 catch (Exception ex)
                 {
-                    _alertService.LongToast($"Failed to purchase subscription. {ex.Message}");
+                    _toastService.LongToast($"Failed to purchase subscription. {ex.Message}");
                 }
             }
             catch (Exception ex)
             {
-                _alertService.LongToast($"Something went wrong when trying to purchase subscription. {ex.Message}");
+                _toastService.LongToast($"Something went wrong when trying to purchase subscription. {ex.Message}");
             }
             finally
             {

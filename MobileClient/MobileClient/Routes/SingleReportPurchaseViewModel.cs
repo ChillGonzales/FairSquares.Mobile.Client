@@ -34,20 +34,21 @@ namespace MobileClient.Routes
         private readonly ValidationModel _validation;
         private readonly Action<Uri> _openUri;
         private readonly MainThreadNavigator _nav;
-        private readonly IToastService _alertService;
+        private readonly IToastService _toastService;
         private readonly string _runtimePlatform;
         private readonly ICurrentUserService _userCache;
         private readonly IPurchasingService _purchaseService;
         private readonly IPurchasedReportService _prService;
         private readonly ICache<PurchasedReportModel> _prCache;
         private readonly ILogger<SingleReportPurchaseViewModel> _emailLogger;
+        private readonly AlertUtility _alertUtility;
 
         public SingleReportPurchaseViewModel(ValidationModel validation,
                                              Action<Uri> openUri,
                                              string runtimePlatform,
-                                             Action<BaseNavPageType> navigateFromMenu,
+                                             AlertUtility alertUtility,
                                              MainThreadNavigator nav,
-                                             IToastService alertService,
+                                             IToastService toastService,
                                              IPurchasedReportService prService,
                                              IPurchasingService purchaseService,
                                              ICurrentUserService userCache,
@@ -57,13 +58,14 @@ namespace MobileClient.Routes
             _validation = validation;
             _openUri = openUri;
             _nav = nav;
-            _alertService = alertService;
+            _toastService = toastService;
             _runtimePlatform = runtimePlatform;
             _userCache = userCache;
             _purchaseService = purchaseService;
             _prService = prService;
             _prCache = prCache;
             _emailLogger = emailLogger;
+            _alertUtility = alertUtility;
 
             SetViewState(validation);
         }
@@ -92,16 +94,17 @@ namespace MobileClient.Routes
                 try
                 {
                     await PurchaseItem(code);
+                    await _alertUtility.Display("Purchase Complete", "Thank you for your purchase!", "Ok");
                     _nav.PopToRoot();
                 }
                 catch (Exception ex)
                 {
-                    _alertService.LongToast($"Failed to purchase report. {ex.Message}");
+                    _toastService.LongToast($"Failed to purchase report. {ex.Message}");
                 }
             }
             catch (Exception ex)
             {
-                _alertService.LongToast($"Something went wrong when trying to purchase report. {ex.Message}");
+                _toastService.LongToast($"Something went wrong when trying to purchase report. {ex.Message}");
             }
             finally
             {

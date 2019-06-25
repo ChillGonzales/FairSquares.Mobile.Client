@@ -18,10 +18,12 @@ namespace MobileClient.Routes
         private readonly ICurrentUserService _userCache;
         private readonly MainThreadNavigator _nav;
         private readonly ILogger<FeedbackViewModel> _logger;
+        private readonly AlertUtility _alertUtility;
         private string _feedbackEntry;
 
         public FeedbackViewModel(INotificationService notifier,
                                  ICurrentUserService userCache,
+                                 AlertUtility alertUtility,
                                  ILogger<FeedbackViewModel> logger,
                                  MainThreadNavigator nav)
         {
@@ -29,11 +31,12 @@ namespace MobileClient.Routes
             _userCache = userCache;
             _nav = nav;
             _logger = logger;
+            _alertUtility = alertUtility;
 
-            SubmitCommand = new Command(() => SubmitFeedback(_feedbackEntry));
+            SubmitCommand = new Command(async () => await SubmitFeedback(_feedbackEntry));
         }
 
-        private void SubmitFeedback(string feedback)
+        private async Task SubmitFeedback(string feedback)
         {
             if (string.IsNullOrWhiteSpace(feedback))
             {
@@ -50,6 +53,7 @@ namespace MobileClient.Routes
                     MessageType = Models.MessageType.Email,
                     Subject = "Feedback from " + user?.Email
                 });
+                await _alertUtility.Display("Feedback Submitted", "Thank you for your feedback!", "Ok");
             }
             catch (Exception ex)
             {

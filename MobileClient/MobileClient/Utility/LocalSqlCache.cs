@@ -13,6 +13,7 @@ namespace MobileClient.Utilities
         private readonly ILogger<LocalSqlCache<T>> _logger;
         private readonly SQLiteConnection _connection;
         private readonly string _tableName;
+        private readonly object _syncLock;
 
         public LocalSqlCache(string path, ILogger<LocalSqlCache<T>> logger)
         {
@@ -21,36 +22,82 @@ namespace MobileClient.Utilities
             _tableName = typeof(Storable).Name.ToString();
             _connection = new SQLiteConnection(path);
             _connection.CreateTable<Storable>(CreateFlags.None);
+            _syncLock = new object();
         }
 
         public void Delete(string key)
         {
-            _connection.Delete<Storable>(key);
+            try
+            {
+                lock (_syncLock)
+                {
+                    _connection.Delete<Storable>(key);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Failed to delete object with key '{key}' from table.", ex);
+            }
         }
         public void Clear()
         {
-            _connection.DeleteAll<Storable>();
+            try
+            {
+                lock (_syncLock)
+                {
+                    _connection.DeleteAll<Storable>();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Failed to clear table.", ex);
+            }
         }
         public T Get(string key)
         {
-            var stored = _connection.Find<Storable>(key);
-            return stored == null ? default(T) : JsonConvert.DeserializeObject<T>(stored.SerializedValue);
+            try
+            {
+                lock (_syncLock)
+                {
+                    var stored = _connection.Find<Storable>(key);
+                    return stored == null ? default(T) : JsonConvert.DeserializeObject<T>(stored.SerializedValue);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Failed to get object with key '{key}' from table.", ex);
+                return default(T);
+            }
         }
         public Dictionary<string, T> GetAll()
         {
-            var rows = _connection.Query<Storable>($"SELECT * FROM [{_tableName}]");
-            return rows.ToDictionary(x => x.Key, y => JsonConvert.DeserializeObject<T>(y.SerializedValue));
+            try
+            {
+                lock (_syncLock)
+                {
+                    var rows = _connection.Query<Storable>($"SELECT * FROM [{_tableName}]");
+                    return rows.ToDictionary(x => x.Key, y => JsonConvert.DeserializeObject<T>(y.SerializedValue));
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Failed to get all rows from table.", ex);
+                return default(Dictionary<string, T>);
+            }
         }
         public void Put(string key, T value)
         {
             try
             {
-                this.Delete(key);
-                _connection.Insert(new Storable()
+                lock (_syncLock)
                 {
-                    Key = key,
-                    SerializedValue = JsonConvert.SerializeObject(value)
-                });
+                    this.Delete(key);
+                    _connection.Insert(new Storable()
+                    {
+                        Key = key,
+                        SerializedValue = JsonConvert.SerializeObject(value)
+                    });
+                }
             }
             catch (Exception ex)
             {
@@ -61,14 +108,17 @@ namespace MobileClient.Utilities
         {
             try
             {
-                _connection.DeleteAll<Storable>();
-                foreach (var kvp in keyValuePairs)
+                lock (_syncLock)
                 {
-                    _connection.Insert(new Storable()
+                    _connection.DeleteAll<Storable>();
+                    foreach (var kvp in keyValuePairs)
                     {
-                        Key = kvp.Key,
-                        SerializedValue = JsonConvert.SerializeObject(kvp.Value)
-                    });
+                        _connection.Insert(new Storable()
+                        {
+                            Key = kvp.Key,
+                            SerializedValue = JsonConvert.SerializeObject(kvp.Value)
+                        });
+                    }
                 }
             }
             catch (Exception ex)
@@ -80,12 +130,15 @@ namespace MobileClient.Utilities
         {
             try
             {
-                foreach (var kvp in keyValuePairs)
+                lock (_syncLock)
                 {
-                    var value = _connection.Find<Storable>(kvp.Key);
-                    if (value != null)
-                        this.Delete(kvp.Key);
-                    _connection.Insert(new Storable() { Key = kvp.Key, SerializedValue = JsonConvert.SerializeObject(kvp.Value) });
+                    foreach (var kvp in keyValuePairs)
+                    {
+                        var value = _connection.Find<Storable>(kvp.Key);
+                        if (value != null)
+                            this.Delete(kvp.Key);
+                        _connection.Insert(new Storable() { Key = kvp.Key, SerializedValue = JsonConvert.SerializeObject(kvp.Value) });
+                    }
                 }
             }
             catch (Exception ex)
