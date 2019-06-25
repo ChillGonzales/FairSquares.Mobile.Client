@@ -28,7 +28,7 @@ namespace Tests.Routes
         private ValidationModel _validationModel;
         private string _runtimePlatform;
         private Action<BaseNavPageType> _navigateFromMenu;
-        private Func<string, string, string, string, Task<bool>> _displayAlert;
+        private AlertUtility _alertUtil;
         private Action<Uri> _openUri;
         private BaseNavPageType? CurrentTab = null;
         private Uri OpenedUri = null;
@@ -50,7 +50,7 @@ namespace Tests.Routes
             };
             _runtimePlatform = Device.Android;
             _navigateFromMenu = new Action<BaseNavPageType>(x => CurrentTab = x);
-            _displayAlert = new Func<string, string, string, string, Task<bool>>((s1, s2, s3, s4) => Task.FromResult(false));
+            _alertUtil = new AlertUtility((s1, s2, s3, s4) => Task.FromResult(false), (s1, s2, s3) => Task.Delay(0));
             _openUri = new Action<Uri>(x => OpenedUri = x);
         }
 
@@ -66,7 +66,7 @@ namespace Tests.Routes
                                            _validationModel,
                                            _runtimePlatform,
                                            _navigateFromMenu,
-                                           _displayAlert,
+                                           _alertUtil,
                                            _openUri);
         }
     }

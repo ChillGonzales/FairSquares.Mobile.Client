@@ -23,6 +23,7 @@ namespace MobileClient.Routes
         private string _endDateLabel;
         private string _disclaimerLabel;
         private string _getMoreReportsLabel;
+        private string _purchasedOrdersLabel;
 
         public ManageSubscriptionViewModel(ValidationModel model,
                                            string runtimePlatform,
@@ -41,6 +42,7 @@ namespace MobileClient.Routes
             {
                 SubscriptionTypeLabel = "   " + _model.Subscription.SubscriptionType.ToString();
                 RemainingOrdersLabel = "   " + _model.RemainingOrders.ToString();
+                PurchasedOrdersLabel = "   " + _model.PurchasedReports.Count.ToString();
                 EndDateLabel = "   " + _model.Subscription.EndDateTime.ToString("dddd, dd MMMM yyyy");
                 GetMoreReportsLabel = $"Purchase additional reports at a reduced price of ${SubscriptionUtility.GetSingleReportInfo(_model).Price} per report.";
                 GetMoreReportsCommand = new Command(() => _nav.Push(_pageFactory.GetPage(PageType.SingleReportPurchase, _model)));
@@ -80,6 +82,18 @@ namespace MobileClient.Routes
             {
                 _remainingOrdersLabel = value;
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RemainingOrdersLabel)));
+            }
+        }
+        public string PurchasedOrdersLabel
+        {
+            get
+            {
+                return _purchasedOrdersLabel;
+            }
+            set
+            {
+                _purchasedOrdersLabel = value;
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PurchasedOrdersLabel)));
             }
         }
         public string EndDateLabel

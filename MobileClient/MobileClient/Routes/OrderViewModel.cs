@@ -24,7 +24,7 @@ namespace MobileClient.Routes
         private readonly MainThreadNavigator _nav;
         private readonly IPageFactory _pageFactory;
         private readonly ICache<Models.Order> _orderCache;
-        private readonly Func<string, string, string, string, Task<bool>> _alertTask;
+        private readonly AlertUtility _alertUtility;
         private readonly IMessagingSubscriber _topicSubscriber;
         private readonly Action<BaseNavPageType> _baseNavigationAction;
         private readonly string _deviceType;
@@ -55,7 +55,7 @@ namespace MobileClient.Routes
                               IMessagingSubscriber topicSubscriber,
                               ILogger<OrderViewModel> logger,
                               string deviceType,
-                              Func<string, string, string, string, Task<bool>> alertTask,
+                              AlertUtility alertUtility,
                               Action<BaseNavPageType> baseNavigationAction,
                               ICache<Models.Order> orderCache)
         {
@@ -66,7 +66,7 @@ namespace MobileClient.Routes
             _orderService = orderService;
             _pageFactory = pageFactory;
             _orderCache = orderCache;
-            _alertTask = alertTask;
+            _alertUtility = alertUtility;
             _topicSubscriber = topicSubscriber;
             _baseNavigationAction = baseNavigationAction;
             _deviceType = deviceType;
@@ -158,7 +158,7 @@ namespace MobileClient.Routes
                 }
                 if (user == null)
                 {
-                    var answer = await _alertTask("Please Log In", "Please log in first to submit a report.", "Login", "Cancel");
+                    var answer = await _alertUtility.Display("Please Log In", "Please log in first to submit a report.", "Login", "Cancel");
                     if (!answer)
                     {
                         SubmitButtonEnabled = true;
@@ -206,6 +206,7 @@ namespace MobileClient.Routes
             Zip = "";
             SubmitButtonEnabled = true;
             Comments = "";
+            await _alertUtility.Display("Order Submitted", "Thank you for your order!", "Ok");
             _baseNavigationAction(BaseNavPageType.MyOrders);
         }
 

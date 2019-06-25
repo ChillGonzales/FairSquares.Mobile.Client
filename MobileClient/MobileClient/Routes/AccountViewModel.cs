@@ -155,7 +155,7 @@ namespace MobileClient.Routes
             {
                 if (user == null)
                 {
-                    SubscriptionLabel = $"Please log in first to view purchasing options.";
+                    SubscriptionLabel = $"Please log in to view purchasing options.";
                     _changeSubStyleClass("Success");
                     SubscriptionButtonText = "View Options";
                     SubscriptionButtonEnabled = false;

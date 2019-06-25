@@ -49,66 +49,56 @@ namespace MobileClient.Services
                     .Select(x => SubscriptionUtility.GetInfoFromSubType(x.SubscriptionType).OrderCount).Sum() + 1
                                                                                                               + purchased.Count()
                                                                                                               - orders.Count();
+                var model = new ValidationModel()
+                {
+                    PurchasedReports = purchased,
+                    RemainingOrders = totalRemainingOrders
+                };
+
                 if (!subs.Any() && !orders.Any())
                 {
-                    return new ValidationModel()
-                    {
-                        State = ValidationState.FreeReportValid,
-                        Message = "User can use their free report.",
-                        RemainingOrders = totalRemainingOrders
-                    };
+                    model.State = ValidationState.FreeReportValid;
+                    model.Message = "User can use their free report.";
+                    return model;
                 }
                 // Handle case of no sub but purchased reports
                 if (!subs.Any() && purchased.Any())
                 {
                     if (orders.Count() < (1 + purchased.Count()))
                     {
-                        return new ValidationModel()
-                        {
-                            State = ValidationState.NoSubscriptionAndReportValid,
-                            RemainingOrders = totalRemainingOrders,
-                            Message = "User can use their purchased report."
-                        };
+                        model.State = ValidationState.NoSubscriptionAndReportValid;
+                        model.Message = "User can use their purchased report.";
+                        return model;
                     }
                 }
                 if (!subs.Any() && orders.Any())
                 {
                     // This case means they've never had a subscription before, and are eligible for a trial month.
-                    return new ValidationModel()
-                    {
-                        State = ValidationState.NoSubscriptionAndTrialValid,
-                        Message = "User has used their free report, but is eligible for a free trial period.",
-                        RemainingOrders = totalRemainingOrders
-                    };
+                    model.State = ValidationState.NoSubscriptionAndTrialValid;
+                    model.Message = "User has used their free report, but is eligible for a free trial period.";
+                    return model;
                 }
                 if (subs.Any() && !SubscriptionUtility.SubscriptionActive(lastSub) && orders.Any())
                 {
-                    return new ValidationModel()
-                    {
-                        State = ValidationState.NoSubscriptionAndTrialAlreadyUsed,
-                        Message = "User has used their free trial and free report.",
-                        RemainingOrders = totalRemainingOrders
-                    };
+                    model.State = ValidationState.NoSubscriptionAndTrialAlreadyUsed;
+                    model.Message = "User has used their free trial and free report.";
+                    return model;
                 }
 
                 if (totalRemainingOrders <= 0)
                 {
-                    return new ValidationModel()
-                    {
-                        State = ValidationState.NoReportsLeftInPeriod,
-                        RemainingOrders = 0,
-                        Subscription = lastSub,
-                        Message = "User has used all of their orders for this subscription period."
-                    };
+                    model.State = ValidationState.NoReportsLeftInPeriod;
+                    model.RemainingOrders = 0;
+                    model.Subscription = lastSub;
+                    model.Message = "User has used all of their orders for this subscription period.";
+                    return model;
                 }
                 else
                 {
-                    return new ValidationModel()
-                    {
-                        State = ValidationState.SubscriptionReportValid,
-                        Subscription = lastSub,
-                        RemainingOrders = totalRemainingOrders,
-                    };
+                    model.State = ValidationState.SubscriptionReportValid;
+                    model.Subscription = lastSub;
+                    model.RemainingOrders = totalRemainingOrders;
+                    return model;
                 }
             }
             catch (Exception ex)
@@ -124,6 +114,7 @@ namespace MobileClient.Services
         public ValidationState State { get; set; }
         public string Message { get; set; }
         public int RemainingOrders { get; set; }
+        public List<PurchasedReportModel> PurchasedReports { get; set; }
         public SubscriptionModel Subscription { get; set; }
     }
 

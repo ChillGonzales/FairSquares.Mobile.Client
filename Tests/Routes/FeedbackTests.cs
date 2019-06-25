@@ -9,6 +9,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Xamarin.Forms;
 
 namespace Tests.Routes
@@ -20,6 +21,7 @@ namespace Tests.Routes
         private Mock<ICurrentUserService> _userCache;
         private Mock<INavigation> _nav;
         private Mock<ILogger<FeedbackViewModel>> _logger;
+        private AlertUtility _alert;
         private MainThreadNavigator _mnNav;
 
         [SetUp]
@@ -28,6 +30,7 @@ namespace Tests.Routes
             _notifier = new Mock<INotificationService>();
             _userCache = new Mock<ICurrentUserService>();
             _nav = new Mock<INavigation>();
+            _alert = new AlertUtility((s1, s2, s3, s4) => Task.FromResult(false), (s1, s2, s3) => Task.Delay(0));
             _logger = new Mock<MobileClient.Utilities.ILogger<FeedbackViewModel>>();
             _notifier.Setup(x => x.Notify(It.Is<NotificationRequest>(y => y.From == "feedback@fairsquarestech.com" &&
                                                                           y.To == "colin.monroe@fairsquarestech.com" &&
@@ -47,7 +50,7 @@ namespace Tests.Routes
         [TestCase("hi")]
         public void WhenFeedbackEntered_RespondAppropriately(string feedback)
         {
-            var vm = new FeedbackViewModel(_notifier.Object, _userCache.Object, _logger.Object, _mnNav);
+            var vm = new FeedbackViewModel(_notifier.Object, _userCache.Object, _alert, _logger.Object, _mnNav);
             vm.FeedbackEntry = feedback;
             vm.SubmitCommand.Execute(null);
             if (string.IsNullOrWhiteSpace(feedback))
@@ -69,7 +72,7 @@ namespace Tests.Routes
         {
             _userCache = new Mock<ICurrentUserService>();
             _userCache.Setup(x => x.GetLoggedInAccount()).Returns(null as AccountModel);
-            var vm = new FeedbackViewModel(_notifier.Object, _userCache.Object, _logger.Object, _mnNav);
+            var vm = new FeedbackViewModel(_notifier.Object, _userCache.Object, _alert, _logger.Object, _mnNav);
             vm.FeedbackEntry = "hi";
             vm.SubmitCommand.Execute(null);
             _notifier.VerifyAll();
