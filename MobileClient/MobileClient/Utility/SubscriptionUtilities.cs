@@ -57,7 +57,8 @@ namespace MobileClient.Utilities
         {
             if (previousSub == null)
                 return new DateTimeOffset(transactionDate);
-            if (transactionDate >= previousSub.StartDateTime)
+            // Weird hack to account for transaction time being slightly later than start date for a subscription purchase. My systems are bad and I should feel bad
+            if (transactionDate >= previousSub.StartDateTime.AddMinutes(10))
             {
                 return previousSub.StartDateTime.AddMonths(1);
             }

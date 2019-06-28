@@ -34,6 +34,10 @@ namespace MobileClient.Utility
                 if (_userCache.GetLoggedInAccount() != null)
                     dict.Add("user_email", _userCache.GetLoggedInAccount().Email);
                 _service.LogEvent("app_error", dict);
+#if DEBUG
+                Debug.WriteLine(message);
+                Debug.WriteLine(JsonConvert.SerializeObject(dict));
+#endif
             }
             catch (Exception ex)
             {

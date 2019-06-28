@@ -37,7 +37,6 @@ namespace MobileClient.iOS
             Crashlytics.Configure();
             Fabric.Fabric.SharedSdk.Debug = true; // To enable debugging 
 
-#if !DEBUG
             // Register your app for remote notifications.
             if (UIDevice.CurrentDevice.CheckSystemVersion(10, 0))
             {
@@ -58,7 +57,6 @@ namespace MobileClient.iOS
                 UIApplication.SharedApplication.RegisterUserNotificationSettings(settings);
             }
             UIApplication.SharedApplication.RegisterForRemoteNotifications();
-#endif
             return base.FinishedLaunching(app, options);
         }
 

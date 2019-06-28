@@ -4,7 +4,7 @@
              Title="Information"
              x:Class="MobileClient.Routes.Instruction">
     <ContentPage.Content>
-        <ScrollView Margin="10">
+        <ScrollView Margin="10" x:Name="ScrollView">
             <Grid RowSpacing="15" x:Name="InstructionGrid">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="{Binding TitleColHeight}" />
@@ -108,7 +108,8 @@
                     <Switch IsToggled="{Binding NotShowAgain}" HorizontalOptions="Start" VerticalOptions="Center"/>
                     <Label Text="Don't show this message again." HorizontalOptions="StartAndExpand" VerticalOptions="Center" />
                 </StackLayout>
-                <Button StyleClass="Success"
+                <Button x:Name="SubmitButton"
+                StyleClass="Success"
                 Command="{Binding DismissCommand}"
                 Text="Got It, Thanks"
                 WidthRequest="250"

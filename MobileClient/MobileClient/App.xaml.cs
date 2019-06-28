@@ -163,7 +163,7 @@ namespace MobileClient
                                     {
                                         purchaseEmailLogger.LogError($"Error occurred while getting purchases. {ex.ToString()}");
                                     }
-                                    var mostRecent = purchases.OrderByDescending(x => x.TransactionDateUtc)?.FirstOrDefault();
+                                    var mostRecent = purchases.OrderBy(x => x.TransactionDateUtc)?.LastOrDefault();
                                     if (mostRecent != null)
                                     {
                                         newSub = SubscriptionUtility.GetModelFromIAP(mostRecent, user, recentSub);

@@ -72,6 +72,14 @@ namespace MobileClient.Routes
             _deviceType = deviceType;
             _logger = logger;
 
+            PurchaseOptionsCommand = new Command(async () =>
+            {
+                var val = await _orderValidator.ValidateOrderRequest(_userService.GetLoggedInAccount());
+                if (SubscriptionUtility.SubscriptionActive(val.Subscription))
+                    _nav.Push(_pageFactory.GetPage(PageType.SingleReportPurchase, val));
+                else
+                    _nav.Push(_pageFactory.GetPage(PageType.PurchaseOptions, val));
+            });
             ErrorMessageRowHeight = 0;
             SelectedOptionIndex = 0;
             SelectedStateIndex = -1;
@@ -93,14 +101,6 @@ namespace MobileClient.Routes
                 }
                 var validation = await _orderValidator.ValidateOrderRequest(user);
                 var activeSub = SubscriptionUtility.SubscriptionActive(validation.Subscription);
-                PurchaseOptionsCommand = new Command(async () =>
-                {
-                    var val = await _orderValidator.ValidateOrderRequest(user);
-                    if (SubscriptionUtility.SubscriptionActive(val.Subscription))
-                        _nav.Push(_pageFactory.GetPage(PageType.SingleReportPurchase, val));
-                    else
-                        _nav.Push(_pageFactory.GetPage(PageType.PurchaseOptions, val));
-                });
                 switch (validation.State)
                 {
                     case ValidationState.NoReportsLeftInPeriod:
@@ -174,7 +174,7 @@ namespace MobileClient.Routes
             {
                 ErrorMessageRowHeight = GridLength.Star;
                 SubmitButtonEnabled = true;
-                ErrorMessage = $"Failed to submit order with error {ex.ToString()}";
+                ErrorMessage = $"Failed to submit order with error {ex.Message}";
                 _logger.LogError($"Failed to submit order.", ex);
             }
         }

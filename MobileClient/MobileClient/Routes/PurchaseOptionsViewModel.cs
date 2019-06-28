@@ -27,7 +27,8 @@ namespace MobileClient.Routes
             _pageFactory = pageFactory;
             IsFreeTrialVisible = new[] { ValidationState.NoSubscriptionAndTrialValid, ValidationState.FreeReportValid }.Contains(validation.State);
             SingleReportPrice = $"Price is ${SubscriptionUtility.IndvReportNoSubPrice} per report.";
-            SubscriptionPrice = $"Plans start at {SubscriptionUtility.BasicOrderCount} reports/month for ${SubscriptionUtility.BasicPrice}.";
+            SubscriptionPrice = $"Plans start at {SubscriptionUtility.BasicOrderCount} reports/month for ${SubscriptionUtility.BasicPrice}" +
+                $"{(IsFreeTrialVisible ? " after 30-day FREE trial ends." : ".")}";
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
