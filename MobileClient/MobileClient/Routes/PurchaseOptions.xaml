@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="MobileClient.Routes.PurchaseOptions">
+    <ContentPage.Content>
+        <ScrollView>
+            <StackLayout Orientation="Vertical" Margin="5">
+                <Label Text="Choose the right option for you."
+                    FontSize="Large"
+                    FontAttributes="Bold"
+                    VerticalOptions="Start" 
+                    HorizontalOptions="CenterAndExpand" />
+                <Label HeightRequest="25" />
+                <StackLayout Orientation="Vertical">
+                    <Frame BorderColor="Black"
+                           VerticalOptions="End">
+                        <StackLayout>
+                            <Label Text="Single reports offer you flexibility without a commitment."
+                                FontAttributes="Bold"
+                                FontSize="Medium"
+                                VerticalOptions="Start" 
+                                HorizontalOptions="CenterAndExpand" />
+                            <Label Text="{Binding SingleReportPrice}"
+                                FontSize="Medium"
+                                VerticalOptions="Start" 
+                                HorizontalOptions="CenterAndExpand" />
+                            <Label HeightRequest="30" />
+                            <Button Text="Single Report Details"
+                                Command="{Binding SingleReportCommand}"
+                                WidthRequest="150"
+                                StyleClass="Info" />
+                        </StackLayout>
+                    </Frame>
+                    <Label HeightRequest="20" />
+                    <Label Text="FREE 30 DAY TRIAL AVAILABLE!"
+                           IsVisible="{Binding IsFreeTrialVisible}"
+                           FontSize="Medium"
+                           FontAttributes="Bold"
+                           VerticalOptions="Start"
+                           HorizontalOptions="CenterAndExpand" />
+                    <Frame BorderColor="Black"
+                           VerticalOptions="Start">
+                        <StackLayout>
+                            <Label Text="Subscriptions give you access to multiple reports every month."
+                                FontSize="Medium"
+                                FontAttributes="Bold"
+                                VerticalOptions="Start" 
+                                HorizontalOptions="CenterAndExpand" />
+                            <Label Text="{Binding SubscriptionPrice}"
+                                FontSize="Medium"
+                                VerticalOptions="Start" 
+                                HorizontalOptions="CenterAndExpand" />
+                            <Label HeightRequest="30" />
+                            <Button Text="Subscription Details" 
+                                Command="{Binding SubscriptionCommand}"
+                                WidthRequest="150"
+                                StyleClass="Info" />
+                        </StackLayout>
+                    </Frame>
+                </StackLayout>
+            </StackLayout>
+    </ScrollView>
+    </ContentPage.Content>
+</ContentPage>

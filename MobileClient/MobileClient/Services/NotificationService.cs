@@ -28,8 +28,7 @@ namespace MobileClient.Services
                 var result = _http.PostAsync($"{_baseUri}/notify?accessKey={_apiKey}", content).Result;
                 result.EnsureSuccessStatusCode();
             }
-            catch (Exception ex)
-            { }
+            catch { }
         }
     }
 }

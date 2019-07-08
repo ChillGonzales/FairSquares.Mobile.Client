@@ -18,22 +18,32 @@ namespace MobileClient.Routes
         public readonly ICommand NavigateTo;
         private readonly ICache<SettingsModel> _settings;
         private readonly IPageFactory _pageFactory;
-        private readonly INavigation _nav;
+        private readonly ILogger<BaseTabViewModel> _logger;
+        private readonly MainThreadNavigator _nav;
         private bool _dialogShown;
 
         public BaseTabViewModel(ICache<SettingsModel> settings,
                                 IPageFactory pageFactory,
-                                INavigation nav)
+                                ILogger<BaseTabViewModel> logger,
+                                MainThreadNavigator nav)
         {
             _settings = settings;
             _pageFactory = pageFactory;
+            _logger = logger;
             _nav = nav;
-            OnAppearingBehavior = new Command(async () =>
+            OnAppearingBehavior = new Command(() =>
             {
-                if (!_dialogShown && (!_settings.GetAll().Any() || _settings.Get("").DisplayWelcomeMessage))
+                try
                 {
-                    _dialogShown = true;
-                    await _nav.PushAsync(_pageFactory.GetPage(PageType.Instruction, true));
+                    if (!_dialogShown && (!_settings.GetAll().Any() || _settings.Get("").DisplayWelcomeMessage))
+                    {
+                        _dialogShown = true;
+                        _nav.Push(_pageFactory.GetPage(PageType.Instruction, true));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"Failed to check settings on load.", ex);
                 }
             });
         }

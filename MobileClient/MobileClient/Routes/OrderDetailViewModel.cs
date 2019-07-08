@@ -19,16 +19,16 @@ namespace MobileClient.Routes
 {
     public class OrderDetailViewModel : INotifyPropertyChanged
     {
-        private Models.Order _order;
+        private readonly Models.Order _order;
         private PropertyModel _property;
         private ImageModel _image;
-        private ICache<PropertyModel> _propertyCache;
-        private ICache<ImageModel> _imageCache;
-        private IPropertyService _propertyService;
-        private IPageFactory _pageFactory;
-        private IImageService _imageService;
-        private IToastService _toastService;
-        private readonly INavigation _nav;
+        private readonly ICache<PropertyModel> _propertyCache;
+        private readonly ICache<ImageModel> _imageCache;
+        private readonly IPropertyService _propertyService;
+        private readonly IPageFactory _pageFactory;
+        private readonly IImageService _imageService;
+        private readonly IToastService _toastService;
+        private readonly MainThreadNavigator _nav;
         private readonly Func<string, string, string, Task> _alertAction;
         private RecalculatedPropertyModel _recalculated;
         private bool _loadingAnimRunning;
@@ -54,7 +54,7 @@ namespace MobileClient.Routes
                                     IPropertyService propService,
                                     IImageService imgService,
                                     IToastService toast,
-                                    INavigation nav,
+                                    MainThreadNavigator nav,
                                     IPageFactory pageFactory,
                                     Func<string, string, string, Task> alertAction,
                                     ILogger<OrderDetailViewModel> logger)
@@ -101,100 +101,131 @@ namespace MobileClient.Routes
 
         private void SetUIMeasurements()
         {
-            // Recalculate roof totals for current property
-            CalculateCurrentTotals(_property);
-
-            // Materialize view
-            _recalculated = GetViewModelFromProperty(_property);
-
-            // Set GUI and event handlers
-            var stream = new StreamImageSource();
-            stream.Stream = (x) =>
+            try
             {
-                return Task.FromResult<Stream>(new MemoryStream(_image.Image));
-            };
-            OrderId = $"Order ID: {_order.OrderId}";
-            PredominantPitch = $"{_recalculated.CurrentPitch}:12";
-            NumberOfRoofs = $"Number of Roofs Measured: {_recalculated.Roofs.Count()}";
-            NumberOfPitches = $"Number of Distinct Pitches Measured: {_recalculated.PitchCount}";
-            ImageSource = stream;
-            Address = StringUtility.RemoveEmptyLines(_property.Address);
-            Area = $"{Convert.ToInt64(_property.Roofs.Sum(x => x.TotalArea)).ToString()} sq. ft.";
-            Squares = $"Total Squares: {_property.Roofs.Sum(x => x.TotalSquares).ToString()} squares";
+                // Recalculate roof totals for current property
+                CalculateCurrentTotals(_property);
+
+                // Materialize view
+                _recalculated = GetViewModelFromProperty(_property);
+
+                // Set GUI and event handlers
+                var stream = new StreamImageSource();
+                stream.Stream = (x) =>
+                {
+                    return Task.FromResult<Stream>(new MemoryStream(_image.Image));
+                };
+                OrderId = $"Order ID: {_order.OrderId}";
+                PredominantPitch = $"{_recalculated.CurrentPitch}:12";
+                NumberOfRoofs = $"Number of Roofs Measured: {_recalculated.Roofs.Count()}";
+                NumberOfPitches = $"Number of Distinct Pitches Measured: {_recalculated.PitchCount}";
+                ImageSource = stream;
+                Address = StringUtility.RemoveEmptyLines(_property.Address);
+                Area = $"{Convert.ToInt64(_property.Roofs.Sum(x => x.TotalArea)).ToString()} sq. ft.";
+                Squares = $"Total Squares: {_property.Roofs.Sum(x => x.TotalSquares).ToString()} squares";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Failed to set UI to new measurements.", ex);
+            }
             RefreshTableView(_property.Roofs.Sum(x => x.TotalArea));
         }
         private async Task LoadPropertyAndImage()
         {
-            if ((_property == null || _image == null) && _order.Fulfilled)
+            try
             {
-                // Try to download measurements when order is marked as fulfilled but measurements aren't found.
-                MainLayoutVisible = false;
-                StatusMessageVisible = false;
-                LoadingAnimVisible = true;
-                LoadingAnimRunning = true;
-                if (_property == null)
+                if ((_property == null || _image == null) && _order.Fulfilled)
                 {
-                    PropertyModel newModel = null;
-                    try
+                    // Try to download measurements when order is marked as fulfilled but measurements aren't found.
+                    MainLayoutVisible = false;
+                    StatusMessageVisible = false;
+                    LoadingAnimVisible = true;
+                    LoadingAnimRunning = true;
+                    if (_property == null)
                     {
-                        newModel = (await _propertyService.GetProperties(new List<string>() { _order.OrderId })).First().Value;
+                        PropertyModel newModel = null;
+                        try
+                        {
+                            newModel = (await _propertyService.GetProperties(new List<string>() { _order.OrderId })).First().Value;
+                        }
+                        catch { }
+                        if (newModel == null || string.IsNullOrWhiteSpace(newModel.OrderId))
+                        {
+                            _toastService.LongToast($"Your order is marked as completed but the measurements cannot be found. Please check your internet connection and try again.");
+                            _logger.LogError($"Order is marked as completed but no measurements found.", $"Order id: {newModel.OrderId}");
+                            return;
+                        }
+                        _propertyCache.Put(newModel.OrderId, newModel);
+                        _property = newModel;
                     }
-                    catch { }
-                    if (newModel == null || string.IsNullOrWhiteSpace(newModel.OrderId))
+                    if (_image == null)
                     {
-                        _toastService.LongToast($"Your order is marked as completed but the measurements cannot be found. Please check your internet connection and try again.");
-                        return;
+                        ImageModel image = null;
+                        try
+                        {
+                            image = _imageService.GetImages(new List<string>() { _order.OrderId }).First().Value;
+                        }
+                        catch { }
+                        if (image == null)
+                        {
+                            _toastService.LongToast($"Your order is marked as completed but the image cannot be found. Please check your internet connection.");
+                            _logger.LogError($"Order is marked as completed but no image found.", $"Order id: {_order.OrderId}");
+                        }
+                        else
+                        {
+                            _imageCache.Put(_order.OrderId, image);
+                            _image = image;
+                        }
                     }
-                    _propertyCache.Put(newModel.OrderId, newModel);
-                    _property = newModel;
+                    LoadingAnimVisible = false;
+                    LoadingAnimRunning = false;
+                    MainLayoutVisible = true;
+                    SetUIMeasurements();
                 }
-                if (_image == null)
-                {
-                    ImageModel image = null;
-                    try
-                    {
-                        image = _imageService.GetImages(new List<string>() { _order.OrderId }).First().Value;
-                    }
-                    catch { }
-                    if (image == null)
-                    {
-                        _toastService.LongToast($"Your order is marked as completed but the image cannot be found. Please check your internet connection.");
-                    }
-                    else
-                    {
-                        _imageCache.Put(_order.OrderId, image);
-                        _image = image;
-                    }
-                }
-                LoadingAnimVisible = false;
-                LoadingAnimRunning = false;
-                MainLayoutVisible = true;
-                SetUIMeasurements();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Failed to load property and image.", ex);
             }
         }
         private void CalculateCurrentTotals(PropertyModel property)
         {
-            foreach (var roof in property.Roofs)
+            try
             {
-                var response = RoofUtility.CalculateTotals(roof);
-                var rise = RoofUtility.GetPredominantPitchFromSections(roof.Sections);
-                roof.TotalArea = Math.Round(response.TotalArea, 0);
-                roof.TotalSquares = Math.Round(response.TotalSquaresCount, 0);
-                roof.PredominantPitchRise = rise;
+                foreach (var roof in property.Roofs)
+                {
+                    var response = RoofUtility.CalculateTotals(roof);
+                    var rise = RoofUtility.GetPredominantPitchFromSections(roof.Sections);
+                    roof.TotalArea = Math.Round(response.TotalArea, 0);
+                    roof.TotalSquares = Math.Round(response.TotalSquaresCount, 0);
+                    roof.PredominantPitchRise = rise;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Failed to calculate current totals.", ex);
             }
         }
         private RecalculatedPropertyModel GetViewModelFromProperty(PropertyModel property)
         {
-            var sections = _property.Roofs.SelectMany(x => x.Sections).ToList();
-            var overallPitch = RoofUtility.GetPredominantPitchFromSections(sections);
-            var count = RoofUtility.GetPitchCount(sections)?.PitchCount ?? 1;
-            return new RecalculatedPropertyModel(property)
+            try
             {
-                RecalculatedSections = property.Roofs.SelectMany(x => x.Sections).Where(x => x.PitchRise == overallPitch).ToList(),
-                CurrentPitch = overallPitch,
-                OriginalPitch = overallPitch,
-                PitchCount = count
-            };
+                var sections = _property.Roofs.SelectMany(x => x.Sections).ToList();
+                var overallPitch = RoofUtility.GetPredominantPitchFromSections(sections);
+                var count = RoofUtility.GetPitchCount(sections)?.PitchCount ?? 1;
+                return new RecalculatedPropertyModel(property)
+                {
+                    RecalculatedSections = property.Roofs.SelectMany(x => x.Sections).Where(x => x.PitchRise == overallPitch).ToList(),
+                    CurrentPitch = overallPitch,
+                    OriginalPitch = overallPitch,
+                    PitchCount = count
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Failed to get view model from property.", ex, property);
+                return null;
+            }
         }
         private void OnPitchValueChanged(int oldValue, int newValue)
         {
@@ -234,25 +265,32 @@ namespace MobileClient.Routes
             }
             catch (Exception ex)
             {
-                _logger.LogError("Failed to calculate pitch. " + ex.ToString());
+                _logger.LogError("Failed to calculate pitch. " + ex.ToString(), ex);
             }
         }
         private void RefreshTableView(double totalArea)
         {
-            SafetyStockSource = null;
-            var groups = new List<WasteGroup>();
-            var pcts = new[] { .05, .10, .15, .20 };
-            foreach (var pct in pcts)
+            try
             {
-                var group = new WasteGroup() { Title = pct.ToString("P0") + " Waste" };
-                group.Add(new WasteViewModel()
+                SafetyStockSource = null;
+                var groups = new List<WasteGroup>();
+                var pcts = new[] { .05, .10, .15, .20 };
+                foreach (var pct in pcts)
                 {
-                    Text = Math.Ceiling((totalArea * (1 + pct)) / 100).ToString() + " Squares",
-                    TextColor = Color.Green
-                });
-                groups.Add(group);
+                    var group = new WasteGroup() { Title = pct.ToString("P0") + " Waste" };
+                    group.Add(new WasteViewModel()
+                    {
+                        Text = Math.Ceiling((totalArea * (1 + pct)) / 100).ToString() + " Squares",
+                        TextColor = Color.Green
+                    });
+                    groups.Add(group);
+                }
+                SafetyStockSource = groups;
             }
-            SafetyStockSource = groups;
+            catch (Exception ex)
+            {
+                _logger.LogError("Failed to refresh safety stock table view.", ex);
+            }
         }
 
         // Bound properties
@@ -341,10 +379,10 @@ namespace MobileClient.Routes
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ImageEnabled)));
             }
         }
-        public ICommand ImageTapCommand => new Command(async () =>
+        public ICommand ImageTapCommand => new Command(() =>
         {
             ImageEnabled = false;
-            await _nav.PushAsync(_pageFactory.GetPage(PageType.ImagePopup, (StreamImageSource)ImageSource));
+            _nav.Push(_pageFactory.GetPage(PageType.ImagePopup, (StreamImageSource)ImageSource));
             ImageEnabled = true;
         });
         public string Squares

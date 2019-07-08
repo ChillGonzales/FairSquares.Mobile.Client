@@ -21,12 +21,14 @@ namespace MobileClient.Services
             _billing = billing;
         }
 
-        public async Task<InAppBillingPurchase> PurchaseSubscription(string name, string payload)
+        public async Task<InAppBillingPurchase> PurchaseItem(string name, ItemType iapType, string payload)
         {
+            if (!SubscriptionUtility.ValidatePurchaseType(name, iapType))
+                throw new InvalidOperationException($"The item that is attempting to be purchased does not have the proper IAP type.");
             bool connected = false;
             try
             {
-                connected = await _billing.ConnectAsync(ItemType.Subscription);
+                connected = await _billing.ConnectAsync(iapType);
             }
             catch (Exception ex)
             {
@@ -45,7 +47,7 @@ namespace MobileClient.Services
             try
             {
                 //check purchases
-                purchase = await _billing.PurchaseAsync(name, ItemType.Subscription, payload);
+                purchase = await _billing.PurchaseAsync(name, iapType, payload);
             }
             catch (InAppBillingPurchaseException purchaseEx)
             {
@@ -114,12 +116,12 @@ namespace MobileClient.Services
             return purchase;
         }
 
-        public async Task<IEnumerable<InAppBillingPurchase>> GetPurchases()
+        public async Task<IEnumerable<InAppBillingPurchase>> GetPurchases(ItemType iapType)
         {
             bool connected = false;
             try
             {
-                connected = await _billing.ConnectAsync(ItemType.Subscription);
+                connected = await _billing.ConnectAsync(iapType);
             }
             catch (Exception)
             {
@@ -134,7 +136,7 @@ namespace MobileClient.Services
             try
             {
                 // fetch purchases
-                return await _billing.GetPurchasesAsync(ItemType.Subscription) ?? Enumerable.Empty<InAppBillingPurchase>();
+                return await _billing.GetPurchasesAsync(iapType) ?? Enumerable.Empty<InAppBillingPurchase>();
             }
             catch (InAppBillingPurchaseException purchaseEx)
             {

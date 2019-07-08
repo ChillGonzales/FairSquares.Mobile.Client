@@ -48,7 +48,7 @@
                     StyleClass="Success"
                     VerticalOptions="Start"
                     HorizontalOptions="CenterAndExpand" />
-                <Label Text="Subscription"
+                <Label Text="Manage Reports"
                    Grid.Row="4"
                    FontSize="Medium"
                    FontAttributes="Bold"
@@ -85,6 +85,7 @@
                     VerticalOptions="Start"
                     HorizontalOptions="StartAndExpand" />
                 <Button Command="{Binding FeedbackCommand}"
+                    IsEnabled="{Binding FeedbackButtonEnabled}"
                     Text="Send Feedback"
                     Grid.Row="10"
                     Grid.Column="0"

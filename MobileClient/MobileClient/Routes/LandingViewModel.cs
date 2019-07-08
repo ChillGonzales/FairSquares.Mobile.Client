@@ -1,6 +1,7 @@
 ﻿using MobileClient.Authentication;
 using MobileClient.Services;
 using MobileClient.Utilities;
+using MobileClient.Utility;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,18 +16,21 @@ namespace MobileClient.Routes
     {
         private readonly OAuth2Authenticator _auth;
         private readonly IToastService _toastService;
-        private readonly INavigation _nav;
+        private readonly MainThreadNavigator _nav;
+        private readonly ILogger<LandingViewModel> _logger;
         private bool _loadingAnimRunning;
         private bool _loadingAnimVisible;
         private bool _loginLayoutVisible;
 
-        public LandingViewModel(OAuth2Authenticator auth, 
+        public LandingViewModel(OAuth2Authenticator auth,
                                 IToastService toastService,
-                                INavigation nav)
+                                ILogger<LandingViewModel> logger,
+                                MainThreadNavigator nav)
         {
             _auth = auth;
             _toastService = toastService;
             _nav = nav;
+            _logger = logger;
             _auth.Completed += Auth_Completed;
             _auth.Error += Auth_Error;
             LoginLayoutVisible = true;
@@ -35,10 +39,11 @@ namespace MobileClient.Routes
 
         private void Auth_Completed(object sender, AuthenticatorCompletedEventArgs e)
         {
-            _nav.PopAsync();
+            _nav.Pop();
         }
         private void Auth_Error(object sender, AuthenticatorErrorEventArgs e)
         {
+            _logger.LogError("Received an error from auth callback.", e.Message, e.Exception);
             _toastService.LongToast($"Oops! Looks like there was an issue. Please try again. Error: '{e.Message}'");
             LoadingAnimVisible = false;
             LoadingAnimRunning = false;
@@ -49,8 +54,15 @@ namespace MobileClient.Routes
             LoadingAnimVisible = true;
             LoadingAnimRunning = true;
             LoginLayoutVisible = false;
-            var presenter = new Xamarin.Auth.Presenters.OAuthLoginPresenter();
-            presenter.Login(_auth);
+            try
+            {
+                var presenter = new Xamarin.Auth.Presenters.OAuthLoginPresenter();
+                presenter.Login(_auth);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Failed to open login screen.", ex);
+            }
         }
 
         // Bound properties

@@ -27,6 +27,18 @@
                        FontSize="Small"
                        VerticalOptions="CenterAndExpand"
                        HorizontalOptions="CenterAndExpand" />
+                <Label HeightRequest="10"/>
+                <Label Text="{Binding PurchaseOptionsText}"
+                       IsVisible="{Binding PurchaseOptionsVisible}"
+                       FontSize="Small"
+                       VerticalOptions="CenterAndExpand"
+                       HorizontalOptions="CenterAndExpand" />
+                <Button Text="View Purchase Options"
+                       StyleClass="Success"
+                       Command="{Binding PurchaseOptionsCommand}"
+                       VerticalOptions="Center"
+                       WidthRequest="250"
+                       HorizontalOptions="Center" />
             </StackLayout>
             <ScrollView IsVisible="{Binding MainLayoutVisible}">
                 <Grid Margin="20" ColumnSpacing="25" RowSpacing="8" x:Name="Grid">

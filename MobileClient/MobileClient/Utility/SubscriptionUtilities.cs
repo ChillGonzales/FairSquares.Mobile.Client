@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using MobileClient.Authentication;
 using MobileClient.Models;
+using MobileClient.Services;
 using Plugin.InAppBilling.Abstractions;
 using Xamarin.Forms;
 
@@ -12,6 +15,14 @@ namespace MobileClient.Utilities
         public const string SUB_NAME_PREMIUM = "premium_subscription_monthly";
         public const string SUB_NAME_BASIC = "basic_subscription_monthly";
         public const string SUB_NAME_ENTERPRISE = "enterprise_subscription_monthly";
+        public const string INDV_REPORT_NO_SUB = "no_sub_one_report";
+        public const string INDV_REPORT_BASIC = "basic_sub_one_report";
+        public const string INDV_REPORT_PREMIUM = "premium_sub_one_report";
+        public const string INDV_REPORT_ENTERPRISE = "enterprise_sub_one_report";
+        public const double IndvReportNoSubPrice = 9.99;
+        public const double IndvReportBasicPrice = 7.99;
+        public const double IndvReportPremiumPrice = 5.99;
+        public const double IndvReportEnterprisePrice = 3.99;
         public const int BasicOrderCount = 3;
         public const int PremiumOrderCount = 8;
         public const int EnterpriseOrderCount = 25;
@@ -23,7 +34,7 @@ namespace MobileClient.Utilities
         {
             return model != null && model.EndDateTime > DateTimeOffset.Now;
         }
-        public static SubscriptionModel GetModelFromIAP(InAppBillingPurchase purchase, string userId, SubscriptionModel previousSub)
+        public static SubscriptionModel GetModelFromIAP(InAppBillingPurchase purchase, AccountModel user, SubscriptionModel previousSub)
         {
             var start = ResolveStartDate(purchase.TransactionDateUtc, previousSub);
             // This is for the case when the last purchase was for the last active month and they have not renewed.
@@ -38,14 +49,16 @@ namespace MobileClient.Utilities
                 PurchasedDateTime = purchase.TransactionDateUtc,
                 PurchaseSource = Device.RuntimePlatform == Device.Android ? PurchaseSource.GooglePlay : PurchaseSource.AppStore,
                 SubscriptionType = GetTypeFromProductId(purchase.ProductId),
-                UserId = userId
+                UserId = user.UserId,
+                Email = user.Email
             };
         }
         public static DateTimeOffset? ResolveStartDate(DateTime transactionDate, SubscriptionModel previousSub)
         {
             if (previousSub == null)
                 return new DateTimeOffset(transactionDate);
-            if (transactionDate >= previousSub.StartDateTime)
+            // Weird hack to account for transaction time being slightly later than start date for a subscription purchase. My systems are bad and I should feel bad
+            if (transactionDate >= previousSub.StartDateTime.AddMinutes(10))
             {
                 return previousSub.StartDateTime.AddMonths(1);
             }
@@ -99,8 +112,52 @@ namespace MobileClient.Utilities
                     };
             }
         }
+        public static SingleReportInfo GetSingleReportInfo(ValidationModel validation)
+        {
+            if (validation.Subscription == null)
+                return new SingleReportInfo()
+                {
+                    Code = INDV_REPORT_NO_SUB,
+                    Price = IndvReportNoSubPrice
+                };
+            switch (validation.Subscription.SubscriptionType)
+            {
+                case SubscriptionType.Premium:
+                    return new SingleReportInfo()
+                    {
+                        Code = INDV_REPORT_PREMIUM,
+                        Price = IndvReportPremiumPrice
+                    };
+                case SubscriptionType.Enterprise:
+                    return new SingleReportInfo()
+                    {
+                        Code = INDV_REPORT_ENTERPRISE,
+                        Price = IndvReportEnterprisePrice
+                    };
+                default:
+                    return new SingleReportInfo()
+                    {
+                        Code = INDV_REPORT_BASIC,
+                        Price = IndvReportBasicPrice
+                    };
+            }
+        }
+        public static bool ValidatePurchaseType(string name, ItemType iapType)
+        {
+            if (new[] { SUB_NAME_BASIC, SUB_NAME_PREMIUM, SUB_NAME_ENTERPRISE }.Contains(name) && iapType == ItemType.Subscription)
+                return true;
+            if (new[] { INDV_REPORT_NO_SUB, INDV_REPORT_BASIC, INDV_REPORT_PREMIUM, INDV_REPORT_ENTERPRISE }.Contains(name) && iapType == ItemType.InAppPurchase)
+                return true;
+
+            return false;
+        }
     }
 
+    public class SingleReportInfo
+    {
+        public double Price { get; set; }
+        public string Code { get; set; }
+    }
     public class SubscriptionInfo
     {
         public int OrderCount { get; set; }

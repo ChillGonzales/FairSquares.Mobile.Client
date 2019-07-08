@@ -8093,6 +8093,9 @@ namespace MobileClient.Droid
 			// aapt resource value: 0x7f09005f
 			public const int character_counter_pattern = 2131296351;
 			
+			// aapt resource value: 0x7f09006b
+			public const int com_crashlytics_android_build_id = 2131296363;
+			
 			// aapt resource value: 0x7f090008
 			public const int common_google_play_services_enable_button = 2131296264;
 			

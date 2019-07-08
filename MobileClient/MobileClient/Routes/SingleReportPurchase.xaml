@@ -1,30 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="MobileClient.Routes.Purchase">
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="MobileClient.Routes.SingleReportPurchase">
     <ContentPage.Content>
         <ScrollView>
             <StackLayout Orientation="Vertical" Margin="5">
-                <Label Text="Choose Your Plan. Cancel Anytime."
+                <Label Text="Get an additional report anytime you need it."
                    FontSize="Large"
                    FontAttributes="Bold"
                    HorizontalOptions="CenterAndExpand"
                    VerticalOptions="Center" />
                 <Label HeightRequest="25" />
 
-                <!--Subscription Dropdown-->
-                <StackLayout Orientation="Horizontal" VerticalOptions="Center" HorizontalOptions="CenterAndExpand">
-                    <Label Text="Choose Your Plan: "
-                           FontSize="Medium"
-                           VerticalOptions="Center"
-                           HorizontalOptions="End" />
-                    <Picker FontSize="Medium"
-                        ItemsSource="{Binding SubscriptionOptions}"
-                        SelectedIndex="{Binding SelectedSubscriptionIndex}"
-                        VerticalOptions="Center"
-                        HorizontalOptions="Start"
-                        WidthRequest="200" />
-                </StackLayout>
                 <Frame OutlineColor="Black">
                     <StackLayout>
                         <Label Text="{Binding MarketingDescText}"
@@ -43,17 +33,12 @@
                            FontSize="Medium"
                            VerticalOptions="Start"
                            HorizontalOptions="CenterAndExpand" />
-                        <Label Text="{Binding AvgCostText}"
-                           IsVisible="{Binding AvgCostVisible}"
+                        <Label Text="{Binding CostComparisonText}"
+                           IsVisible="{Binding CostComparisonVisible}"
                            FontSize="Medium"
                            VerticalOptions="Start"
                            HorizontalOptions="CenterAndExpand" />
-                        <Label Text="{Binding SingleReportText}"
-                           IsVisible="{Binding SingleReportVisible}"
-                           FontSize="Medium"
-                           VerticalOptions="Start"
-                           HorizontalOptions="CenterAndExpand" />
-                        <Label HeightRequest="30" />
+                        <Label HeightRequest="50" />
                         <AbsoluteLayout HorizontalOptions="Fill" VerticalOptions="Fill">
                             <Button Text="{Binding PurchaseButtonText}"
                                 Command="{Binding PurchaseButtonCommand}"

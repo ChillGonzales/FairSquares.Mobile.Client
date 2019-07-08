@@ -1,5 +1,6 @@
 ﻿using MobileClient.Models;
 using MobileClient.Utilities;
+using MobileClient.Utility;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -11,27 +12,39 @@ namespace MobileClient.Routes
 {
     public class InstructionViewModel : INotifyPropertyChanged
     {
-        private readonly INavigation _nav;
+        private readonly MainThreadNavigator _nav;
         private readonly ICache<SettingsModel> _settings;
+        private readonly ILogger<InstructionViewModel> _logger;
         private GridLength _dismissBtnColHeight;
         private bool _notShowAgain;
         private GridLength _switchColHeight;
         private GridLength _titleColHeight;
 
-        public InstructionViewModel(INavigation nav, ICache<SettingsModel> settings, bool showDismissButton)
+        public InstructionViewModel(MainThreadNavigator nav,
+                                    ICache<SettingsModel> settings,
+                                    ILogger<InstructionViewModel> logger,
+                                    bool showDismissButton)
         {
             _nav = nav;
             _settings = settings;
+            _logger = logger;
             TitleColHeight = showDismissButton ? 50 : 0;
             SwitchColHeight = showDismissButton ? 50 : 0;
             DismissBtnColHeight = showDismissButton ? 50 : 0;
-            DismissCommand = new Command(async () =>
+            DismissCommand = new Command(() =>
             {
-                if (NotShowAgain)
+                try
                 {
-                    _settings.Put("", new SettingsModel() { DisplayWelcomeMessage = false });
+                    if (NotShowAgain)
+                    {
+                        _settings.Put("", new SettingsModel() { DisplayWelcomeMessage = false });
+                    }
                 }
-                await _nav.PopAsync();
+                catch (Exception ex)
+                {
+                    _logger.LogError($"Failed to update settings cache.", ex);
+                }
+                _nav.Pop();
             });
         }
 

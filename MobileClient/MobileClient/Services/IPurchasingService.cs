@@ -8,7 +8,7 @@ namespace MobileClient.Services
 {
     public interface IPurchasingService
     {
-        Task<InAppBillingPurchase> PurchaseSubscription(string name, string payload);
-        Task<IEnumerable<InAppBillingPurchase>> GetPurchases();
+        Task<InAppBillingPurchase> PurchaseItem(string name, ItemType iapType, string payload);
+        Task<IEnumerable<InAppBillingPurchase>> GetPurchases(ItemType iapType);
     }
 }

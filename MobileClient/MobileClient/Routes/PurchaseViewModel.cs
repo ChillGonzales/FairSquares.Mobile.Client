@@ -18,7 +18,7 @@ namespace MobileClient.Routes
 {
     public class PurchaseViewModel : INotifyPropertyChanged
     {
-        private readonly IToastService _alertService;
+        private readonly IToastService _toastService;
         private readonly IPurchasingService _purchaseService;
         private readonly ICache<SubscriptionModel> _subCache;
         private readonly ISubscriptionService _subService;
@@ -26,14 +26,13 @@ namespace MobileClient.Routes
         private readonly ValidationModel _validationModel;
         private readonly string _runtimePlatform;
         private readonly Action<Uri> _openUri;
-        private readonly Func<string, string, string, string, Task<bool>> _displayAlert;
-        private readonly INavigation _nav;
+        private readonly AlertUtility _alertUtility;
+        private readonly MainThreadNavigator _nav;
         private readonly Action<BaseNavPageType> _navigateFromMenu;
         private List<SubscriptionType> _subscriptionSource = new List<SubscriptionType>()
         {
             SubscriptionType.Basic,
-            SubscriptionType.Premium,
-            SubscriptionType.Enterprise
+            SubscriptionType.Premium
         };
 
         // Local binding vars
@@ -51,20 +50,22 @@ namespace MobileClient.Routes
         private bool _loadAnimationRunning;
         private bool _loadAnimationVisible;
         private string _legalText;
+        private string _singleReportText;
+        private bool _singleReportVisible;
 
-        public PurchaseViewModel(IToastService alertService,
+        public PurchaseViewModel(IToastService toastService,
                                  IPurchasingService purchaseService,
                                  ICache<SubscriptionModel> subCache,
                                  ISubscriptionService subService,
                                  ICurrentUserService userCache,
-                                 INavigation nav,
+                                 MainThreadNavigator nav,
                                  ValidationModel validationModel,
                                  string runtimePlatform,
                                  Action<BaseNavPageType> navigateFromMenu,
-                                 Func<string, string, string, string, Task<bool>> displayAlert,
+                                 AlertUtility alertUtility,
                                  Action<Uri> openUri)
         {
-            _alertService = alertService;
+            _toastService = toastService;
             _purchaseService = purchaseService;
             _subCache = subCache;
             _subService = subService;
@@ -72,7 +73,7 @@ namespace MobileClient.Routes
             _validationModel = validationModel;
             _runtimePlatform = runtimePlatform;
             _openUri = openUri;
-            _displayAlert = displayAlert;
+            _alertUtility = alertUtility;
             _nav = nav;
             _navigateFromMenu = navigateFromMenu;
             LegalLinkCommand = new Command(() => _openUri(new Uri(Configuration.PrivacyPolicyUrl)));
@@ -114,14 +115,14 @@ namespace MobileClient.Routes
                     MarketingDescText = $"A 25% Cost Savings!";
                     ReportsDescText = $"{SubscriptionUtility.PremiumOrderCount} reports per month";
                     CostDescText = $"${SubscriptionUtility.PremiumPrice} per month";
-                    AvgCostText = $"Value of $6.25 per report";
+                    AvgCostText = $"Unlocks access to purchase additional reports at a reduced price of ${SubscriptionUtility.IndvReportPremiumPrice} per report.";
                     break;
                 case SubscriptionType.Enterprise:
                     MarketingDescVisible = true;
                     MarketingDescText = $"Over 50% in Cost Savings!";
                     ReportsDescText = $"{SubscriptionUtility.EnterpriseOrderCount} reports per month";
                     CostDescText = $"${SubscriptionUtility.EnterprisePrice} per month";
-                    AvgCostText = $"Value of $4.00 per report";
+                    AvgCostText = $"Unlocks access to purchase additional reports at a reduced price of ${SubscriptionUtility.IndvReportEnterprisePrice} per report.";
                     break;
                 default:
                     if (new[] { ValidationState.NoSubscriptionAndTrialValid, ValidationState.FreeReportValid }.Contains(validation.State))
@@ -136,7 +137,7 @@ namespace MobileClient.Routes
                         CostDescText = $"${SubscriptionUtility.BasicPrice} per month";
                     }
                     ReportsDescText = $"{SubscriptionUtility.BasicOrderCount} reports per month";
-                    AvgCostText = $"Value of $8.33 per report";
+                    AvgCostText = $"Unlocks access to purchase additional reports at a reduced price of ${SubscriptionUtility.IndvReportBasicPrice} per report.";
                     break;
             }
         }
@@ -159,18 +160,17 @@ namespace MobileClient.Routes
                 try
                 {
                     await PurchaseSubscription(subCode);
-                    Device.BeginInvokeOnMainThread(async () => await _nav.PopAsync());
-                    _alertService.LongToast($"Thank you for your purchase!");
-                    _navigateFromMenu(BaseNavPageType.Order);
+                    await _alertUtility.Display("Purchase Complete", "Thank you for your purchase!", "Ok");
+                    _nav.PopToRoot();
                 }
                 catch (Exception ex)
                 {
-                    _alertService.LongToast($"Failed to purchase subscription. {ex.Message}");
+                    _toastService.LongToast($"Failed to purchase subscription. {ex.Message}");
                 }
             }
             catch (Exception ex)
             {
-                _alertService.LongToast($"Something went wrong when trying to purchase subscription. {ex.Message}");
+                _toastService.LongToast($"Something went wrong when trying to purchase subscription. {ex.Message}");
             }
             finally
             {
@@ -190,17 +190,7 @@ namespace MobileClient.Routes
             {
                 throw new InvalidOperationException("User must be logged in to purchase a subscription.");
             }
-#if RELEASE
-            var sub = await _purchaseService.PurchaseSubscription(subCode, "payload");
-#else
-            var sub = new InAppBillingPurchase()
-            {
-                PurchaseToken = "PurchaseToken",
-                ProductId = subCode,
-                Id = "12345"
-            };
-            await Task.Delay(5000);
-#endif
+            var sub = await _purchaseService.PurchaseItem(subCode, ItemType.Subscription, "payload");
             if (sub == null)
                 throw new InvalidOperationException($"Something went wrong when attempting to purchase. Please try again.");
 
@@ -213,12 +203,15 @@ namespace MobileClient.Routes
                 PurchasedDateTime = DateTimeOffset.Now,
                 EndDateTime = DateTimeOffset.Now.AddMonths(1),
                 PurchaseSource = Device.RuntimePlatform == Device.Android ? Models.PurchaseSource.GooglePlay : Models.PurchaseSource.AppStore,
-                UserId = _userCache.GetLoggedInAccount().UserId
+                UserId = _userCache.GetLoggedInAccount().UserId,
+                Email = _userCache.GetLoggedInAccount().Email
             };
-            _subCache.Put(_userCache.GetLoggedInAccount().UserId, model);
-#if RELEASE
-                _subService.AddSubscription(model);
-#endif
+            try
+            {
+                _subCache.Put(model.PurchaseId, model);
+            }
+            catch { }
+            _subService.AddSubscription(model);
         }
 
         private string GetLegalJargon(SubscriptionType selected, ValidationModel validation)
@@ -360,6 +353,30 @@ namespace MobileClient.Routes
             {
                 _avgCostVisible = value;
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AvgCostVisible)));
+            }
+        }
+        public string SingleReportText
+        {
+            get
+            {
+                return _singleReportText;
+            }
+            set
+            {
+                _singleReportText = value;
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SingleReportText)));
+            }
+        }
+        public bool SingleReportVisible
+        {
+            get
+            {
+                return _singleReportVisible;
+            }
+            set
+            {
+                _singleReportVisible = value;
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SingleReportVisible)));
             }
         }
         public string PurchaseButtonText

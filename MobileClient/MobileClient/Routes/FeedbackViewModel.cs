@@ -1,6 +1,7 @@
 ﻿using MobileClient.Authentication;
 using MobileClient.Services;
 using MobileClient.Utilities;
+using MobileClient.Utility;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,19 +16,22 @@ namespace MobileClient.Routes
     {
         private readonly INotificationService _notifier;
         private readonly ICurrentUserService _userCache;
-        private readonly IToastService _toast;
-        private readonly INavigation _nav;
+        private readonly MainThreadNavigator _nav;
+        private readonly ILogger<FeedbackViewModel> _logger;
+        private readonly AlertUtility _alertUtility;
         private string _feedbackEntry;
 
         public FeedbackViewModel(INotificationService notifier,
                                  ICurrentUserService userCache,
-                                 IToastService toast,
-                                 INavigation nav)
+                                 AlertUtility alertUtility,
+                                 ILogger<FeedbackViewModel> logger,
+                                 MainThreadNavigator nav)
         {
             _notifier = notifier;
             _userCache = userCache;
-            _toast = toast;
             _nav = nav;
+            _logger = logger;
+            _alertUtility = alertUtility;
 
             SubmitCommand = new Command(async () => await SubmitFeedback(_feedbackEntry));
         }
@@ -49,10 +53,13 @@ namespace MobileClient.Routes
                     MessageType = Models.MessageType.Email,
                     Subject = "Feedback from " + user?.Email
                 });
-                _toast.ShortToast($"Thank you for your feedback!");
+                await _alertUtility.Display("Feedback Submitted", "Thank you for your feedback!", "Ok");
             }
-            catch { }
-            await _nav.PopAsync();
+            catch (Exception ex)
+            {
+                _logger.LogError("Failed to submit feedback.", ex, $"Feedback: {feedback}");
+            }
+            _nav.Pop();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

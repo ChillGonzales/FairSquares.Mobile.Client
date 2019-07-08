@@ -20,6 +20,7 @@ namespace Tests.Routes
         private Mock<IOrderValidationService> _validator;
         private Mock<ILogger<AccountViewModel>> _logger;
         private Mock<INavigation> _nav;
+        private MainThreadNavigator _mnNav;
         private Mock<IPageFactory> _pageFac;
         private string _loginStyle;
         private string _subStyle;
@@ -35,6 +36,7 @@ namespace Tests.Routes
             _nav = new Mock<INavigation>();
             _logger = new Mock<ILogger<AccountViewModel>>();
             _pageFac = new Mock<IPageFactory>();
+            _mnNav = new MainThreadNavigator(_nav.Object);
             _loginStyle = "";
             _subStyle = "";
             _loginStyleAction = x => _loginStyle = x;
@@ -48,7 +50,7 @@ namespace Tests.Routes
             _pageFac.Setup(x => x.GetPage(PageType.Instruction, false)).Returns(null as Instruction);
             var account = new AccountViewModel(_userCache.Object,
                     _validator.Object,
-                    _nav.Object,
+                    _mnNav,
                     _pageFac.Object,
                     _loginStyleAction,
                     _subStyleAction,
@@ -58,8 +60,8 @@ namespace Tests.Routes
             Assert.AreEqual(false, account.SubscriptionButtonEnabled);
             Assert.AreEqual("Please log in to continue", account.Email);
             Assert.AreEqual("Log In", account.LogOutText);
-            Assert.AreEqual("Manage", account.SubscriptionButtonText);
-            Assert.AreEqual("Log in to manage your subscription.", account.SubscriptionLabel);
+            Assert.AreEqual("View Options", account.SubscriptionButtonText);
+            Assert.AreEqual("Please log in first.", account.SubscriptionLabel);
             account.LogOutCommand.Execute(null);
             account.ToolbarInfoCommand.Execute(null);
             _pageFac.Verify(x => x.GetPage(PageType.Landing), Times.Once);
@@ -76,14 +78,14 @@ namespace Tests.Routes
                 UserId = "123"
             };
             _userCache.Setup(x => x.GetLoggedInAccount()).Returns(user);
-            _validator.Setup(x => x.ValidateOrderRequest(user))
+            _validator.Setup(x => x.ValidateOrderRequest(user, It.IsAny<bool>()))
                 .ReturnsAsync(new ValidationModel()
                 {
                     State = ValidationState.FreeReportValid
                 });
             var account = new AccountViewModel(_userCache.Object,
                     _validator.Object,
-                    _nav.Object,
+                    _mnNav,
                     _pageFac.Object,
                     _loginStyleAction,
                     _subStyleAction,
@@ -114,7 +116,7 @@ namespace Tests.Routes
             _pageFac.Setup(x => x.GetPage(PageType.ManageSubscription, It.IsAny<ValidationModel>()))
                 .Returns(null as ManageSubscription);
             _nav.Setup(x => x.PushAsync(It.IsAny<ManageSubscription>()));
-            _validator.Setup(x => x.ValidateOrderRequest(user))
+            _validator.Setup(x => x.ValidateOrderRequest(user, It.IsAny<bool>()))
                 .ReturnsAsync(new ValidationModel()
                 {
                     State = ValidationState.SubscriptionReportValid,
@@ -122,13 +124,13 @@ namespace Tests.Routes
                 });
             var acct = new AccountViewModel(_userCache.Object,
                 _validator.Object,
-                _nav.Object,
+                _mnNav,
                 _pageFac.Object,
                 _loginStyleAction,
                 _subStyleAction,
                 _logger.Object);
             Assert.AreEqual("Danger", _loginStyle);
-            Assert.AreEqual("Info", _subStyle);
+            Assert.AreEqual("Success", _subStyle);
             Assert.AreEqual("Manage", acct.SubscriptionButtonText);
             Assert.AreEqual("Reports remaining: 2", acct.SubscriptionLabel);
             Assert.AreEqual(true, acct.SubscriptionButtonEnabled);

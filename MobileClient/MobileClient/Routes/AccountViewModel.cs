@@ -18,7 +18,7 @@ namespace MobileClient.Routes
     public class AccountViewModel : INotifyPropertyChanged
     {
         public readonly ICommand OnAppearingBehavior;
-        private readonly INavigation _navigation;
+        private readonly MainThreadNavigator _navigation;
         private readonly IPageFactory _pageFactory;
         private readonly ICurrentUserService _userCache;
         private readonly IOrderValidationService _orderValidator;
@@ -30,10 +30,11 @@ namespace MobileClient.Routes
         private string _subscriptionButtonText;
         private string _logoutText;
         private bool _subscriptionButtonEnabled;
+        private bool _feedbackButtonEnabled = true;
 
-        public AccountViewModel(ICurrentUserService userCache, 
-                                IOrderValidationService orderValidator, 
-                                INavigation navigation,
+        public AccountViewModel(ICurrentUserService userCache,
+                                IOrderValidationService orderValidator,
+                                MainThreadNavigator navigation,
                                 IPageFactory pageFactory,
                                 Action<string> changeLogInStyleClass,
                                 Action<string> changeSubStyleClass,
@@ -42,6 +43,7 @@ namespace MobileClient.Routes
             _navigation = navigation;
             _pageFactory = pageFactory;
             _userCache = userCache;
+            _logger = logger;
             _userCache.OnLoggedIn += async (s, e) =>
             {
                 SetAccountState(e.Account);
@@ -66,15 +68,14 @@ namespace MobileClient.Routes
             SetInitialState(user);
         }
 
-        private void SetInitialState(AccountModel user)
+        private async Task SetInitialState(AccountModel user)
         {
-            ToolbarInfoCommand = new Command(async () => await _navigation.PushAsync(_pageFactory.GetPage(PageType.Instruction, false)));
-            SetAccountState(user);
+            ToolbarInfoCommand = new Command(() => _navigation.Push(_pageFactory.GetPage(PageType.Instruction, false)));
             LogOutCommand = new Command(async () =>
             {
                 if (_userCache.GetLoggedInAccount() == null)
                 {
-                    await _navigation.PushAsync(_pageFactory.GetPage(PageType.Landing));
+                    _navigation.Push(_pageFactory.GetPage(PageType.Landing));
                 }
                 else
                 {
@@ -83,74 +84,101 @@ namespace MobileClient.Routes
                     await SetSubState(null);
                 }
             });
-
-            Task.Run(async () => await SetSubState(user)).Wait();
-            SubscriptionCommand = new Command(async () => await SubscriptionPressed());
-            FeedbackCommand = new Command(async () => await _navigation.PushAsync(_pageFactory.GetPage(PageType.Feedback)));
+            SubscriptionCommand = new Command(async () =>
+            {
+                if (_userCache.GetLoggedInAccount() == null)
+                    return;
+                var valid = await _orderValidator.ValidateOrderRequest(_userCache.GetLoggedInAccount());
+                try
+                {
+                    SubscriptionButtonEnabled = false;
+                    if (SubscriptionUtility.SubscriptionActive(valid.Subscription))
+                        _navigation.Push(_pageFactory.GetPage(PageType.ManageSubscription, valid));
+                    else
+                        _navigation.Push(_pageFactory.GetPage(PageType.PurchaseOptions, valid));
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError("Failed to handle subscription click command.", ex);
+                }
+                finally
+                {
+                    SubscriptionButtonEnabled = true;
+                }
+            });
+            FeedbackCommand = new Command(() =>
+            {
+                try
+                {
+                    FeedbackButtonEnabled = false;
+                    _navigation.Push(_pageFactory.GetPage(PageType.Feedback, _navigation));
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError("Failed to handle feedback click command.", ex);
+                }
+                finally
+                {
+                    FeedbackButtonEnabled = true;
+                }
+            });
+            SetAccountState(user);
+            await SetSubState(user, true);
         }
 
         private void SetAccountState(AccountModel user)
         {
-            if (user == null)
-            {
-                Email = "Please log in to continue";
-                _changeLoginStyleClass("Info");
-                LogOutText = "Log In";
-            }
-            else
-            {
-                Email = user.Email;
-                _changeLoginStyleClass("Danger");
-                LogOutText = "Sign Out";
-            }
-        }
-
-        private async Task SetSubState(AccountModel user)
-        {
-            if (user == null)
-            {
-                SubscriptionLabel = $"Log in to manage your subscription.";
-                _changeSubStyleClass("Success");
-                SubscriptionButtonText = "Manage";
-                SubscriptionButtonEnabled = false;
-                return;
-            }
-            var validity = await _orderValidator.ValidateOrderRequest(user);
-            if (validity.State == ValidationState.NoReportsLeftInPeriod || validity.State == ValidationState.SubscriptionReportValid)
-            {
-                SubscriptionLabel = $"Reports remaining: {validity.RemainingOrders.ToString()}";
-                _changeSubStyleClass("Info");
-                SubscriptionButtonText = "Manage";
-                SubscriptionButtonEnabled = true;
-            }
-            else
-            {
-                SubscriptionLabel = "Purchase a monthly subscription that fits your needs.";
-                _changeSubStyleClass("Success");
-                SubscriptionButtonText = "Purchase";
-                SubscriptionButtonEnabled = true;
-            }
-        }
-
-        private async Task SubscriptionPressed()
-        {
-            if (_userCache.GetLoggedInAccount() == null)
-                return;
             try
             {
-                var validation = await _orderValidator.ValidateOrderRequest(_userCache.GetLoggedInAccount());
-                if (new[] { ValidationState.SubscriptionReportValid, ValidationState.NoReportsLeftInPeriod }.Contains(validation.State))
+                if (user == null)
                 {
-                    await _navigation.PushAsync(_pageFactory.GetPage(PageType.ManageSubscription, validation));
+                    Email = "Please log in to continue";
+                    _changeLoginStyleClass("Info");
+                    LogOutText = "Log In";
                 }
                 else
                 {
-                    await _navigation.PushAsync(_pageFactory.GetPage(PageType.Purchase, validation));
+                    Email = user.Email;
+                    _changeLoginStyleClass("Danger");
+                    LogOutText = "Sign Out";
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error occurred attempting to purchase subscription.{ex.ToString()}");
+                _logger.LogError("Failed to set acccount state.", ex);
+            }
+        }
+
+        private async Task SetSubState(AccountModel user, bool startUp = false)
+        {
+            try
+            {
+                if (user == null)
+                {
+                    SubscriptionLabel = $"Please log in to view purchasing options.";
+                    _changeSubStyleClass("Success");
+                    SubscriptionButtonText = "View Options";
+                    SubscriptionButtonEnabled = false;
+                    return;
+                }
+                var validity = await _orderValidator.ValidateOrderRequest(user, !startUp);
+                var activeSub = SubscriptionUtility.SubscriptionActive(validity.Subscription);
+                _changeSubStyleClass(activeSub ? "Info" : "Success");
+                SubscriptionButtonText = activeSub ? "Manage" : "View Options";
+                SubscriptionButtonEnabled = true;
+                if (validity.RemainingOrders > 0)
+                {
+                    SubscriptionLabel = $"Reports remaining: {validity.RemainingOrders.ToString()}";
+                }
+                else
+                {
+                    SubscriptionLabel = $"No reports remaining. " +
+                        $"{(activeSub ? "Additional reports can be purchased at a reduced price. Click below to find out more." : "Click below to view purchase options.")}";
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Failed to set subscription state.", ex);
             }
         }
 
@@ -220,6 +248,18 @@ namespace MobileClient.Routes
             }
         }
         public ICommand FeedbackCommand { get; private set; }
+        public bool FeedbackButtonEnabled
+        {
+            get
+            {
+                return _feedbackButtonEnabled;
+            }
+            set
+            {
+                _feedbackButtonEnabled = value;
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FeedbackButtonEnabled)));
+            }
+        }
         #endregion
     }
 }

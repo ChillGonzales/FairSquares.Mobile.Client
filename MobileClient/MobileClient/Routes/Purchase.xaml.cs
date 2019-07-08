@@ -2,6 +2,7 @@
 using MobileClient.Models;
 using MobileClient.Services;
 using MobileClient.Utilities;
+using MobileClient.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,11 +25,12 @@ namespace MobileClient.Routes
                                                    App.Container.GetInstance<ICache<SubscriptionModel>>(),
                                                    App.Container.GetInstance<ISubscriptionService>(),
                                                    App.Container.GetInstance<ICurrentUserService>(),
-                                                   this.Navigation,
+                                                   new MainThreadNavigator(this.Navigation),
                                                    model,
                                                    Device.RuntimePlatform,
                                                    page => (Application.Current.MainPage as BaseTab).NavigateToTab(page),
-                                                   (s1, s2, s3, s4) => DisplayAlert(s1, s2, s3, s4),
+                                                   new AlertUtility((s1, s2, s3, s4) => DisplayAlert(s1, s2, s3, s4),
+                                                   (s1, s2, s3) => DisplayAlert(s1, s2, s3)),
                                                    uri => Device.OpenUri(uri));
         }
     }

@@ -1,4 +1,6 @@
 ﻿using MobileClient.Services;
+using MobileClient.Utilities;
+using MobileClient.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +18,12 @@ namespace MobileClient.Routes
         public ManageSubscription(ValidationModel model)
         {
             InitializeComponent();
-            BindingContext = new ManageSubscriptionViewModel(model, Device.RuntimePlatform, x => Device.OpenUri(x));
+            BindingContext = new ManageSubscriptionViewModel(model, 
+                                                             Device.RuntimePlatform, 
+                                                             x => Device.OpenUri(x),
+                                                             new MainThreadNavigator(this.Navigation),
+                                                             App.Container.GetInstance<ILogger<ManageSubscriptionViewModel>>(),
+                                                             App.Container.GetInstance<IPageFactory>());
         }
     }
 }

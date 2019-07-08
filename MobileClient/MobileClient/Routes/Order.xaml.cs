@@ -20,10 +20,12 @@ namespace MobileClient.Routes
                                                 App.Container.GetInstance<IOrderService>(),
                                                 App.Container.GetInstance<IToastService>(),
                                                 App.Container.GetInstance<IPageFactory>(),
-                                                this.Navigation,
+                                                new MainThreadNavigator(this.Navigation),
                                                 App.Container.GetInstance<IMessagingSubscriber>(),
+                                                App.Container.GetInstance<ILogger<OrderViewModel>>(),
                                                 Device.RuntimePlatform,
-                                                (s1, s2, s3, s4) => DisplayAlert(s1, s2, s3, s4),
+                                                new AlertUtility((s1, s2, s3, s4) => DisplayAlert(s1, s2, s3, s4),
+                                                    (s1, s2, s3) => DisplayAlert(s1, s2, s3)),
                                                 x => (App.Current.MainPage as BaseTab).NavigateToTab(x),
                                                 App.Container.GetInstance<ICache<Models.Order>>());
             _onAppearingBehavior = vm.OnAppearingBehavior;

@@ -3,6 +3,7 @@ using MobileClient.Models;
 using MobileClient.Routes;
 using MobileClient.Services;
 using MobileClient.Utilities;
+using MobileClient.Utility;
 using MobileClient.ViewModels;
 using Moq;
 using NUnit.Framework;
@@ -23,10 +24,11 @@ namespace Tests.Routes
         private Mock<ISubscriptionService> _subService;
         private Mock<ICurrentUserService> _userCache;
         private Mock<INavigation> _nav;
+        private MainThreadNavigator _mnNav;
         private ValidationModel _validationModel;
         private string _runtimePlatform;
         private Action<BaseNavPageType> _navigateFromMenu;
-        private Func<string, string, string, string, Task<bool>> _displayAlert;
+        private AlertUtility _alertUtil;
         private Action<Uri> _openUri;
         private BaseNavPageType? CurrentTab = null;
         private Uri OpenedUri = null;
@@ -40,6 +42,7 @@ namespace Tests.Routes
             _subService = new Mock<ISubscriptionService>();
             _userCache = new Mock<ICurrentUserService>();
             _nav = new Mock<INavigation>();
+            _mnNav = new MainThreadNavigator(_nav.Object);
             _validationModel = new ValidationModel()
             {
                 RemainingOrders = 0,
@@ -47,7 +50,7 @@ namespace Tests.Routes
             };
             _runtimePlatform = Device.Android;
             _navigateFromMenu = new Action<BaseNavPageType>(x => CurrentTab = x);
-            _displayAlert = new Func<string, string, string, string, Task<bool>>((s1, s2, s3, s4) => Task.FromResult(false));
+            _alertUtil = new AlertUtility((s1, s2, s3, s4) => Task.FromResult(false), (s1, s2, s3) => Task.Delay(0));
             _openUri = new Action<Uri>(x => OpenedUri = x);
         }
 
@@ -59,11 +62,11 @@ namespace Tests.Routes
                                            _subCache.Object,
                                            _subService.Object,
                                            _userCache.Object,
-                                           _nav.Object,
+                                           _mnNav,
                                            _validationModel,
                                            _runtimePlatform,
                                            _navigateFromMenu,
-                                           _displayAlert,
+                                           _alertUtil,
                                            _openUri);
         }
     }

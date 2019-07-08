@@ -15,6 +15,7 @@ namespace MobileClient.Models
         public DateTimeOffset PurchasedDateTime { get; set; }
         public DateTimeOffset StartDateTime { get; set; }
         public DateTimeOffset EndDateTime { get; set; }
+        public string Email { get; set; }
     }
 
     public enum SubscriptionType

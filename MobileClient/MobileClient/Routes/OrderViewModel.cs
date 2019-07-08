@@ -21,13 +21,14 @@ namespace MobileClient.Routes
         private readonly ICurrentUserService _userService;
         private readonly IOrderService _orderService;
         private readonly IToastService _toast;
-        private readonly INavigation _nav;
+        private readonly MainThreadNavigator _nav;
         private readonly IPageFactory _pageFactory;
         private readonly ICache<Models.Order> _orderCache;
-        private readonly Func<string, string, string, string, Task<bool>> _alertTask;
+        private readonly AlertUtility _alertUtility;
         private readonly IMessagingSubscriber _topicSubscriber;
         private readonly Action<BaseNavPageType> _baseNavigationAction;
         private readonly string _deviceType;
+        private readonly ILogger<OrderViewModel> _logger;
         private GridLength _errorMessageRowHeight;
         private bool _cannotSubmitLayoutVisible;
         private string _cannotSubmitHeaderText;
@@ -42,16 +43,19 @@ namespace MobileClient.Routes
         private string _comments;
         private string _errorMessage;
         private bool _submitButtonEnabled = true;
+        private string _purchaseOptionsText;
+        private bool _purchaseOptionsVisible;
 
         public OrderViewModel(IOrderValidationService validator,
                               ICurrentUserService userCache,
                               IOrderService orderService,
                               IToastService toast,
                               IPageFactory pageFactory,
-                              INavigation nav,
+                              MainThreadNavigator nav,
                               IMessagingSubscriber topicSubscriber,
+                              ILogger<OrderViewModel> logger,
                               string deviceType,
-                              Func<string, string, string, string, Task<bool>> alertTask,
+                              AlertUtility alertUtility,
                               Action<BaseNavPageType> baseNavigationAction,
                               ICache<Models.Order> orderCache)
         {
@@ -62,51 +66,75 @@ namespace MobileClient.Routes
             _orderService = orderService;
             _pageFactory = pageFactory;
             _orderCache = orderCache;
-            _alertTask = alertTask;
+            _alertUtility = alertUtility;
             _topicSubscriber = topicSubscriber;
             _baseNavigationAction = baseNavigationAction;
             _deviceType = deviceType;
+            _logger = logger;
 
+            PurchaseOptionsCommand = new Command(async () =>
+            {
+                var val = await _orderValidator.ValidateOrderRequest(_userService.GetLoggedInAccount());
+                if (SubscriptionUtility.SubscriptionActive(val.Subscription))
+                    _nav.Push(_pageFactory.GetPage(PageType.SingleReportPurchase, val));
+                else
+                    _nav.Push(_pageFactory.GetPage(PageType.PurchaseOptions, val));
+            });
             ErrorMessageRowHeight = 0;
             SelectedOptionIndex = 0;
             SelectedStateIndex = -1;
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
             SetVisualStateForValidation();
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
         }
 
         private async Task SetVisualStateForValidation()
         {
-            var user = _userService.GetLoggedInAccount();
-            if (user == null)
+            try
             {
-                MainLayoutVisible = true;
-                CannotSubmitLayoutVisible = false;
-                return;
-            }
-            var validation = await _orderValidator.ValidateOrderRequest(user);
-            switch (validation.State)
-            {
-                case ValidationState.NoReportsLeftInPeriod:
-                    MainLayoutVisible = false;
-                    CannotSubmitHeaderText = "You've been busy!";
-                    CannotSubmitLabelText = $"Sorry, you have used all of your reports for this month.";
-                    CannotSubmitLayoutVisible = true;
-                    break;
-                case ValidationState.NoSubscriptionAndTrialValid:
-                    MainLayoutVisible = false;
-                    CannotSubmitHeaderText = "Thanks for trying Fair Squares!";
-                    CannotSubmitLabelText = $"Please go to the Account Tab to claim your free one month trial before continuing.";
-                    CannotSubmitLayoutVisible = true;
-                    break;
-                case ValidationState.NoSubscriptionAndTrialAlreadyUsed:
-                    MainLayoutVisible = false;
-                    CannotSubmitHeaderText = "Thanks for trying Fair Squares!";
-                    CannotSubmitLabelText = $"Please purchase a subscription from the Account Tab before continuing.";
-                    CannotSubmitLayoutVisible = true;
-                    break;
-                default:
+                var user = _userService.GetLoggedInAccount();
+                if (user == null)
+                {
                     MainLayoutVisible = true;
                     CannotSubmitLayoutVisible = false;
-                    break;
+                    return;
+                }
+                var validation = await _orderValidator.ValidateOrderRequest(user);
+                var activeSub = SubscriptionUtility.SubscriptionActive(validation.Subscription);
+                switch (validation.State)
+                {
+                    case ValidationState.NoReportsLeftInPeriod:
+                        MainLayoutVisible = false;
+                        CannotSubmitHeaderText = "You've been busy!";
+                        CannotSubmitLabelText = $"Sorry, you have used all of your reports for this month.";
+                        CannotSubmitLayoutVisible = true;
+                        PurchaseOptionsText = $"Additional reports can be purchased at a reduced price of " +
+                            $"${SubscriptionUtility.GetSingleReportInfo(validation).Price} per report.";
+                        PurchaseOptionsVisible = true;
+                        break;
+                    case ValidationState.NoSubscriptionAndTrialValid:
+                        MainLayoutVisible = false;
+                        CannotSubmitHeaderText = "Thanks for trying Fair Squares!";
+                        CannotSubmitLabelText = $"Please claim your free one month subscription trial, or click below to view other options.";
+                        CannotSubmitLayoutVisible = true;
+                        PurchaseOptionsVisible = false;
+                        break;
+                    case ValidationState.NoSubscriptionAndTrialAlreadyUsed:
+                        MainLayoutVisible = false;
+                        CannotSubmitHeaderText = "Thanks for trying Fair Squares!";
+                        CannotSubmitLabelText = $"Click below to view options for getting more reports.";
+                        CannotSubmitLayoutVisible = true;
+                        PurchaseOptionsVisible = false;
+                        break;
+                    default:
+                        MainLayoutVisible = true;
+                        CannotSubmitLayoutVisible = false;
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Failed to set visual state on load.", ex);
             }
         }
 
@@ -130,13 +158,13 @@ namespace MobileClient.Routes
                 }
                 if (user == null)
                 {
-                    var answer = await _alertTask("Please Log In", "Please log in first to submit a report.", "Login", "Cancel");
+                    var answer = await _alertUtility.Display("Please Log In", "Please log in first to submit a report.", "Login", "Cancel");
                     if (!answer)
                     {
                         SubmitButtonEnabled = true;
                         return;
                     }
-                    await _nav.PushAsync(_pageFactory.GetPage(PageType.Landing));
+                    _nav.Push(_pageFactory.GetPage(PageType.Landing));
                     SubmitButtonEnabled = true;
                     return;
                 }
@@ -146,7 +174,8 @@ namespace MobileClient.Routes
             {
                 ErrorMessageRowHeight = GridLength.Star;
                 SubmitButtonEnabled = true;
-                ErrorMessage = $"Failed to submit order with error {ex.ToString()}";
+                ErrorMessage = $"Failed to submit order with error {ex.Message}";
+                _logger.LogError($"Failed to submit order.", ex);
             }
         }
 
@@ -166,7 +195,6 @@ namespace MobileClient.Routes
             newOrder.OrderId = await _orderService.AddOrder(newOrder);
             _topicSubscriber.Subscribe(new List<string>() { newOrder.OrderId });
             _orderCache.Put(newOrder.OrderId, newOrder);
-            _toast.ShortToast($"Your address has been submitted!");
 
             // Clear all fields
             AddressLine1 = "";
@@ -178,6 +206,7 @@ namespace MobileClient.Routes
             Zip = "";
             SubmitButtonEnabled = true;
             Comments = "";
+            await _alertUtility.Display("Order Submitted", "Thank you for your order!", "Ok");
             _baseNavigationAction(BaseNavPageType.MyOrders);
         }
 
@@ -280,7 +309,7 @@ namespace MobileClient.Routes
             }
         }
         public List<string> StatesSource => States.Select(x => x.Text).ToList();
-        public ICommand ToolbarInfo_Command => new Command(async () => await _nav.PushAsync(_pageFactory.GetPage(PageType.Instruction, false)));
+        public ICommand ToolbarInfo_Command => new Command(() => _nav.Push(_pageFactory.GetPage(PageType.Instruction, false)));
         public ICommand OnAppearingBehavior => new Command(async () => await SetVisualStateForValidation());
         public int SelectedStateIndex
         {
@@ -356,6 +385,31 @@ namespace MobileClient.Routes
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SubmitButtonEnabled)));
             }
         }
+        public string PurchaseOptionsText
+        {
+            get
+            {
+                return _purchaseOptionsText;
+            }
+            set
+            {
+                _purchaseOptionsText = value;
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PurchaseOptionsText)));
+            }
+        }
+        public bool PurchaseOptionsVisible
+        {
+            get
+            {
+                return _purchaseOptionsVisible;
+            }
+            set
+            {
+                _purchaseOptionsVisible = value;
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PurchaseOptionsVisible)));
+            }
+        }
+        public ICommand PurchaseOptionsCommand { get; private set; }
 
         private readonly List<OptionViewModel> Options = new List<OptionViewModel>()
         {

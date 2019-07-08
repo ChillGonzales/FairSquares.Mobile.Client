@@ -24,12 +24,13 @@ namespace MobileClient.Routes
         private readonly ICache<PropertyModel> _propertyCache;
         private readonly ICache<ImageModel> _imageCache;
         private readonly ILogger<MyOrdersViewModel> _logger;
+        private readonly Action<Action> _uiInvoke;
         private readonly ICacheRefresher _cacheRefresher;
         private readonly IOrderValidationService _validationService;
         private readonly IPageFactory _pageFactory;
         private readonly ICurrentUserService _userService;
         private readonly IMessagingCenter _messagingCenter;
-        private readonly INavigation _nav;
+        private readonly MainThreadNavigator _nav;
         private readonly Action<BaseNavPageType> _baseNavAction;
         private bool _loadingLayoutVisible;
         private bool _loadingAnimVisible;
@@ -52,8 +53,9 @@ namespace MobileClient.Routes
                                  IOrderValidationService validator,
                                  IPageFactory pageFactory,
                                  ICurrentUserService userService,
-                                 INavigation nav,
+                                 MainThreadNavigator nav,
                                  IMessagingCenter messagingCenter,
+                                 Action<Action> uiInvoke,
                                  Action<BaseNavPageType> baseNavAction)
         {
             _orderService = orderSvc;
@@ -61,6 +63,7 @@ namespace MobileClient.Routes
             _propertyCache = propertyCache;
             _imageCache = imageCache;
             _logger = logger;
+            _uiInvoke = uiInvoke;
             _cacheRefresher = cacheRefresher;
             _validationService = validator;
             _pageFactory = pageFactory;
@@ -69,15 +72,8 @@ namespace MobileClient.Routes
             _nav = nav;
             _baseNavAction = baseNavAction;
             OnAppearingBehavior = new Command(async () => await SetViewState());
-            _messagingCenter.Subscribe<App>(this, "CacheInvalidated", async x =>
-            {
-                try
-                {
-                    await this.SetViewState();
-                }
-                catch { }
-            });
-            ExampleReportCommand = new Command(async () =>
+            _messagingCenter.Subscribe<App>(this, "CacheInvalidated", async x => await this.SetViewState());
+            ExampleReportCommand = new Command(() =>
             {
                 try
                 {
@@ -88,7 +84,7 @@ namespace MobileClient.Routes
                         Image = Convert.FromBase64String(Examples.ExampleImage)
                     });
                     _propertyCache.Put(order.OrderId, JsonConvert.DeserializeObject<PropertyModel>(Examples.ExampleProperty));
-                    await _nav.PushAsync(_pageFactory.GetPage(PageType.OrderDetail, order));
+                    _nav.Push(_pageFactory.GetPage(PageType.OrderDetail, order));
                 }
                 catch (Exception ex)
                 {
@@ -100,7 +96,7 @@ namespace MobileClient.Routes
                 try
                 {
                     OrderListRefreshing = true;
-                    await _cacheRefresher.RefreshCaches(_userService.GetLoggedInAccount()?.UserId);
+                    await _cacheRefresher.RefreshCaches(_userService.GetLoggedInAccount());
                     SetListViewSource(_orderCache.GetAll().Select(x => x.Value).ToList());
                     OrderListRefreshing = false;
                 }
@@ -115,71 +111,92 @@ namespace MobileClient.Routes
         private async Task SetViewState()
         {
             var orders = new List<Models.Order>();
-            var user = _userService.GetLoggedInAccount();
-            if (_cacheRefresher.Invalidated)
+            try
             {
-                MainLayoutVisible = false;
-                LoadingLayoutVisible = true;
-                LoadingAnimRunning = true;
+                var user = _userService.GetLoggedInAccount();
+                if (_cacheRefresher.Invalidated)
+                {
+                    MainLayoutVisible = false;
+                    LoadingLayoutVisible = true;
+                    LoadingAnimRunning = true;
+                    if (user != null)
+                    {
+                        var fresh = await _orderService.GetMemberOrders(user.UserId);
+                        _orderCache.Put(fresh.ToDictionary(x => x.OrderId, x => x));
+                    }
+                    MainLayoutVisible = true;
+                    LoadingLayoutVisible = false;
+                    LoadingAnimRunning = false;
+                    _cacheRefresher.Revalidate();
+                }
+                orders = _orderCache.GetAll().Select(x => x.Value).ToList();
+                var anyOrders = orders.Any();
+                MainLayoutVisible = anyOrders;
+                NoOrderLayoutVisible = !anyOrders;
                 if (user != null)
                 {
-                    var fresh = await _orderService.GetMemberOrders(user.UserId);
-                    _orderCache.Put(fresh.ToDictionary(x => x.OrderId, x => x));
+                    var validation = await _validationService.ValidateOrderRequest(user);
+                    FreeReportLayoutVisible = validation.State == ValidationState.FreeReportValid;
+                    LoginLayoutVisible = false;
                 }
-                MainLayoutVisible = true;
-                LoadingLayoutVisible = false;
-                LoadingAnimRunning = false;
-                _cacheRefresher.Revalidate();
+                else
+                {
+                    FreeReportLayoutVisible = false;
+                    LoginLayoutVisible = true;
+                }
             }
-            orders = _orderCache.GetAll().Select(x => x.Value).ToList();
-            var anyOrders = orders.Any();
-            MainLayoutVisible = anyOrders;
-            NoOrderLayoutVisible = !anyOrders;
-            if (user != null)
+            catch (Exception ex)
             {
-                var validation = await _validationService.ValidateOrderRequest(user);
-                FreeReportLayoutVisible = validation.State == ValidationState.FreeReportValid;
-                LoginLayoutVisible = false;
-            }
-            else
-            {
-                FreeReportLayoutVisible = false;
-                LoginLayoutVisible = true;
+                _logger.LogError($"Failed to set view state.", ex);
             }
             SetListViewSource(orders);
         }
 
         private void SetListViewSource(List<Models.Order> orders)
         {
-            var fulGroup = new OrderGroup() { Title = "Completed" };
-            fulGroup.AddRange(orders.Where(x => x.Fulfilled).Select(x => new OrderViewCell()
+            try
             {
-                Text = $"(#{x.OrderId}) {x.StreetAddress.Split('\n')[0]}",
-                TextColor = Color.Black,
-                OrderId = x.OrderId
-            }));
-            var penGroup = new OrderGroup() { Title = "Pending" };
-            penGroup.AddRange(orders.Where(x => !x.Fulfilled).Select(x => new OrderViewCell()
+                var fulGroup = new OrderGroup() { Title = "Completed" };
+                fulGroup.AddRange(orders.Where(x => x.Fulfilled).Select(x => new OrderViewCell()
+                {
+                    Text = $"(#{x.OrderId}) {x.StreetAddress.Split('\n')[0]}",
+                    TextColor = Color.Black,
+                    OrderId = x.OrderId
+                }));
+                var penGroup = new OrderGroup() { Title = "Pending" };
+                penGroup.AddRange(orders.Where(x => !x.Fulfilled).Select(x => new OrderViewCell()
+                {
+                    Text = $"(#{x.OrderId}) {x.StreetAddress.Split('\n')[0]}",
+                    TextColor = Color.Black,
+                    OrderId = x.OrderId
+                }));
+                _uiInvoke(() => OrdersSource = new List<OrderGroup>() { fulGroup, penGroup });
+            }
+            catch (Exception ex)
             {
-                Text = $"(#{x.OrderId}) {x.StreetAddress.Split('\n')[0]}",
-                TextColor = Color.Black,
-                OrderId = x.OrderId
-            }));
-            OrdersSource = new List<OrderGroup>() { fulGroup, penGroup };
+                _logger.LogError($"Failed to set list view source", ex);
+            }
         }
 
-        private async Task HandleSelectedItemChange(OrderViewCell selected)
+        private void HandleSelectedItemChange(OrderViewCell selected)
         {
-            if (selected == null)
-                return;
-            var id = selected.OrderId;
-            await _nav.PushAsync(_pageFactory.GetPage(PageType.OrderDetail, _orderCache.Get(id)));
+            try
+            {
+                if (selected == null)
+                    return;
+                var id = selected.OrderId;
+                _nav.Push(_pageFactory.GetPage(PageType.OrderDetail, _orderCache.Get(id)));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Failed to handle selected item change event.", ex);
+            }
             OrderListSelectedItem = null;
         }
 
         // Bound properties
         public event PropertyChangedEventHandler PropertyChanged;
-        public ICommand ToolbarInfoCommand => new Command(async () => await _nav.PushAsync(_pageFactory.GetPage(PageType.Instruction, false)));
+        public ICommand ToolbarInfoCommand => new Command(() => _nav.Push(_pageFactory.GetPage(PageType.Instruction, false)));
         public bool LoadingLayoutVisible
         {
             get
@@ -240,7 +257,7 @@ namespace MobileClient.Routes
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LoginLayoutVisible)));
             }
         }
-        public ICommand LoginCommand => new Command(async () => await _nav.PushAsync(_pageFactory.GetPage(PageType.Landing)));
+        public ICommand LoginCommand => new Command(() => _nav.Push(_pageFactory.GetPage(PageType.Landing)));
         public bool FreeReportLayoutVisible
         {
             get

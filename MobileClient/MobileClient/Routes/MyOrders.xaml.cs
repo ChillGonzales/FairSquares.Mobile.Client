@@ -31,8 +31,9 @@ namespace MobileClient.Routes
                                            App.Container.GetInstance<IOrderValidationService>(),
                                            App.Container.GetInstance<IPageFactory>(),
                                            App.Container.GetInstance<ICurrentUserService>(),
-                                           this.Navigation,
+                                           new MainThreadNavigator(this.Navigation),
                                            App.Container.GetInstance<IMessagingCenter>(),
+                                           x => Device.BeginInvokeOnMainThread(x),
                                            x => (Application.Current.MainPage as BaseTab).NavigateToTab(x));
             _onAppearingBehavior = vm.OnAppearingBehavior;
             BindingContext = vm;

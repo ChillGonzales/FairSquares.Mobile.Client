@@ -11,73 +11,94 @@ namespace MobileClient.Services
 {
     public class OrderValidationService : IOrderValidationService
     {
-        private readonly IOrderService _orderService;
-        private readonly ISubscriptionService _subService;
+        private readonly ICache<Order> _orderCache;
+        private readonly ICache<SubscriptionModel> _subCache;
+        private readonly ICache<PurchasedReportModel> _prCache;
+        private readonly ICacheRefresher _cacheRefresher;
         private readonly ILogger<OrderValidationService> _logger;
 
-        public OrderValidationService(IOrderService orderService, ISubscriptionService subService, ILogger<OrderValidationService> logger)
+        public OrderValidationService(ICacheRefresher cacheRefresher,
+                                      ICache<Order> orderCache,
+                                      ICache<SubscriptionModel> subCache,
+                                      ICache<PurchasedReportModel> prCache,
+                                      ILogger<OrderValidationService> logger)
         {
-            _orderService = orderService;
-            _subService = subService;
+            _cacheRefresher = cacheRefresher;
+            _orderCache = orderCache;
+            _subCache = subCache;
+            _prCache = prCache;
             _logger = logger;
         }
 
-        public async Task<ValidationModel> ValidateOrderRequest(AccountModel user)
+        public async Task<ValidationModel> ValidateOrderRequest(AccountModel user, bool useCached = true)
         {
             try
             {
-                var subs = _subService.GetSubscriptions(user.UserId).OrderBy(x => x.StartDateTime);
-                var lastSub = subs.LastOrDefault();
-                var orders = await _orderService.GetMemberOrders(user.UserId);
+                List<SubscriptionModel> subs = null;
+                List<PurchasedReportModel> purchased = null;
+                IEnumerable<Models.Order> orders = null;
+                SubscriptionModel lastSub = null;
+                if (!useCached)
+                    await _cacheRefresher.RefreshCaches(user);
+                subs = _subCache.GetAll().Select(x => x.Value).OrderBy(x => x.StartDateTime).ToList();
+                lastSub = subs.LastOrDefault();
+                purchased = _prCache.GetAll().Select(x => x.Value).ToList();
+                orders = _orderCache.GetAll().Select(x => x.Value);
 
-                if (!SubscriptionUtility.SubscriptionActive(lastSub) && orders.Any())
+                var totalRemainingOrders = subs
+                    .Select(x => SubscriptionUtility.GetInfoFromSubType(x.SubscriptionType).OrderCount).Sum() + 1
+                                                                                                              + purchased.Count()
+                                                                                                              - orders.Count();
+                var model = new ValidationModel()
+                {
+                    PurchasedReports = purchased,
+                    RemainingOrders = totalRemainingOrders
+                };
+
+                if (!subs.Any() && !orders.Any())
+                {
+                    model.State = ValidationState.FreeReportValid;
+                    model.Message = "User can use their free report.";
+                    return model;
+                }
+                // Handle case of no sub but purchased reports
+                if (!subs.Any() && purchased.Any())
+                {
+                    if (orders.Count() < (1 + purchased.Count()))
+                    {
+                        model.State = ValidationState.NoSubscriptionAndReportValid;
+                        model.Message = "User can use their purchased report.";
+                        return model;
+                    }
+                }
+                if (!subs.Any() && orders.Any())
                 {
                     // This case means they've never had a subscription before, and are eligible for a trial month.
-                    if (lastSub == null)
-                    {
-                        return new ValidationModel()
-                        {
-                            State = ValidationState.NoSubscriptionAndTrialValid,
-                            Message = "User has used their free report, but is eligible for a free trial period."
-                        };
-                    }
-                    return new ValidationModel()
-                    {
-                        State = ValidationState.NoSubscriptionAndTrialAlreadyUsed,
-                        Message = "User does not have a subscription and has used their free report and trial period."
-                    };
+                    model.State = ValidationState.NoSubscriptionAndTrialValid;
+                    model.Message = "User has used their free report, but is eligible for a free trial period.";
+                    return model;
                 }
-                if (!SubscriptionUtility.SubscriptionActive(lastSub) && !orders.Any())
+                if (subs.Any() && !SubscriptionUtility.SubscriptionActive(lastSub) && orders.Any())
                 {
-                    return new ValidationModel()
-                    {
-                        State = ValidationState.FreeReportValid,
-                        Message = "User can use their free report."
-                    };
+                    model.State = ValidationState.NoSubscriptionAndTrialAlreadyUsed;
+                    model.Message = "User has used their free trial and free report.";
+                    return model;
                 }
-
-                // Add 1 to the calculation to take into account free report
-                var totalRemainingOrders = subs
-                    .Select(x => SubscriptionUtility.GetInfoFromSubType(x.SubscriptionType).OrderCount).Sum() - orders.Count() + 1;
 
                 if (totalRemainingOrders <= 0)
                 {
-                    return new ValidationModel()
-                    {
-                        State = ValidationState.NoReportsLeftInPeriod,
-                        RemainingOrders = 0,
-                        Subscription = lastSub,
-                        Message = "User has used all of their orders for this subscription period."
-                    };
+                    model.State = ValidationState.NoReportsLeftInPeriod;
+                    model.RemainingOrders = 0;
+                    model.Subscription = lastSub;
+                    model.Message = "User has used all of their orders for this subscription period.";
+                    return model;
                 }
                 else
                 {
-                    return new ValidationModel()
-                    {
-                        State = ValidationState.SubscriptionReportValid,
-                        Subscription = lastSub,
-                        RemainingOrders = totalRemainingOrders,
-                    };
+                    model.State = ValidationState.SubscriptionReportValid;
+                    model.Subscription = lastSub;
+                    model.RemainingOrders = totalRemainingOrders;
+                    return model;
                 }
             }
             catch (Exception ex)
@@ -93,6 +114,7 @@ namespace MobileClient.Services
         public ValidationState State { get; set; }
         public string Message { get; set; }
         public int RemainingOrders { get; set; }
+        public List<PurchasedReportModel> PurchasedReports { get; set; }
         public SubscriptionModel Subscription { get; set; }
     }
 
@@ -100,6 +122,7 @@ namespace MobileClient.Services
     {
         NoSubscriptionAndTrialAlreadyUsed,
         NoSubscriptionAndTrialValid,
+        NoSubscriptionAndReportValid,
         FreeReportValid,
         SubscriptionReportValid,
         NoReportsLeftInPeriod
