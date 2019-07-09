@@ -197,7 +197,7 @@ namespace MobileClient.Routes
                     var response = RoofUtility.CalculateTotals(roof);
                     var rise = RoofUtility.GetPredominantPitchFromSections(roof.Sections);
                     roof.TotalArea = Math.Round(response.TotalArea, 0);
-                    roof.TotalSquares = Math.Round(response.TotalSquaresCount, 0);
+                    roof.TotalSquares = Math.Ceiling(response.TotalSquaresCount);
                     roof.PredominantPitchRise = rise;
                 }
             }
