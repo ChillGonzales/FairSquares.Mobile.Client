@@ -177,6 +177,14 @@ namespace MobileClient.Routes
                 ErrorMessage = $"Failed to submit order with error {ex.Message}";
                 _logger.LogError($"Failed to submit order.", ex);
             }
+            finally
+            {
+                try
+                {
+                    await SetVisualStateForValidation();
+                }
+                catch { }
+            }
         }
 
         private async Task SubmitOrder(string userId, string email)

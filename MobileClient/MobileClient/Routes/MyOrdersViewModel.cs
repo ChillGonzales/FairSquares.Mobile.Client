@@ -71,8 +71,6 @@ namespace MobileClient.Routes
             _messagingCenter = messagingCenter;
             _nav = nav;
             _baseNavAction = baseNavAction;
-            OnAppearingBehavior = new Command(async () => await SetViewState());
-            _messagingCenter.Subscribe<App>(this, "CacheInvalidated", async x => await this.SetViewState());
             ExampleReportCommand = new Command(() =>
             {
                 try
@@ -102,10 +100,12 @@ namespace MobileClient.Routes
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"Failed to refresh order list. \n{ex.ToString()}");
+                    _logger.LogError($"Failed to refresh order list.", ex);
                 }
             };
             OrderListRefreshCommand = new Command(refreshAction);
+            _messagingCenter.Subscribe<App>(this, "CacheInvalidated", async x => await this.SetViewState());
+            OnAppearingBehavior = new Command(async () => await SetViewState());
         }
 
         private async Task SetViewState()
@@ -118,6 +118,7 @@ namespace MobileClient.Routes
                 {
                     MainLayoutVisible = false;
                     LoadingLayoutVisible = true;
+                    LoadingAnimVisible = true;
                     LoadingAnimRunning = true;
                     if (user != null)
                     {
@@ -127,6 +128,7 @@ namespace MobileClient.Routes
                     MainLayoutVisible = true;
                     LoadingLayoutVisible = false;
                     LoadingAnimRunning = false;
+                    LoadingAnimVisible = false;
                     _cacheRefresher.Revalidate();
                 }
                 orders = _orderCache.GetAll().Select(x => x.Value).ToList();
@@ -147,7 +149,7 @@ namespace MobileClient.Routes
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Failed to set view state.", ex);
+                _logger.LogError($"Failed to set view state. {ex.Message}", ex);
             }
             SetListViewSource(orders);
         }

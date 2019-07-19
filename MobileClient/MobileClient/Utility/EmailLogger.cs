@@ -21,7 +21,7 @@ namespace MobileClient.Utilities
             _userCache = userCache;
         }
 
-        public void LogError(string message, params object[] args)
+        public void LogError(string message, Exception ex, params object[] args)
         {
             try
             {
@@ -44,9 +44,9 @@ namespace MobileClient.Utilities
                     });
                 });
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                Debug.WriteLine($"An error occurred while logging to email." + ex.ToString());
+                Debug.WriteLine($"An error occurred while logging to email." + e.ToString());
             }
         }
     }

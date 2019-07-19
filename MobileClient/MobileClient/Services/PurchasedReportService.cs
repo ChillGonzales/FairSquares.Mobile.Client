@@ -52,7 +52,7 @@ namespace MobileClient.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Failed to get purchased reports.", userId, ex);
+                _logger.LogError($"Failed to get purchased reports. {ex.Message}", ex, userId);
                 throw;
             }
         }

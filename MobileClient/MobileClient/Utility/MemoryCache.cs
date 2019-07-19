@@ -25,7 +25,7 @@ namespace MobileClient.Utilities
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error deleting cached value for key '{key}'. {ex.ToString()}");
+                _logger.LogError($"Error deleting cached value for key '{key}'. {ex.ToString()}", ex);
                 throw;
             }
         }
@@ -51,7 +51,7 @@ namespace MobileClient.Utilities
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error getting all cached values. {ex.ToString()}");
+                _logger.LogError($"Error getting all cached values. {ex.ToString()}", ex);
                 throw;
             }
         }
@@ -66,7 +66,7 @@ namespace MobileClient.Utilities
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error getting cached value for key '{key}'. {ex.ToString()}");
+                _logger.LogError($"Error getting cached value for key '{key}'. {ex.ToString()}", ex);
                 throw;
             }
         }
@@ -79,7 +79,7 @@ namespace MobileClient.Utilities
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error replacing cached value for key '{key}'. {ex.ToString()}");
+                _logger.LogError($"Error replacing cached value for key '{key}'. {ex.ToString()}", ex);
                 throw;
             }
         }
@@ -92,7 +92,7 @@ namespace MobileClient.Utilities
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error replacing cache. {ex.ToString()}");
+                _logger.LogError($"Error replacing cache. {ex.ToString()}", ex);
                 throw;
             }
         }
@@ -108,7 +108,7 @@ namespace MobileClient.Utilities
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error updating cache.", ex.ToString());
+                _logger.LogError($"Error updating cache.", ex);
                 throw;
             }
         }

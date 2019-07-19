@@ -39,7 +39,7 @@ namespace MobileClient.Services
             if (!connected)
             {
                 // we are offline or can't connect, don't try to purchase
-                _logger.LogError($"Can't connect to billing service.", name, payload);
+                _logger.LogError($"Can't connect to billing service.", null, name, payload);
                 throw new InvalidOperationException($"Can't connect to billing service. Check connection to internet.");
             }
 
@@ -100,7 +100,7 @@ namespace MobileClient.Services
             catch (Exception ex)
             {
                 // Something else has gone wrong, log it
-                _logger.LogError("Failed to purchase subscription.", name, ex);
+                _logger.LogError("Failed to purchase subscription.", ex, name);
                 throw new InvalidOperationException(ex.Message, ex);
             }
             finally
@@ -110,7 +110,7 @@ namespace MobileClient.Services
             if (purchase == null)
             {
                 // did not purchase
-                _logger.LogError("Failed to purchase subscription.", name);
+                _logger.LogError("Failed to purchase subscription.", null, name);
                 throw new InvalidOperationException("Failed to complete purchase. Please contact support.");
             }
             return purchase;

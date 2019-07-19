@@ -36,7 +36,7 @@ namespace MobileClient.Services
             {
                 if (!x.Response.Result.IsSuccessStatusCode)
                 {
-                    _logger.LogError($"Image request failed for order id '{x.Order}' with code '{x.Response.Result.StatusCode}");
+                    _logger.LogError($"Image request failed for order id '{x.Order}' with code '{x.Response.Result.StatusCode}", null);
                     return new ImageModel()
                     {
                         Image = new byte[0],

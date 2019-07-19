@@ -24,7 +24,8 @@ namespace MobileClient.Routes
                                           App.Container.GetInstance<IPageFactory>(),
                                           s => LogOutButton.StyleClass = new List<string>() { s },
                                           s => SubButton.StyleClass = new List<string>() { s },
-                                          App.Container.GetInstance<ILogger<AccountViewModel>>());
+                                          App.Container.GetInstance<ILogger<AccountViewModel>>(),
+                                          App.Container.GetInstance<ICacheRefresher>());
             _onAppearing = vm.OnAppearingBehavior;
             BindingContext = vm;
         }

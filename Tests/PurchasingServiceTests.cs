@@ -45,7 +45,7 @@ namespace Tests
             _billing.Verify(x => x.ConnectAsync(ItemType.Subscription), Times.Once);
             _billing.Verify(x => x.DisconnectAsync(), Times.Once);
             _billing.Verify(x => x.PurchaseAsync(name, ItemType.Subscription, "", null), Times.Once);
-            _logger.Verify(x => x.LogError(It.IsAny<string>()), Times.Never);
+            _logger.Verify(x => x.LogError(It.IsAny<string>(), It.IsAny<Exception>()), Times.Never);
         }
 
         public async Task WhenPurchasingSubscriptionWithoutConnection_ThrowsError()

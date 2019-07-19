@@ -37,7 +37,7 @@ namespace MobileClient.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Failed to get properties. {ex.ToString()}");
+                _logger.LogError($"Failed to get properties.", ex);
                 throw;
             }
 

@@ -161,7 +161,7 @@ namespace MobileClient
                                     }
                                     catch (Exception ex)
                                     {
-                                        purchaseEmailLogger.LogError($"Error occurred while getting purchases. {ex.ToString()}");
+                                        purchaseEmailLogger.LogError($"Error occurred while getting purchases.", ex);
                                     }
                                     var mostRecent = purchases.OrderBy(x => x.TransactionDateUtc)?.LastOrDefault();
                                     if (mostRecent != null)

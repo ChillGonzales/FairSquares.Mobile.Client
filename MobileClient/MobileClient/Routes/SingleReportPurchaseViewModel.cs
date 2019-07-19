@@ -143,7 +143,7 @@ namespace MobileClient.Routes
             }
             catch (Exception ex)
             {
-                _emailLogger.LogError($"Purchase succeeded but failed to add purchase to server.", JsonConvert.SerializeObject(model), ex.ToString());
+                _emailLogger.LogError($"Purchase succeeded but failed to add purchase to server.", ex, model);
             }
             try
             {

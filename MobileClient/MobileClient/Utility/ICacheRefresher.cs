@@ -11,6 +11,7 @@ namespace MobileClient.Utilities
         Task RefreshCaches(AccountModel user);
         void Invalidate();
         void Revalidate();
+        Task RefreshTask { get; }
         bool Invalidated { get; }
     }
 }
