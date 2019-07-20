@@ -35,7 +35,7 @@ namespace Tests.Routes
                 }
             };
             _nav = new Mock<INavigation>();
-            _mnNav = new MainThreadNavigator(_nav.Object);
+            _mnNav = new MainThreadNavigator(x => x(), _nav.Object);
             _logger = new Mock<ILogger<ManageSubscriptionViewModel>>();
             _pageFactory = new Mock<IPageFactory>();
         }

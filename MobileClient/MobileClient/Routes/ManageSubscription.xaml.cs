@@ -21,7 +21,7 @@ namespace MobileClient.Routes
             BindingContext = new ManageSubscriptionViewModel(model, 
                                                              Device.RuntimePlatform, 
                                                              x => Device.OpenUri(x),
-                                                             new MainThreadNavigator(this.Navigation),
+                                                             new MainThreadNavigator(x => Device.BeginInvokeOnMainThread(x), this.Navigation),
                                                              App.Container.GetInstance<ILogger<ManageSubscriptionViewModel>>(),
                                                              App.Container.GetInstance<IPageFactory>());
         }

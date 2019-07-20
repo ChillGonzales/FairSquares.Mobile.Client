@@ -42,7 +42,7 @@ namespace MobileClient.Routes
             {
                 SubscriptionTypeLabel = "   " + _model.Subscription.SubscriptionType.ToString();
                 RemainingOrdersLabel = "   " + _model.RemainingOrders.ToString();
-                PurchasedOrdersLabel = "   " + _model.PurchasedReports.Count.ToString();
+                PurchasedOrdersLabel = "   " + _model.PurchasedReports?.Count.ToString();
                 EndDateLabel = "   " + _model.Subscription.EndDateTime.ToString("dddd, dd MMMM yyyy");
                 GetMoreReportsLabel = $"Purchase additional reports at a reduced price of ${SubscriptionUtility.GetSingleReportInfo(_model).Price} per report.";
                 GetMoreReportsCommand = new Command(() => _nav.Push(_pageFactory.GetPage(PageType.SingleReportPurchase, _model)));

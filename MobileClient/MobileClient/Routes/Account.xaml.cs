@@ -20,7 +20,7 @@ namespace MobileClient.Routes
             InitializeComponent();
             var vm = new AccountViewModel(App.Container.GetInstance<ICurrentUserService>(),
                                           App.Container.GetInstance<IOrderValidationService>(),
-                                          new MainThreadNavigator(this.Navigation),
+                                          new MainThreadNavigator(x => Device.BeginInvokeOnMainThread(x), this.Navigation),
                                           App.Container.GetInstance<IPageFactory>(),
                                           s => LogOutButton.StyleClass = new List<string>() { s },
                                           s => SubButton.StyleClass = new List<string>() { s },

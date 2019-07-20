@@ -31,7 +31,7 @@ namespace MobileClient.Routes
                                            App.Container.GetInstance<IOrderValidationService>(),
                                            App.Container.GetInstance<IPageFactory>(),
                                            App.Container.GetInstance<ICurrentUserService>(),
-                                           new MainThreadNavigator(this.Navigation),
+                                           new MainThreadNavigator(x => Device.BeginInvokeOnMainThread(x), this.Navigation),
                                            App.Container.GetInstance<IMessagingCenter>(),
                                            x => Device.BeginInvokeOnMainThread(x),
                                            x => (Application.Current.MainPage as BaseTab).NavigateToTab(x));

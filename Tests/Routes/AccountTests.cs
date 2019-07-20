@@ -9,6 +9,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Xamarin.Forms;
 
 namespace Tests.Routes
@@ -22,6 +23,7 @@ namespace Tests.Routes
         private Mock<INavigation> _nav;
         private MainThreadNavigator _mnNav;
         private Mock<IPageFactory> _pageFac;
+        private Mock<ICacheRefresher> _refresher;
         private string _loginStyle;
         private string _subStyle;
         private Action<string> _loginStyleAction;
@@ -36,7 +38,8 @@ namespace Tests.Routes
             _nav = new Mock<INavigation>();
             _logger = new Mock<ILogger<AccountViewModel>>();
             _pageFac = new Mock<IPageFactory>();
-            _mnNav = new MainThreadNavigator(_nav.Object);
+            _mnNav = new MainThreadNavigator(x => x(), _nav.Object);
+            _refresher = new Mock<ICacheRefresher>();
             _loginStyle = "";
             _subStyle = "";
             _loginStyleAction = x => _loginStyle = x;
@@ -54,14 +57,15 @@ namespace Tests.Routes
                     _pageFac.Object,
                     _loginStyleAction,
                     _subStyleAction,
-                    _logger.Object);
+                    _logger.Object,
+                    _refresher.Object);
             Assert.AreEqual("Info", _loginStyle);
             Assert.AreEqual("Success", _subStyle);
             Assert.AreEqual(false, account.SubscriptionButtonEnabled);
             Assert.AreEqual("Please log in to continue", account.Email);
             Assert.AreEqual("Log In", account.LogOutText);
             Assert.AreEqual("View Options", account.SubscriptionButtonText);
-            Assert.AreEqual("Please log in first.", account.SubscriptionLabel);
+            Assert.AreEqual("Please log in to view purchasing options.", account.SubscriptionLabel);
             account.LogOutCommand.Execute(null);
             account.ToolbarInfoCommand.Execute(null);
             _pageFac.Verify(x => x.GetPage(PageType.Landing), Times.Once);
@@ -89,18 +93,19 @@ namespace Tests.Routes
                     _pageFac.Object,
                     _loginStyleAction,
                     _subStyleAction,
-                    _logger.Object);
+                    _logger.Object,
+                    _refresher.Object);
             Assert.AreEqual("Success", _subStyle);
             Assert.AreEqual("Danger", _loginStyle);
-            Assert.AreEqual("Purchase a monthly subscription that fits your needs.", account.SubscriptionLabel);
+            Assert.AreEqual("No reports remaining. Click below to view purchase options.", account.SubscriptionLabel);
             Assert.AreEqual(true, account.SubscriptionButtonEnabled);
-            Assert.AreEqual("Purchase", account.SubscriptionButtonText);
+            Assert.AreEqual("View Options", account.SubscriptionButtonText);
             Assert.AreEqual("Sign Out", account.LogOutText);
             Assert.AreEqual(user.Email, account.Email);
             _userCache.VerifyAll();
             _validator.VerifyAll();
             account.SubscriptionCommand.Execute(null);
-            _pageFac.Verify(x => x.GetPage(PageType.Purchase, It.IsAny<ValidationModel>()), Times.Once);
+            _pageFac.Verify(x => x.GetPage(PageType.PurchaseOptions, It.IsAny<ValidationModel>()), Times.Once);
             _nav.Verify(x => x.PushAsync(It.IsAny<Purchase>()), Times.Once);
         }
 
@@ -115,12 +120,17 @@ namespace Tests.Routes
             _userCache.Setup(x => x.GetLoggedInAccount()).Returns(user);
             _pageFac.Setup(x => x.GetPage(PageType.ManageSubscription, It.IsAny<ValidationModel>()))
                 .Returns(null as ManageSubscription);
-            _nav.Setup(x => x.PushAsync(It.IsAny<ManageSubscription>()));
+            _nav.Setup(x => x.PushAsync(It.IsAny<ManageSubscription>())).Returns(Task.Delay(0));
             _validator.Setup(x => x.ValidateOrderRequest(user, It.IsAny<bool>()))
                 .ReturnsAsync(new ValidationModel()
                 {
                     State = ValidationState.SubscriptionReportValid,
-                    RemainingOrders = 2
+                    RemainingOrders = 2,
+                    Subscription = new SubscriptionModel()
+                    {
+                        EndDateTime = DateTimeOffset.Now.AddDays(30),
+                        SubscriptionType = SubscriptionType.Basic
+                    }
                 });
             var acct = new AccountViewModel(_userCache.Object,
                 _validator.Object,
@@ -128,9 +138,10 @@ namespace Tests.Routes
                 _pageFac.Object,
                 _loginStyleAction,
                 _subStyleAction,
-                _logger.Object);
+                _logger.Object,
+                _refresher.Object);
             Assert.AreEqual("Danger", _loginStyle);
-            Assert.AreEqual("Success", _subStyle);
+            Assert.AreEqual("Info", _subStyle);
             Assert.AreEqual("Manage", acct.SubscriptionButtonText);
             Assert.AreEqual("Reports remaining: 2", acct.SubscriptionLabel);
             Assert.AreEqual(true, acct.SubscriptionButtonEnabled);

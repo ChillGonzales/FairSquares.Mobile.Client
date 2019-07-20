@@ -41,7 +41,7 @@ namespace Tests.Routes
                 UserId = "1234"
             });
             _nav.Setup(x => x.PopAsync()).ReturnsAsync(null as Page);
-            _mnNav = new MainThreadNavigator(_nav.Object);
+            _mnNav = new MainThreadNavigator(x => x(), _nav.Object);
         }
 
         [Test]

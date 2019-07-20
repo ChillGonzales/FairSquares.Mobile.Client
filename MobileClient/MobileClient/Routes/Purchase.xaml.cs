@@ -25,7 +25,7 @@ namespace MobileClient.Routes
                                                    App.Container.GetInstance<ICache<SubscriptionModel>>(),
                                                    App.Container.GetInstance<ISubscriptionService>(),
                                                    App.Container.GetInstance<ICurrentUserService>(),
-                                                   new MainThreadNavigator(this.Navigation),
+                                                   new MainThreadNavigator(x => Device.BeginInvokeOnMainThread(x), this.Navigation),
                                                    model,
                                                    Device.RuntimePlatform,
                                                    page => (Application.Current.MainPage as BaseTab).NavigateToTab(page),

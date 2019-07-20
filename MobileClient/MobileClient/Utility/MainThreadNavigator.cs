@@ -9,31 +9,33 @@ namespace MobileClient.Utility
     public class MainThreadNavigator
     {
         private readonly INavigation _nav;
+        private readonly Action<Action> _invoke;
 
-        public MainThreadNavigator(INavigation nav)
+        public MainThreadNavigator(Action<Action> invoke, INavigation nav)
         {
             _nav = nav;
+            _invoke = invoke;
         }
 
         public void Push(Page page)
         {
-            Device.BeginInvokeOnMainThread(async () => await _nav.PushAsync(page));
+            _invoke(async () => await _nav.PushAsync(page));
         }
         public void Pop()
         {
-            Device.BeginInvokeOnMainThread(async () => await _nav.PopAsync());
+            _invoke(async () => await _nav.PopAsync());
         }
         public void PushModal(Page page)
         {
-            Device.BeginInvokeOnMainThread(async () => await _nav.PushModalAsync(page));
+            _invoke(async () => await _nav.PushModalAsync(page));
         }
         public void PopModal()
         {
-            Device.BeginInvokeOnMainThread(async () => await _nav.PopModalAsync());
+            _invoke(async () => await _nav.PopModalAsync());
         }
         public void PopToRoot()
         {
-            Device.BeginInvokeOnMainThread(async () => await _nav.PopToRootAsync());
+            _invoke(async () => await _nav.PopToRootAsync());
         }
     }
 }

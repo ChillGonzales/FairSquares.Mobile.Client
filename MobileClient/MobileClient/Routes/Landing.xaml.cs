@@ -16,7 +16,7 @@ namespace MobileClient.Routes
             BindingContext = new LandingViewModel(App.Container.GetInstance<OAuth2Authenticator>(),
                                                   App.Container.GetInstance<IToastService>(),
                                                   App.Container.GetInstance<ILogger<LandingViewModel>>(),
-                                                  new MainThreadNavigator(this.Navigation));
+                                                  new MainThreadNavigator(x => Device.BeginInvokeOnMainThread(x), this.Navigation));
         }
     }
 }
