@@ -105,7 +105,10 @@
     <PackageReference Include="Xamarin.Firebase.Messaging">
       <Version>60.1142.1</Version>
     </PackageReference>
-    <PackageReference Include="Xamarin.Forms" Version="3.6.0.344457" />
+    <PackageReference Include="Xamarin.Forms" Version="3.6.0.539721" />
+    <PackageReference Include="Xamarin.Forms.Maps">
+      <Version>3.6.0.539721</Version>
+    </PackageReference>
     <PackageReference Include="Xamarin.Forms.Pages">
       <Version>3.4.0.1009999</Version>
     </PackageReference>
@@ -127,6 +130,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BorderlessEntryRenderer.cs" />
+    <Compile Include="PurchaseOptions.xaml.cs">
+      <DependentUpon>PurchaseOptions.xaml</DependentUpon>
+    </Compile>
     <Compile Include="PushNotifications\FirebaseRegistrationService.cs" />
     <Compile Include="GoogleAuthInterceptor.cs" />
     <Compile Include="MainActivity.cs" />
@@ -306,6 +312,12 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\values\Strings.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="PurchaseOptions.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
 </Project>
