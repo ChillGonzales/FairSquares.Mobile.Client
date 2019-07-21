@@ -44,6 +44,7 @@ namespace MobileClient.Droid
                 Xamarin.Essentials.Platform.Init(this, savedInstanceState);
                 global::Xamarin.Auth.Presenters.XamarinAndroid.AuthenticationConfiguration.Init(this, savedInstanceState);
                 global::Xamarin.Auth.CustomTabsConfiguration.CustomTabsClosingMessage = null;
+                global::Xamarin.FormsMaps.Init(this, savedInstanceState);
                 CrossCurrentActivity.Current.Init(this, savedInstanceState);
                 Plugin.CurrentActivity.CrossCurrentActivity.Current.Activity = this;
                 Fabric.Fabric.With(this, new Crashlytics.Crashlytics());
