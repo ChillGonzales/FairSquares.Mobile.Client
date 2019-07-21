@@ -121,10 +121,7 @@ namespace MobileClient.Routes
                     LoadingAnimVisible = true;
                     LoadingAnimRunning = true;
                     if (user != null)
-                    {
-                        var fresh = await _orderService.GetMemberOrders(user.UserId);
-                        _orderCache.Put(fresh.ToDictionary(x => x.OrderId, x => x));
-                    }
+                        await _cacheRefresher.RefreshTask;
                     MainLayoutVisible = true;
                     LoadingLayoutVisible = false;
                     LoadingAnimRunning = false;

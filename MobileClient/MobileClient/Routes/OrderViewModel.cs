@@ -201,8 +201,15 @@ namespace MobileClient.Routes
                 PlatformType = _deviceType == Device.Android ? Models.PlatformType.Android : Models.PlatformType.iOS
             };
             newOrder.OrderId = await _orderService.AddOrder(newOrder);
-            _topicSubscriber.Subscribe(new List<string>() { newOrder.OrderId });
-            _orderCache.Put(newOrder.OrderId, newOrder);
+            try
+            {
+                _topicSubscriber.Subscribe(new List<string>() { newOrder.OrderId });
+            }
+            catch { }
+            try
+            {
+                _orderCache.Put(newOrder.OrderId, newOrder);
+            } catch { }
 
             // Clear all fields
             AddressLine1 = "";
@@ -214,7 +221,7 @@ namespace MobileClient.Routes
             Zip = "";
             SubmitButtonEnabled = true;
             Comments = "";
-            await _alertUtility.Display("Order Submitted", "Thank you for your order!", "Ok");
+            await _alertUtility.Display("Order submitted", "Thank you for your order!", "Ok");
             _baseNavigationAction(BaseNavPageType.MyOrders);
         }
 

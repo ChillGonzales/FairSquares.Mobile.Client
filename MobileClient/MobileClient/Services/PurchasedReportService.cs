@@ -46,7 +46,7 @@ namespace MobileClient.Services
                     if (result.StatusCode == System.Net.HttpStatusCode.NotFound)
                         return new List<PurchasedReportModel>();
                     else
-                        throw new Exception(result.Content.ReadAsStringAsync().Result);
+                        throw new Exception($"HTTP call failed with status code '{result.StatusCode}' and content '{result.Content.ReadAsStringAsync().Result}'.");
                 }
                 return JsonConvert.DeserializeObject<List<PurchasedReportModel>>(result.Content.ReadAsStringAsync().Result);
             }
