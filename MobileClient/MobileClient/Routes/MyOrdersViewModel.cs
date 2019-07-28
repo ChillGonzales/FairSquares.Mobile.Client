@@ -113,13 +113,13 @@ namespace MobileClient.Routes
             var orders = new List<Models.Order>();
             try
             {
+                MainLayoutVisible = false;
+                LoadingLayoutVisible = true;
+                LoadingAnimVisible = true;
+                LoadingAnimRunning = true;
                 var user = _userService.GetLoggedInAccount();
                 if (_cacheRefresher.Invalidated)
                 {
-                    MainLayoutVisible = false;
-                    LoadingLayoutVisible = true;
-                    LoadingAnimVisible = true;
-                    LoadingAnimRunning = true;
                     if (user != null)
                         await _cacheRefresher.RefreshTask;
                     MainLayoutVisible = true;
@@ -128,12 +128,12 @@ namespace MobileClient.Routes
                     LoadingAnimVisible = false;
                     _cacheRefresher.Revalidate();
                 }
-                orders = _orderCache.GetAll().Select(x => x.Value).ToList();
-                var anyOrders = orders.Any();
-                MainLayoutVisible = anyOrders;
-                NoOrderLayoutVisible = !anyOrders;
                 if (user != null)
                 {
+                    orders = _orderCache.GetAll().Select(x => x.Value).ToList();
+                    var anyOrders = orders.Any();
+                    MainLayoutVisible = anyOrders;
+                    NoOrderLayoutVisible = !anyOrders;
                     var validation = await _validationService.ValidateOrderRequest(user);
                     FreeReportLayoutVisible = validation.State == ValidationState.FreeReportValid;
                     LoginLayoutVisible = false;
@@ -141,12 +141,20 @@ namespace MobileClient.Routes
                 else
                 {
                     FreeReportLayoutVisible = false;
+                    MainLayoutVisible = false;
                     LoginLayoutVisible = true;
+                    NoOrderLayoutVisible = true;
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Failed to set view state. {ex.Message}", ex);
+            }
+            finally
+            {
+                LoadingLayoutVisible = false;
+                LoadingAnimRunning = false;
+                LoadingAnimVisible = false;
             }
             SetListViewSource(orders);
         }
