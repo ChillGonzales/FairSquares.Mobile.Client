@@ -94,8 +94,9 @@ namespace MobileClient.Routes
                 try
                 {
                     OrderListRefreshing = true;
-                    await _cacheRefresher.RefreshCaches(_userService.GetLoggedInAccount());
-                    SetListViewSource(_orderCache.GetAll().Select(x => x.Value).ToList());
+                    var fresh = await _orderService.GetMemberOrders(_userService.GetLoggedInAccount()?.UserId);
+                    _orderCache.Put(fresh.ToDictionary(x => x.OrderId, x => x));
+                    SetListViewSource(fresh.ToList());
                     OrderListRefreshing = false;
                 }
                 catch (Exception ex)
@@ -104,7 +105,10 @@ namespace MobileClient.Routes
                 }
             };
             OrderListRefreshCommand = new Command(refreshAction);
-            _messagingCenter.Subscribe<App>(this, "CacheInvalidated", async x => await this.SetViewState());
+            _messagingCenter.Subscribe<App>(this, "CacheInvalidated", async x =>
+            {
+                await this.SetViewState();
+            });
             OnAppearingBehavior = new Command(async () => await SetViewState());
         }
 
@@ -114,22 +118,32 @@ namespace MobileClient.Routes
             try
             {
                 MainLayoutVisible = false;
+                FreeReportLayoutVisible = false;
+                LoginLayoutVisible = false;
+                NoOrderLayoutVisible = false;
                 LoadingLayoutVisible = true;
                 LoadingAnimVisible = true;
                 LoadingAnimRunning = true;
                 var user = _userService.GetLoggedInAccount();
-                if (_cacheRefresher.Invalidated)
-                {
-                    if (user != null)
-                        await _cacheRefresher.RefreshTask;
-                    MainLayoutVisible = true;
-                    LoadingLayoutVisible = false;
-                    LoadingAnimRunning = false;
-                    LoadingAnimVisible = false;
-                    _cacheRefresher.Revalidate();
-                }
                 if (user != null)
                 {
+                    if (_cacheRefresher.Invalidated)
+                    {
+                        // Just refresh order cache if cache refresh hasn't been started yet.
+                        if (_cacheRefresher.RefreshTask == null || _cacheRefresher.RefreshTask.IsCompleted)
+                        {
+                            var fresh = await _orderService.GetMemberOrders(user.UserId);
+                            _orderCache.Put(fresh.ToDictionary(x => x.OrderId, x => x));
+                        }
+                        else
+                        {
+                            await _cacheRefresher.RefreshTask;
+                        }
+                        MainLayoutVisible = true;
+                        LoadingLayoutVisible = false;
+                        LoadingAnimRunning = false;
+                        LoadingAnimVisible = false;
+                    }
                     orders = _orderCache.GetAll().Select(x => x.Value).ToList();
                     var anyOrders = orders.Any();
                     MainLayoutVisible = anyOrders;

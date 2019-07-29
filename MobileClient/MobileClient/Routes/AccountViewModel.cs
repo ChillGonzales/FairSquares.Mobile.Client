@@ -165,7 +165,7 @@ namespace MobileClient.Routes
                     return;
                 }
                 if (_cacheRefresher.Invalidated)
-                    await _cacheRefresher.RefreshTask;
+                    await (_cacheRefresher.RefreshTask ?? Task.CompletedTask);
                 var validity = await _orderValidator.ValidateOrderRequest(user);
                 var activeSub = SubscriptionUtility.SubscriptionActive(validity.Subscription);
                 _changeSubStyleClass(activeSub ? "Info" : "Success");
