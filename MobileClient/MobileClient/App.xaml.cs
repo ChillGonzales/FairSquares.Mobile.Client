@@ -277,6 +277,7 @@ namespace MobileClient
                 refresher.Invalidate();
                 if (Device.RuntimePlatform == Device.iOS)
                     MessagingCenter.Send<App>(this, "CacheInvalidated");
+                refresher.Revalidate();
             }
             catch { }
         }

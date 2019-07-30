@@ -117,18 +117,18 @@ namespace MobileClient.Routes
             var orders = new List<Models.Order>();
             try
             {
-                MainLayoutVisible = false;
-                FreeReportLayoutVisible = false;
-                LoginLayoutVisible = false;
-                NoOrderLayoutVisible = false;
-                LoadingLayoutVisible = true;
-                LoadingAnimVisible = true;
-                LoadingAnimRunning = true;
                 var user = _userService.GetLoggedInAccount();
                 if (user != null)
                 {
                     if (_cacheRefresher.Invalidated)
                     {
+                        MainLayoutVisible = false;
+                        FreeReportLayoutVisible = false;
+                        LoginLayoutVisible = false;
+                        NoOrderLayoutVisible = false;
+                        LoadingLayoutVisible = true;
+                        LoadingAnimVisible = true;
+                        LoadingAnimRunning = true;
                         // Just refresh order cache if cache refresh hasn't been started yet.
                         if (_cacheRefresher.RefreshTask == null || _cacheRefresher.RefreshTask.IsCompleted)
                         {
