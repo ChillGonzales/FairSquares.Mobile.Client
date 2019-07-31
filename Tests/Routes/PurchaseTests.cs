@@ -42,7 +42,7 @@ namespace Tests.Routes
             _subService = new Mock<ISubscriptionService>();
             _userCache = new Mock<ICurrentUserService>();
             _nav = new Mock<INavigation>();
-            _mnNav = new MainThreadNavigator(_nav.Object);
+            _mnNav = new MainThreadNavigator(x => x(), _nav.Object);
             _validationModel = new ValidationModel()
             {
                 RemainingOrders = 0,

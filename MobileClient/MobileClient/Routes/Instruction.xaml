@@ -10,8 +10,8 @@
                     <RowDefinition Height="{Binding TitleColHeight}" />
                     <RowDefinition Height="50" />
                     <RowDefinition Height="50" />
-                    <RowDefinition Height="75" />
-                    <RowDefinition Height="75" />
+                    <RowDefinition Height="90" />
+                    <RowDefinition Height="90" />
                     <RowDefinition Height="30" />
                     <RowDefinition Height="50" />
                     <RowDefinition Height="50" />

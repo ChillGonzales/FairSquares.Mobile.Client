@@ -52,7 +52,7 @@ namespace MobileClient.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Failed to get subscription.", userId, ex);
+                _logger.LogError($"Failed to get subscription.", ex, userId);
                 throw;
             }
         }

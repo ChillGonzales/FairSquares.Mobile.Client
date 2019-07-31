@@ -177,6 +177,14 @@ namespace MobileClient.Routes
                 ErrorMessage = $"Failed to submit order with error {ex.Message}";
                 _logger.LogError($"Failed to submit order.", ex);
             }
+            finally
+            {
+                try
+                {
+                    await SetVisualStateForValidation();
+                }
+                catch { }
+            }
         }
 
         private async Task SubmitOrder(string userId, string email)
@@ -193,8 +201,15 @@ namespace MobileClient.Routes
                 PlatformType = _deviceType == Device.Android ? Models.PlatformType.Android : Models.PlatformType.iOS
             };
             newOrder.OrderId = await _orderService.AddOrder(newOrder);
-            _topicSubscriber.Subscribe(new List<string>() { newOrder.OrderId });
-            _orderCache.Put(newOrder.OrderId, newOrder);
+            try
+            {
+                _topicSubscriber.Subscribe(new List<string>() { newOrder.OrderId });
+            }
+            catch { }
+            try
+            {
+                _orderCache.Put(newOrder.OrderId, newOrder);
+            } catch { }
 
             // Clear all fields
             AddressLine1 = "";
@@ -206,7 +221,7 @@ namespace MobileClient.Routes
             Zip = "";
             SubmitButtonEnabled = true;
             Comments = "";
-            await _alertUtility.Display("Order Submitted", "Thank you for your order!", "Ok");
+            await _alertUtility.Display("Order submitted", "Thank you for your order!", "Ok");
             _baseNavigationAction(BaseNavPageType.MyOrders);
         }
 

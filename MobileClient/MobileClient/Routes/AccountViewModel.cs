@@ -25,6 +25,7 @@ namespace MobileClient.Routes
         private readonly Action<string> _changeLoginStyleClass;
         private readonly Action<string> _changeSubStyleClass;
         private readonly ILogger<AccountViewModel> _logger;
+        private readonly ICacheRefresher _cacheRefresher;
         private string _email;
         private string _subscriptionLabel;
         private string _subscriptionButtonText;
@@ -38,12 +39,14 @@ namespace MobileClient.Routes
                                 IPageFactory pageFactory,
                                 Action<string> changeLogInStyleClass,
                                 Action<string> changeSubStyleClass,
-                                ILogger<AccountViewModel> logger)
+                                ILogger<AccountViewModel> logger,
+                                ICacheRefresher cacheRefresher)
         {
             _navigation = navigation;
             _pageFactory = pageFactory;
             _userCache = userCache;
             _logger = logger;
+            _cacheRefresher = cacheRefresher;
             _userCache.OnLoggedIn += async (s, e) =>
             {
                 SetAccountState(e.Account);
@@ -123,7 +126,7 @@ namespace MobileClient.Routes
                 }
             });
             SetAccountState(user);
-            await SetSubState(user, true);
+            await SetSubState(user);
         }
 
         private void SetAccountState(AccountModel user)
@@ -149,7 +152,7 @@ namespace MobileClient.Routes
             }
         }
 
-        private async Task SetSubState(AccountModel user, bool startUp = false)
+        private async Task SetSubState(AccountModel user)
         {
             try
             {
@@ -161,7 +164,9 @@ namespace MobileClient.Routes
                     SubscriptionButtonEnabled = false;
                     return;
                 }
-                var validity = await _orderValidator.ValidateOrderRequest(user, !startUp);
+                if (_cacheRefresher.Invalidated)
+                    await (_cacheRefresher.RefreshTask ?? Task.CompletedTask);
+                var validity = await _orderValidator.ValidateOrderRequest(user);
                 var activeSub = SubscriptionUtility.SubscriptionActive(validity.Subscription);
                 _changeSubStyleClass(activeSub ? "Info" : "Success");
                 SubscriptionButtonText = activeSub ? "Manage" : "View Options";

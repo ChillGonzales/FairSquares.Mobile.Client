@@ -43,7 +43,7 @@ namespace MobileClient.Routes
         }
         private void Auth_Error(object sender, AuthenticatorErrorEventArgs e)
         {
-            _logger.LogError("Received an error from auth callback.", e.Message, e.Exception);
+            _logger.LogError("Received an error from auth callback.", e.Exception);
             _toastService.LongToast($"Oops! Looks like there was an issue. Please try again. Error: '{e.Message}'");
             LoadingAnimVisible = false;
             LoadingAnimRunning = false;

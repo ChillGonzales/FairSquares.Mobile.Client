@@ -28,7 +28,7 @@ namespace MobileClient.Routes
                                               App.Container.GetInstance<IPropertyService>(),
                                               App.Container.GetInstance<IImageService>(),
                                               App.Container.GetInstance<IToastService>(),
-                                              new MainThreadNavigator(this.Navigation),
+                                              new MainThreadNavigator(x => Device.BeginInvokeOnMainThread(x), this.Navigation),
                                               App.Container.GetInstance<IPageFactory>(),
                                               (s1, s2, s3) => DisplayAlert(s1, s2, s3),
                                               App.Container.GetInstance<ILogger<OrderDetailViewModel>>());

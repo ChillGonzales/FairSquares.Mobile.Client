@@ -20,7 +20,7 @@ namespace MobileClient.Routes
                                                 App.Container.GetInstance<IOrderService>(),
                                                 App.Container.GetInstance<IToastService>(),
                                                 App.Container.GetInstance<IPageFactory>(),
-                                                new MainThreadNavigator(this.Navigation),
+                                                new MainThreadNavigator(x => Device.BeginInvokeOnMainThread(x), this.Navigation),
                                                 App.Container.GetInstance<IMessagingSubscriber>(),
                                                 App.Container.GetInstance<ILogger<OrderViewModel>>(),
                                                 Device.RuntimePlatform,

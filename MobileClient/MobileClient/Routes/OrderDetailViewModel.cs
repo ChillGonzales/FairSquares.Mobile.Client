@@ -152,7 +152,7 @@ namespace MobileClient.Routes
                         if (newModel == null || string.IsNullOrWhiteSpace(newModel.OrderId))
                         {
                             _toastService.LongToast($"Your order is marked as completed but the measurements cannot be found. Please check your internet connection and try again.");
-                            _logger.LogError($"Order is marked as completed but no measurements found.", $"Order id: {newModel.OrderId}");
+                            _logger.LogError($"Order is marked as completed but no measurements found.", null, $"Order id: {newModel.OrderId}");
                             return;
                         }
                         _propertyCache.Put(newModel.OrderId, newModel);
@@ -169,7 +169,7 @@ namespace MobileClient.Routes
                         if (image == null)
                         {
                             _toastService.LongToast($"Your order is marked as completed but the image cannot be found. Please check your internet connection.");
-                            _logger.LogError($"Order is marked as completed but no image found.", $"Order id: {_order.OrderId}");
+                            _logger.LogError($"Order is marked as completed but no image found.", null, $"Order id: {_order.OrderId}");
                         }
                         else
                         {

@@ -19,7 +19,7 @@ namespace MobileClient.Utility
             _service = service;
             _userCache = userCache;
         }
-        public void LogError(string message, params object[] args)
+        public void LogError(string message, Exception ex, params object[] args)
         {
             try
             {
@@ -27,6 +27,7 @@ namespace MobileClient.Utility
                 dict.Add("source_name", typeof(T).ToString());
                 dict.Add("message", message);
                 dict.Add("app_platform", Device.RuntimePlatform);
+                dict.Add("exception", ex?.Message);
                 for (int i = 0; i < args.Length; i++)
                 {
                     dict.Add($"metadata_{i}", JsonConvert.SerializeObject(args[i]));
@@ -39,10 +40,10 @@ namespace MobileClient.Utility
                 Debug.WriteLine(JsonConvert.SerializeObject(dict));
 #endif
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
 #if DEBUG
-                Debug.WriteLine(ex.ToString());
+                Debug.WriteLine(e.ToString());
 #endif
             }
         }

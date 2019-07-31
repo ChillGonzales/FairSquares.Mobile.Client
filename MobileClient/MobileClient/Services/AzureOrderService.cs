@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,6 +38,8 @@ namespace MobileClient.Services
 
         public async Task<IEnumerable<Order>> GetMemberOrders(string memberId)
         {
+            if (string.IsNullOrWhiteSpace(memberId))
+                return Enumerable.Empty<Order>();
             var result = await _http.GetAsync($"{_baseEndpoint}/member?memberId={memberId}&accessKey={_apiKey}");
             if (!result.IsSuccessStatusCode)
             {

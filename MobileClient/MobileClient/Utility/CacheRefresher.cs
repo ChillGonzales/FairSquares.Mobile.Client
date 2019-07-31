@@ -11,6 +11,7 @@ namespace MobileClient.Utilities
         private readonly ILogger<CacheRefresher> _logger;
         private readonly Func<AccountModel, Task> _refreshFunc;
         public bool Invalidated { get; private set; }
+        public Task RefreshTask { get; private set; }
 
         public CacheRefresher(ILogger<CacheRefresher> logger, Func<AccountModel, Task> refreshFunc)
         {
@@ -24,7 +25,8 @@ namespace MobileClient.Utilities
             {
                 if (user == null)
                     return;
-                await _refreshFunc(user);
+                RefreshTask = _refreshFunc(user);
+                await RefreshTask;
                 Invalidated = false;
             }
             catch (Exception ex)

@@ -20,7 +20,7 @@ namespace MobileClient.Routes
         {
             InitializeComponent();
             _showDismissButton = showDismissButton;
-            BindingContext = new InstructionViewModel(new MainThreadNavigator(this.Navigation), 
+            BindingContext = new InstructionViewModel(new MainThreadNavigator(x => Device.BeginInvokeOnMainThread(x), this.Navigation), 
                                                       App.Container.GetInstance<ICache<SettingsModel>>(),
                                                       App.Container.GetInstance<ILogger<InstructionViewModel>>(),
                                                       showDismissButton);

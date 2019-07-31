@@ -26,7 +26,7 @@ namespace MobileClient.Routes
                                                                Device.RuntimePlatform,
                                                                new AlertUtility((s1, s2, s3, s4) => DisplayAlert(s1, s2, s3, s4),
                                                                 (s1, s2, s3) => DisplayAlert(s1, s2, s3)),
-                                                               new MainThreadNavigator(this.Navigation),
+                                                               new MainThreadNavigator(x => Device.BeginInvokeOnMainThread(x), this.Navigation),
                                                                App.Container.GetInstance<IToastService>(),
                                                                App.Container.GetInstance<IPurchasedReportService>(),
                                                                App.Container.GetInstance<IPurchasingService>(),

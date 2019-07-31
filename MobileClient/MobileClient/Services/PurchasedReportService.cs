@@ -3,6 +3,7 @@ using MobileClient.Utilities;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 
@@ -40,19 +41,21 @@ namespace MobileClient.Services
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(userId))
+                    return new List<PurchasedReportModel>();
                 var result = _http.GetAsync($"{_baseUri}?userId={userId}").Result;
                 if (!result.IsSuccessStatusCode)
                 {
                     if (result.StatusCode == System.Net.HttpStatusCode.NotFound)
                         return new List<PurchasedReportModel>();
                     else
-                        throw new Exception(result.Content.ReadAsStringAsync().Result);
+                        throw new Exception($"HTTP call failed with status code '{result.StatusCode}' and content '{result.Content.ReadAsStringAsync().Result}'.");
                 }
                 return JsonConvert.DeserializeObject<List<PurchasedReportModel>>(result.Content.ReadAsStringAsync().Result);
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Failed to get purchased reports.", userId, ex);
+                _logger.LogError($"Failed to get purchased reports. {ex.Message}", ex, userId);
                 throw;
             }
         }

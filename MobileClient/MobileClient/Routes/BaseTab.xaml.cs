@@ -25,7 +25,7 @@ namespace MobileClient.Routes
             var vm = new BaseTabViewModel(App.Container.GetInstance<ICache<SettingsModel>>(),
                                           App.Container.GetInstance<IPageFactory>(),
                                           App.Container.GetInstance<ILogger<BaseTabViewModel>>(),
-                                          new MainThreadNavigator(CurrentPage.Navigation));
+                                          new MainThreadNavigator(x => Device.BeginInvokeOnMainThread(x), CurrentPage.Navigation));
             _onAppearing = vm.OnAppearingBehavior;
             BindingContext = vm;
         }
