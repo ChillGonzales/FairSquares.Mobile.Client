@@ -43,11 +43,12 @@ namespace MobileClient
                 Container = new Container();
                 var analyticsSvc = DependencyService.Get<IAnalyticsService>();
                 var userService = new CurrentUserService();
+                var loggerFactory = new LoggerFactory(analyticsSvc, userService);
                 var orderService = new AzureOrderService(new HttpClient(), _orderEndpoint, _apiKey);
-                var propertyService = new PropertyService(new HttpClient(), _propertyEndpoint, new AnalyticsLogger<PropertyService>(analyticsSvc, userService));
-                var imageService = new BlobImageService(new HttpClient(), _blobEndpoint, new AnalyticsLogger<BlobImageService>(analyticsSvc, userService));
-                var subService = new SubscriptionService(new HttpClient(), _subEndpoint, new AnalyticsLogger<SubscriptionService>(analyticsSvc, userService));
-                var prService = new PurchasedReportService(new HttpClient(), _purchasedReportsEndpoint, new AnalyticsLogger<PurchasedReportService>(analyticsSvc, userService));
+                var propertyService = new PropertyService(new HttpClient(), _propertyEndpoint, loggerFactory.Get<PropertyService>(Debugger.IsAttached));
+                var imageService = new BlobImageService(new HttpClient(), _blobEndpoint, loggerFactory.Get<BlobImageService>(Debugger.IsAttached));
+                var subService = new SubscriptionService(new HttpClient(), _subEndpoint, loggerFactory.Get<SubscriptionService>(Debugger.IsAttached));
+                var prService = new PurchasedReportService(new HttpClient(), _purchasedReportsEndpoint, loggerFactory.Get<PurchasedReportService>(Debugger.IsAttached));
                 var authenticator = new OAuth2Authenticator(Configuration.ClientId,
                                                             null,
                                                             Configuration.Scope,
@@ -70,17 +71,17 @@ namespace MobileClient
                 // Setup caches and begin process of filling them.
                 var dbBasePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
                 var propertyCache = new LocalSqlCache<PropertyModel>(Path.Combine(dbBasePath, "property.db3"), 
-                    new AnalyticsLogger<LocalSqlCache<PropertyModel>>(analyticsSvc, userService));
+                    loggerFactory.Get<LocalSqlCache<PropertyModel>>());
                 var orderCache = new LocalSqlCache<Models.Order>(Path.Combine(dbBasePath, "order.db3"), 
-                    new AnalyticsLogger<LocalSqlCache<Models.Order>>(analyticsSvc, userService));
+                    loggerFactory.Get<LocalSqlCache<Models.Order>>());
                 var imageCache = new LocalSqlCache<ImageModel>(Path.Combine(dbBasePath, "images.db3"), 
-                    new AnalyticsLogger<LocalSqlCache<ImageModel>>(analyticsSvc, userService));
+                    loggerFactory.Get<LocalSqlCache<ImageModel>>());
                 var subCache = new LocalSqlCache<SubscriptionModel>(Path.Combine(dbBasePath, "subs.db3"), 
-                    new AnalyticsLogger<LocalSqlCache<SubscriptionModel>>(analyticsSvc, userService));
+                    loggerFactory.Get<LocalSqlCache<SubscriptionModel>>());
                 var settingsCache = new LocalSqlCache<SettingsModel>(Path.Combine(dbBasePath, "sets.db3"), 
-                    new AnalyticsLogger<LocalSqlCache<SettingsModel>>(analyticsSvc, userService));
+                    loggerFactory.Get<LocalSqlCache<SettingsModel>>());
                 var prCache = new LocalSqlCache<PurchasedReportModel>(Path.Combine(dbBasePath, "purchasedreports.db3"), 
-                    new AnalyticsLogger<LocalSqlCache<PurchasedReportModel>>(analyticsSvc, userService));
+                    loggerFactory.Get<LocalSqlCache<PurchasedReportModel>>());
 
                 Action ClearCaches = () =>
                 {
@@ -193,7 +194,7 @@ namespace MobileClient
                     return Task.WhenAll(new[] { prTask, orderTask });
                 };
 
-                var refresher = new CacheRefresher(new AnalyticsLogger<CacheRefresher>(analyticsSvc, userService), RefreshCaches);
+                var refresher = new CacheRefresher(loggerFactory.Get<CacheRefresher>(), RefreshCaches);
                 refresher.Invalidate();
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                 refresher.RefreshCaches(userService.GetLoggedInAccount());
