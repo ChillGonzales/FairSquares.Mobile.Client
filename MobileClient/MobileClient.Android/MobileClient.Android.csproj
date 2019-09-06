@@ -130,6 +130,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExtendedMapRenderer.cs" />
     <Compile Include="BorderlessEntryRenderer.cs" />
     <Compile Include="PurchaseOptions.xaml.cs">
       <DependentUpon>PurchaseOptions.xaml</DependentUpon>

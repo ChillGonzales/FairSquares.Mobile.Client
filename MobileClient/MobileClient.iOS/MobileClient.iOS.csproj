@@ -111,6 +111,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="BorderlessEntryRenderer.cs" />
+    <Compile Include="ExtendedMapRenderer.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
     <Compile Include="Utilities\CustomList.cs" />
