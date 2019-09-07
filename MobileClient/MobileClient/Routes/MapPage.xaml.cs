@@ -2,6 +2,7 @@
 using MobileClient.Utility;
 using System;
 using System.Linq;
+using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.Maps;
 using Xamarin.Forms.Xaml;
@@ -70,9 +71,47 @@ namespace MobileClient.Routes
                     measure = false;
                 }
             };
-            var stack = new StackLayout { Spacing = 0 };
-            stack.Children.Add(map);
-            Content = stack;
+            var btn = new Button()
+            {
+                Text = "Measure This Property",
+                VerticalOptions = LayoutOptions.End,
+                HorizontalOptions = LayoutOptions.Center,
+                WidthRequest = 150,
+                StyleClass = new[] { "Info" },
+                IsVisible = false
+            };
+            btn.Command = new Command(() => 
+            {
+            });
+
+            var bar = new SearchBar()
+            {
+                Placeholder = "Enter address of property"
+            };
+            bar.SearchCommand = new Command(async () =>
+            {
+                if (string.IsNullOrWhiteSpace(bar.Text))
+                    return;
+                var locations = await Geocoding.GetLocationsAsync(bar.Text);
+                if (locations.Any())
+                {
+                    var loc = locations.First();
+                    var pos = new Position(loc.Latitude, loc.Longitude);
+                    var pl = await Geocoding.GetPlacemarksAsync(locations.FirstOrDefault());
+                    var pin = new Pin() { Position = pos, Type = PinType.Place, Address = pl.FirstOrDefault()?.PostalCode, Label = pl.FirstOrDefault()?.PostalCode };
+                    map.MoveToRegion(MapSpan.FromCenterAndRadius(new Position(loc.Latitude, loc.Longitude), Distance.FromMeters(10)));
+                    map.Pins.Add(pin);
+                    btn.IsVisible = true;
+                    bar.HorizontalOptions = LayoutOptions.CenterAndExpand;
+                    bar.VerticalOptions = LayoutOptions.Start;
+                    bar.HeightRequest = 75;
+                }
+            });
+            var grid = new Grid();
+            grid.Children.Add(map);
+            grid.Children.Add(bar);
+            grid.Children.Add(btn);
+            Content = grid;
         }
         private double ToRadians(double angle)
         {
