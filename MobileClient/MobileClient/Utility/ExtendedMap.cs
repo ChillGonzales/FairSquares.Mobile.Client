@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Windows.Input;
+using Xamarin.Forms;
 using Xamarin.Forms.Maps;
 
 namespace MobileClient.Utility
@@ -12,8 +14,8 @@ namespace MobileClient.Utility
     {
         public event EventHandler<TapEventArgs> Tap;
 
-        public ExtendedMap(MapSpan region) : base(region)
-        { }
+        public ExtendedMap() : base() { }
+        public ExtendedMap(MapSpan region) : base(region) { }
 
         public void OnTap(Position coordinate)
         {

@@ -4,11 +4,35 @@
              xmlns:d="http://xamarin.com/schemas/2014/forms/design"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:maps="clr-namespace:Xamarin.Forms.Maps;assembly=Xamarin.Forms.Maps"
+             xmlns:util="clr-namespace:MobileClient.Utility"
              mc:Ignorable="d"
              Title="Map it up!"
              x:Class="MobileClient.Routes.MapPage">
     <ContentPage.Content>
-        <StackLayout>
-        </StackLayout>
+        <Grid x:Name="BaseView">
+            <util:ExtendedMap x:Name="Map" 
+                              IsShowingUser="True"
+                              MapType="Hybrid"
+                              HeightRequest="100"
+                              WidthRequest="960"
+                              VerticalOptions="FillAndExpand">
+                <util:ExtendedMap.Behaviors>
+                    <util:EventToCommandBehavior EventName="Tap" Command="{Binding MapTapCommand}" />
+                </util:ExtendedMap.Behaviors>
+            </util:ExtendedMap>
+            <SearchBar Placeholder="Enter address to measure" 
+                       HorizontalOptions="CenterAndExpand"
+                       VerticalOptions="Start"
+                       HeightRequest="75"
+                       Text="{Binding SearchBarText}"
+                       SearchCommand="{Binding SearchCommand}"/>
+            <Button Text="{Binding ActionButtonText}"
+                    VerticalOptions="End"
+                    HorizontalOptions="Center"
+                    WidthRequest="150"
+                    StyleClass="Success"
+                    Command="{Binding ActionButtonCommand}"
+                    IsVisible="{Binding ActionButtonVisible}" />
+        </Grid>
     </ContentPage.Content>
 </ContentPage>
