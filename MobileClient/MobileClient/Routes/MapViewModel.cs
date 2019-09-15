@@ -23,13 +23,22 @@ namespace MobileClient.Routes
         private string _actionButtonText;
         private bool _actionButtonVisible;
         private IList<Pin> _pins;
+        private bool _isShowingUser;
+        private readonly IToastService _toast;
+        private readonly Action<Pin> _addPin;
+        private readonly Action<Pin> _removePin;
+        private readonly Action<MapSpan> _setMapSpan;
+        private readonly MainThreadNavigator _navigation;
+        private readonly IPageFactory _pageFactory;
+        private Placemark _foundLocation;
 
         public MapViewModel(IToastService toast,
                             Action<Pin> addPin,
                             Action<Pin> removePin,
                             Action<MapSpan> setMapSpan,
                             MainThreadNavigator navigation,
-                            IPageFactory pageFactory)
+                            IPageFactory pageFactory,
+                            bool hasLocationPermission)
         {
             _toast = toast;
             _addPin = addPin;
@@ -38,11 +47,11 @@ namespace MobileClient.Routes
             _navigation = navigation;
             _pageFactory = pageFactory;
             _pins = new List<Pin>();
+            _isShowingUser = hasLocationPermission;
             ActionButtonText = "Measure It!";
             MapTapCommand = new Command(x =>
             {
                 var e = (TapEventArgs)x;
-                Console.WriteLine($"Latitude: {e.Position.Latitude.ToString()} Longitude: {e.Position.Longitude.ToString()}");
                 if (point1 == null)
                 {
                     if (_pins.Any())
@@ -63,6 +72,7 @@ namespace MobileClient.Routes
                 }
                 if (measure)
                 {
+                    // TODO: Use location extensions instead
                     var R = 6371e3; // metres
                     var φ1 = ToRadians(point1.Value.Latitude);
                     var φ2 = ToRadians(point2.Value.Latitude);
@@ -90,13 +100,15 @@ namespace MobileClient.Routes
                 {
                     var loc = locations.First();
                     var pos = new Position(loc.Latitude, loc.Longitude);
-                    var pl = await Geocoding.GetPlacemarksAsync(locations.FirstOrDefault());
-                    var pin = new Pin() { Position = pos, Type = PinType.Place, Address = pl.FirstOrDefault()?.PostalCode, Label = pl.FirstOrDefault()?.PostalCode };
+                    _foundLocation = (await Geocoding.GetPlacemarksAsync(locations.FirstOrDefault())).FirstOrDefault();
+                    var address = $"{_foundLocation.SubThoroughfare} {_foundLocation.Thoroughfare}";
+                    var pin = new Pin() { Position = pos, Type = PinType.SearchResult, Address = address, Label = address };
                     _setMapSpan(MapSpan.FromCenterAndRadius(new Position(loc.Latitude, loc.Longitude), Distance.FromMeters(10)));
                     AddPin(pin);
                     ActionButtonVisible = true;
                 }
             });
+            ActionButtonCommand = new Command(() => _navigation.Push(_pageFactory.GetPage(PageType.OrderConfirmation, _foundLocation)));
         }
 
         private void RemovePin(Pin pin)
@@ -116,13 +128,6 @@ namespace MobileClient.Routes
 
         #region Binding
         public event PropertyChangedEventHandler PropertyChanged;
-
-        private readonly IToastService _toast;
-        private readonly Action<Pin> _addPin;
-        private readonly Action<Pin> _removePin;
-        private readonly Action<MapSpan> _setMapSpan;
-        private readonly MainThreadNavigator _navigation;
-        private readonly IPageFactory _pageFactory;
 
         public ICommand MapTapCommand { get; private set; }
         public string SearchBarText
@@ -161,6 +166,18 @@ namespace MobileClient.Routes
             {
                 _actionButtonVisible = value;
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ActionButtonVisible)));
+            }
+        }
+        public bool IsShowingUser
+        {
+            get
+            {
+                return _isShowingUser;
+            }
+            private set
+            {
+                _isShowingUser = value;
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsShowingUser)));
             }
         }
         #endregion

@@ -1,9 +1,11 @@
-﻿using Android.App;
+﻿using Android;
+using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.Gms.Common;
 using Android.OS;
 using Android.Runtime;
+using Android.Support.V4.App;
 using Android.Util;
 using Android.Views;
 using Plugin.CurrentActivity;
@@ -53,6 +55,11 @@ namespace MobileClient.Droid
                 LoadApplication(new App());
                 var x = typeof(Xamarin.Forms.Themes.LightThemeResources);
                 x = typeof(Xamarin.Forms.Themes.Android.UnderlineEffect);
+                //ActivityCompat.RequestPermissions(this, new String[] 
+                //{
+                //  Manifest.Permission.AccessFineLocation,
+                //  Manifest.Permission.AccessCoarseLocation
+                //}, );
             }
             catch (Exception ex)
             {

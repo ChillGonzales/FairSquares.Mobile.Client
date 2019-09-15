@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.FairSquares.MobileClient" android:installLocation="auto" android:versionCode="57" android:versionName="1.0.57">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.FairSquares.MobileClient" android:installLocation="auto" android:versionCode="58" android:versionName="1.0.58">
 	<uses-sdk android:minSdkVersion="23" android:targetSdkVersion="28" />
 	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -18,7 +18,7 @@
 			</intent-filter>
 		</receiver>
 		<meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@drawable/ic_stat_web_hi_res_512" />
-    <meta-data android:name="com.google.android.maps.v2.API_KEY" android:value="AIzaSyCsfk7zRdZ5JHv6UVwk_hSksZRjFGvfw6E" />
-    <uses-library android:name="org.apache.http.legacy" android:required="false" />
-  </application>
+		<meta-data android:name="com.google.android.maps.v2.API_KEY" android:value="AIzaSyCsfk7zRdZ5JHv6UVwk_hSksZRjFGvfw6E" />
+		<uses-library android:name="org.apache.http.legacy" android:required="false" />
+	</application>
 </manifest>

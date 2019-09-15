@@ -3,6 +3,7 @@ using MobileClient.Services;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Xamarin.Essentials;
 using Xamarin.Forms;
 
 namespace MobileClient.Utility
@@ -39,6 +40,8 @@ namespace MobileClient.Utility
                     return new SingleReportPurchase(stateArgs[0] as ValidationModel);
                 case PageType.Feedback:
                     return new Feedback();
+                case PageType.OrderConfirmation:
+                    return new OrderConfirmation(stateArgs[0] as Placemark);
                 default:
                     return new Account();
             }
@@ -57,6 +60,7 @@ namespace MobileClient.Utility
         MyOrders,
         OrderDetail,
         Order,
+        OrderConfirmation,
         PaymentConfirmation,
         Purchase,
         PurchaseOptions,

@@ -11,7 +11,7 @@
     <ContentPage.Content>
         <Grid x:Name="BaseView">
             <util:ExtendedMap x:Name="Map" 
-                              IsShowingUser="True"
+                              IsShowingUser="{Binding IsShowingUser}"
                               MapType="Hybrid"
                               HeightRequest="100"
                               WidthRequest="960"
@@ -21,9 +21,11 @@
                 </util:ExtendedMap.Behaviors>
             </util:ExtendedMap>
             <SearchBar Placeholder="Enter address to measure" 
+                       BackgroundColor="White"
                        HorizontalOptions="CenterAndExpand"
                        VerticalOptions="Start"
                        HeightRequest="75"
+                       WidthRequest="700"
                        Text="{Binding SearchBarText}"
                        SearchCommand="{Binding SearchCommand}"/>
             <Button Text="{Binding ActionButtonText}"

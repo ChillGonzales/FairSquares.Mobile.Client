@@ -21,7 +21,8 @@ namespace MobileClient.Routes
                                       p => Map.Pins.Remove(p),
                                       s => Map.MoveToRegion(s),
                                       new MainThreadNavigator(x => Device.BeginInvokeOnMainThread(x), this.Navigation),
-                                      App.Container.GetInstance<IPageFactory>());
+                                      App.Container.GetInstance<IPageFactory>(),
+                                      false);
         }
     }
 }
