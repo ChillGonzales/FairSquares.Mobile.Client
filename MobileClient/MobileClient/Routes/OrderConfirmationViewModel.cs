@@ -24,6 +24,7 @@ namespace MobileClient.Routes
         private bool _submitButtonEnabled;
         private int _selectedOptionIndex;
         private string _comments;
+        private string _submitButtonText;
         private readonly Placemark _placemark;
         private readonly ICurrentUserService _userService;
         private readonly AlertUtility _alertUtility;
@@ -37,6 +38,9 @@ namespace MobileClient.Routes
         private readonly IToastService _toast;
         private readonly MainThreadNavigator _nav;
         private readonly ILogger<OrderConfirmationViewModel> _logger;
+        private readonly Action<string> _changeSubmitButtonStyle;
+
+        public ICommand OnAppearingBehavior { get; private set; }
 
         public OrderConfirmationViewModel(Placemark placemark,
                                           ICurrentUserService userService,
@@ -50,6 +54,7 @@ namespace MobileClient.Routes
                                           string deviceType,
                                           MainThreadNavigator nav,
                                           ICache<Models.Order> orderCache,
+                                          Action<string> changeSubmitButtonStyle,
                                           ILogger<OrderConfirmationViewModel> logger)
         {
             _placemark = placemark;
@@ -67,6 +72,14 @@ namespace MobileClient.Routes
             _logger = logger;
             SubmitButtonEnabled = true;
             SubmitCommand = new Command(async () => await Submit());
+            _changeSubmitButtonStyle = changeSubmitButtonStyle;
+            OnAppearingBehavior = new Command(() => SetViewState());
+        }
+
+        private void SetViewState()
+        {
+            _changeSubmitButtonStyle(_userService.GetLoggedInAccount() == null ? "Info" : "Success");
+            SubmitButtonText = _userService.GetLoggedInAccount() == null ? "Log In" : "Submit Order";
             AddressLine1 = $"{_placemark.SubThoroughfare} {_placemark.Thoroughfare}";
             AddressLine2 = $"{_placemark.SubLocality + " "}{_placemark.Locality}, {_placemark.AdminArea} {_placemark.PostalCode}";
         }
@@ -79,12 +92,6 @@ namespace MobileClient.Routes
                 SubmitButtonEnabled = false;
                 if (user == null)
                 {
-                    var answer = await _alertUtility.Display("Please Log In", "Please log in first to submit a report.", "Login", "Cancel");
-                    if (!answer)
-                    {
-                        SubmitButtonEnabled = true;
-                        return;
-                    }
                     _nav.Push(_pageFactory.GetPage(PageType.Landing));
                     SubmitButtonEnabled = true;
                     return;
@@ -188,6 +195,18 @@ namespace MobileClient.Routes
             {
                 _comments = value;
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Comments)));
+            }
+        }
+        public string SubmitButtonText
+        {
+            get
+            {
+                return _submitButtonText;
+            }
+            set
+            {
+                _submitButtonText = value;
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SubmitButtonText)));
             }
         }
         private readonly List<OptionViewModel> Options = new List<OptionViewModel>()

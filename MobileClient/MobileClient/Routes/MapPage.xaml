@@ -30,9 +30,16 @@
                        SearchCommand="{Binding SearchCommand}"/>
             <Button Text="{Binding ActionButtonText}"
                     VerticalOptions="End"
-                    HorizontalOptions="Center"
+                    HorizontalOptions="Start"
                     WidthRequest="150"
                     StyleClass="Success"
+                    Command="{Binding ActionButtonCommand}"
+                    IsVisible="{Binding ActionButtonVisible}" />
+            <Button Text="{Binding ActionButtonText}"
+                    VerticalOptions="End"
+                    HorizontalOptions="End"
+                    WidthRequest="150"
+                    StyleClass="Info"
                     Command="{Binding ActionButtonCommand}"
                     IsVisible="{Binding ActionButtonVisible}" />
         </Grid>

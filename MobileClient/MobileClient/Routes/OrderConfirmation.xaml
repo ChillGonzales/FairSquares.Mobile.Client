@@ -48,7 +48,8 @@
                             HorizontalOptions="StartAndExpand" />
             </StackLayout>
             <Label HeightRequest="30" />
-            <Button Text="Submit Order"
+            <Button Text="{Binding SubmitButtonText}"
+                    x:Name="SubmitButton"
                     HorizontalOptions="Center"
                     VerticalOptions="Center"
                     WidthRequest="250"
