@@ -8,8 +8,8 @@
                      Command="{Binding ToolbarInfoCommand}" />
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
-        <ScrollView>
-            <Grid Margin="8">
+        <ScrollView Margin="5">
+            <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
@@ -45,7 +45,7 @@
                     Grid.Row="2"
                     Grid.Column="0"
                     WidthRequest="250"
-                    StyleClass="Success"
+                    StyleClass="btn-danger"
                     VerticalOptions="Start"
                     HorizontalOptions="CenterAndExpand" />
                 <Label Text="Manage Reports"
@@ -68,7 +68,7 @@
                    Grid.Column="0"
                    WidthRequest="250"
                    IsEnabled="{Binding SubscriptionButtonEnabled}"
-                   StyleClass= "Info"
+                   StyleClass= "btn-primary"
                    VerticalOptions="Start"
                    HorizontalOptions="CenterAndExpand" />
                 <Label Text="Feedback"
@@ -89,7 +89,7 @@
                     Text="Send Feedback"
                     Grid.Row="10"
                     Grid.Column="0"
-                    StyleClass="Info"
+                    StyleClass="btn-primary"
                     WidthRequest="250"
                     HorizontalOptions="CenterAndExpand"
                     VerticalOptions="Start" />

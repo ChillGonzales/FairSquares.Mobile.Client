@@ -53,8 +53,6 @@ namespace MobileClient.Droid
                 Fabric.Fabric.With(this, new Crashlytics.Crashlytics());
                 Crashlytics.Crashlytics.HandleManagedExceptions();
                 LoadApplication(new App());
-                var x = typeof(Xamarin.Forms.Themes.LightThemeResources);
-                x = typeof(Xamarin.Forms.Themes.Android.UnderlineEffect);
                 //ActivityCompat.RequestPermissions(this, new String[] 
                 //{
                 //  Manifest.Permission.AccessFineLocation,

@@ -18,7 +18,7 @@
         BarTextColor="{StaticResource primary-title-color}"
         Icon="ic_action_straighten.png">
         <x:Arguments>
-            <routes:Order />
+            <routes:MapPage />
         </x:Arguments>
     </NavigationPage>
     <NavigationPage x:Name="MyOrdersTab"
@@ -37,15 +37,6 @@
         Icon="ic_action_account_circle.png">
         <x:Arguments>
             <routes:Account />
-        </x:Arguments>
-    </NavigationPage>
-    <NavigationPage x:Name="MapTab"
-        Title="Map"
-        BarBackgroundColor="{StaticResource primary-back-title-color}"
-        BarTextColor="{StaticResource primary-title-color}"
-        Icon="ic_action_folder_open.png">
-        <x:Arguments>
-            <routes:MapPage />
         </x:Arguments>
     </NavigationPage>
 </TabbedPage>

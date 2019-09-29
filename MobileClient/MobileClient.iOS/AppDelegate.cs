@@ -55,8 +55,6 @@ namespace MobileClient.iOS
             catch { }
 
             LoadApplication(new App());
-            var x = typeof(Xamarin.Forms.Themes.LightThemeResources);
-            x = typeof(Xamarin.Forms.Themes.iOS.UnderlineEffect);
 
             // Firebase component initialize
             Firebase.Core.App.Configure();

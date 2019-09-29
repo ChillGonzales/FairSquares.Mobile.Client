@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Xamarin.Essentials;
 using Xamarin.Forms;
@@ -25,7 +26,10 @@ namespace MobileClient.Routes
         private readonly Action<MapSpan> _setMapSpan;
         private readonly MainThreadNavigator _navigation;
         private readonly IPageFactory _pageFactory;
+        private string _movePinText;
         private Placemark _foundLocation;
+        private bool _movePinVisible;
+        private Color _movePinColor;
 
         public MapViewModel(IToastService toast,
                             Action<Pin> addPin,
@@ -43,27 +47,36 @@ namespace MobileClient.Routes
             _pageFactory = pageFactory;
             _pins = new List<Pin>();
             _isShowingUser = hasLocationPermission;
-            ActionButtonText = "Measure It!";
-            SearchCommand = new Command(async x =>
-            {
-                if (string.IsNullOrWhiteSpace(SearchBarText))
-                    return;
-                var locations = await Geocoding.GetLocationsAsync(SearchBarText);
-                if (!locations.Any())
-                {
-                    _toast.LongToast($"No addresses were found.");
-                    return;
-                }
-                var loc = locations.First();
-                var pos = new Position(loc.Latitude, loc.Longitude);
-                _foundLocation = (await Geocoding.GetPlacemarksAsync(locations.FirstOrDefault())).FirstOrDefault();
-                var address = $"{_foundLocation.SubThoroughfare} {_foundLocation.Thoroughfare}";
-                var pin = new Pin() { Position = pos, Type = PinType.SearchResult, Address = address, Label = address };
-                _setMapSpan(MapSpan.FromCenterAndRadius(new Position(loc.Latitude, loc.Longitude), Distance.FromMeters(20)));
-                AddPin(pin);
-                ActionButtonVisible = true;
-            });
+            ActionButtonText = "Measure It";
+            MovePinText = "Move Pin";
+            SearchCommand = new Command(async x => await this.Search(SearchBarText));
+            MovePinCommand = new Command(() => ToggleMovePinMode());
             ActionButtonCommand = new Command(() => _navigation.Push(_pageFactory.GetPage(PageType.OrderConfirmation, _foundLocation)));
+        }
+
+        private void ToggleMovePinMode()
+        {
+
+        }
+        private async Task Search(string searchText)
+        {
+            if (string.IsNullOrWhiteSpace(searchText))
+                return;
+            var locations = await Geocoding.GetLocationsAsync(searchText);
+            if (!locations.Any())
+            {
+                _toast.LongToast($"Address was not found.");
+                return;
+            }
+            var loc = locations.First();
+            var pos = new Position(loc.Latitude, loc.Longitude);
+            _foundLocation = (await Geocoding.GetPlacemarksAsync(locations.FirstOrDefault())).FirstOrDefault();
+            var address = $"{_foundLocation.SubThoroughfare} {_foundLocation.Thoroughfare}";
+            var pin = new Pin() { Position = pos, Type = PinType.SearchResult, Address = address, Label = address };
+            _setMapSpan(MapSpan.FromCenterAndRadius(new Position(loc.Latitude, loc.Longitude), Distance.FromMeters(20)));
+            AddPin(pin);
+            ActionButtonVisible = true;
+            MovePinVisible = true;
         }
 
         private void RemovePin(Pin pin)
@@ -75,10 +88,6 @@ namespace MobileClient.Routes
         {
             _pins.Add(pin);
             _addPin(pin);
-        }
-        private double ToRadians(double angle)
-        {
-            return (Math.PI / 180) * angle;
         }
 
         #region Binding
@@ -110,7 +119,7 @@ namespace MobileClient.Routes
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ActionButtonText)));
             }
         }
-        public ICommand ActionButtonCommand { get; private set; } = new Command(() => { });
+        public ICommand ActionButtonCommand { get; private set; }
         public bool ActionButtonVisible
         {
             get
@@ -133,6 +142,31 @@ namespace MobileClient.Routes
             {
                 _isShowingUser = value;
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsShowingUser)));
+            }
+        }
+        public string MovePinText
+        {
+            get
+            {
+                return _movePinText;
+            }
+            set
+            {
+                _movePinText = value;
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MovePinText)));
+            }
+        }
+        public ICommand MovePinCommand { get; private set; }
+        public bool MovePinVisible
+        {
+            get
+            {
+                return _movePinVisible;
+            }
+            set
+            {
+                _movePinVisible = value;
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MovePinVisible)));
             }
         }
         #endregion

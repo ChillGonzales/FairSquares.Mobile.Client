@@ -51,7 +51,7 @@
                         <Label HeightRequest="15" />
                         <Button Text="Get More Reports"
                             Command="{Binding GetMoreReportsCommand}"
-                            StyleClass="Success"
+                            StyleClass="btn-success"
                             WidthRequest="300"
                             VerticalOptions="Start"
                             HorizontalOptions="Center" />

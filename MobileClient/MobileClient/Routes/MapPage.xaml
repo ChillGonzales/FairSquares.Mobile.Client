@@ -6,7 +6,7 @@
              xmlns:maps="clr-namespace:Xamarin.Forms.Maps;assembly=Xamarin.Forms.Maps"
              xmlns:util="clr-namespace:MobileClient.Utility"
              mc:Ignorable="d"
-             Title="Map it up!"
+             Title="Find A Property"
              x:Class="MobileClient.Routes.MapPage">
     <ContentPage.Content>
         <Grid x:Name="BaseView">
@@ -24,24 +24,30 @@
                        BackgroundColor="White"
                        HorizontalOptions="CenterAndExpand"
                        VerticalOptions="Start"
-                       HeightRequest="75"
+                       HeightRequest="50"
                        WidthRequest="700"
                        Text="{Binding SearchBarText}"
                        SearchCommand="{Binding SearchCommand}"/>
-            <Button Text="{Binding ActionButtonText}"
-                    VerticalOptions="End"
-                    HorizontalOptions="Start"
-                    WidthRequest="150"
-                    StyleClass="Success"
-                    Command="{Binding ActionButtonCommand}"
-                    IsVisible="{Binding ActionButtonVisible}" />
-            <Button Text="{Binding ActionButtonText}"
-                    VerticalOptions="End"
-                    HorizontalOptions="End"
-                    WidthRequest="150"
-                    StyleClass="Info"
-                    Command="{Binding ActionButtonCommand}"
-                    IsVisible="{Binding ActionButtonVisible}" />
+            <StackLayout Orientation="Horizontal"
+                         VerticalOptions="End"
+                         HorizontalOptions="CenterAndExpand">
+                <Button Text="{Binding ActionButtonText}"
+                        VerticalOptions="Center"
+                        HorizontalOptions="Center"
+                        WidthRequest="150"
+                        HeightRequest="50"
+                        StyleClass="btn-primary"
+                        Command="{Binding ActionButtonCommand}"
+                        IsVisible="{Binding ActionButtonVisible}" />
+                <Button Text="{Binding MovePinText}"
+                        VerticalOptions="Center"
+                        HorizontalOptions="End"
+                        HeightRequest="50"
+                        WidthRequest="150"
+                        StyleClass="btn-secondary"
+                        Command="{Binding MovePinCommand}"
+                        IsVisible="{Binding MovePinVisible}" />
+            </StackLayout>
         </Grid>
     </ContentPage.Content>
 </ContentPage>

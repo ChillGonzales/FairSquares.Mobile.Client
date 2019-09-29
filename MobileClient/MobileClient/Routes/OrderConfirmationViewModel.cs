@@ -78,7 +78,7 @@ namespace MobileClient.Routes
 
         private void SetViewState()
         {
-            _changeSubmitButtonStyle(_userService.GetLoggedInAccount() == null ? "Info" : "Success");
+            _changeSubmitButtonStyle(_userService.GetLoggedInAccount() == null ? "btn-primary" : "btn-success");
             SubmitButtonText = _userService.GetLoggedInAccount() == null ? "Log In" : "Submit Order";
             AddressLine1 = $"{_placemark.SubThoroughfare} {_placemark.Thoroughfare}";
             AddressLine2 = $"{_placemark.SubLocality + " "}{_placemark.Locality}, {_placemark.AdminArea} {_placemark.PostalCode}";

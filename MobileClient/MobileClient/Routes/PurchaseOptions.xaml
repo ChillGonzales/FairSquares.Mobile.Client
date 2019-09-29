@@ -31,7 +31,7 @@
                             <Button Text="Single Report Details"
                                 Command="{Binding SingleReportCommand}"
                                 WidthRequest="150"
-                                StyleClass="Info" />
+                                StyleClass="btn-primary" />
                         </StackLayout>
                     </Frame>
                     <Label HeightRequest="20" />
@@ -57,7 +57,7 @@
                             <Button Text="Subscription Details" 
                                 Command="{Binding SubscriptionCommand}"
                                 WidthRequest="150"
-                                StyleClass="Info" />
+                                StyleClass="btn-primary" />
                         </StackLayout>
                     </Frame>
                 </StackLayout>

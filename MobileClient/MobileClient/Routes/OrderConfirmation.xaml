@@ -55,7 +55,7 @@
                     WidthRequest="250"
                     IsEnabled="{Binding SubmitButtonEnabled}"
                     Command="{Binding SubmitCommand}"
-                    StyleClass="Success" />
+                    StyleClass="btn-success" />
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

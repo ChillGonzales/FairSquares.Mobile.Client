@@ -32,7 +32,7 @@
                                 HorizontalOptions="CenterAndExpand"
                                 VerticalOptions="CenterAndExpand"
                                 WidthRequest="250"
-                                StyleClass="Info" />
+                                StyleClass="btn-primary" />
                     </StackLayout>
                 </Frame>
                 <Frame IsVisible="{Binding FreeReportLayoutVisible}" OutlineColor="Black">
@@ -47,7 +47,7 @@
                                 HorizontalOptions="CenterAndExpand"
                                 VerticalOptions="CenterAndExpand"
                                 WidthRequest="250"
-                                StyleClass="Success" />
+                                StyleClass="btn-success" />
                     </StackLayout>
                 </Frame>
                 <Label HeightRequest="40" VerticalOptions="Fill"/>
@@ -63,7 +63,7 @@
                             HorizontalOptions="CenterAndExpand"
                             VerticalOptions="CenterAndExpand"
                             WidthRequest="250"
-                            StyleClass="Info" />
+                            StyleClass="btn-primary" />
                     </StackLayout>
                 </Frame>
             </StackLayout>

@@ -17,12 +17,15 @@ namespace MobileClient.Routes
         {
             InitializeComponent();
             BindingContext = new MapViewModel(App.Container.GetInstance<IToastService>(),
-                                      p => Map.Pins.Add(p),
+                                      p =>
+                                      {
+                                          Map.Pins.Add(p);
+                                      },
                                       p => Map.Pins.Remove(p),
                                       s => Map.MoveToRegion(s),
                                       new MainThreadNavigator(x => Device.BeginInvokeOnMainThread(x), this.Navigation),
                                       App.Container.GetInstance<IPageFactory>(),
-                                      false);
+                                      true);
         }
     }
 }
