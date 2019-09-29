@@ -25,6 +25,12 @@ namespace MobileClient.Routes
         private int _selectedOptionIndex;
         private string _comments;
         private string _submitButtonText;
+        private bool _cannotSubmitLayoutVisible;
+        private string _cannotSubmitHeaderText;
+        private string _cannotSubmitLabelText;
+        private bool _purchaseOptionsVisible;
+        private string _purchaseOptionsText;
+        private bool _mainLayoutVisible;
         private readonly LocationModel _location;
         private readonly ICurrentUserService _userService;
         private readonly AlertUtility _alertUtility;
@@ -73,15 +79,24 @@ namespace MobileClient.Routes
             SubmitButtonEnabled = true;
             SubmitCommand = new Command(async () => await Submit());
             _changeSubmitButtonStyle = changeSubmitButtonStyle;
-            OnAppearingBehavior = new Command(() => SetViewState());
+            OnAppearingBehavior = new Command(async () => await SetViewState());
+            PurchaseOptionsCommand = new Command(async () =>
+            {
+                var val = await _orderValidation.ValidateOrderRequest(_userService.GetLoggedInAccount());
+                if (SubscriptionUtility.SubscriptionActive(val.Subscription))
+                    _nav.Push(_pageFactory.GetPage(PageType.SingleReportPurchase, val));
+                else
+                    _nav.Push(_pageFactory.GetPage(PageType.PurchaseOptions, val));
+            });
         }
 
-        private void SetViewState()
+        private async Task SetViewState()
         {
             _changeSubmitButtonStyle(_userService.GetLoggedInAccount() == null ? "btn-primary" : "btn-success");
             SubmitButtonText = _userService.GetLoggedInAccount() == null ? "Log In" : "Submit Order";
             AddressLine1 = $"{_location.Placemark.SubThoroughfare} {_location.Placemark.Thoroughfare}";
             AddressLine2 = $"{_location.Placemark.SubLocality + " "}{_location.Placemark.Locality}, {_location.Placemark.AdminArea} {_location.Placemark.PostalCode}";
+            await SetVisualStateForValidation();
         }
 
         private async Task Submit()
@@ -103,6 +118,14 @@ namespace MobileClient.Routes
                 SubmitButtonEnabled = true;
                 _toast.LongToast($"Failed to submit order with error '{ex.Message}'. Please contact Fair Squares support.");
                 _logger.LogError($"Failed to submit order.", ex);
+            }
+            finally
+            {
+                try
+                {
+                    await SetVisualStateForValidation();
+                }
+                catch { }
             }
         }
 
@@ -131,9 +154,58 @@ namespace MobileClient.Routes
                 _orderCache.Put(newOrder.OrderId, newOrder);
             }
             catch { }
-            await _alertUtility.Display("Order submitted", "Thank you for your order!", "Ok");
+            await _alertUtility.Display("Order Submitted", "Thank you for your order!", "Ok");
             _nav.Pop();
             _baseNavAction(BaseNavPageType.MyOrders);
+        }
+        private async Task SetVisualStateForValidation()
+        {
+            try
+            {
+                var user = _userService.GetLoggedInAccount();
+                if (user == null)
+                {
+                    MainLayoutVisible = true;
+                    CannotSubmitLayoutVisible = false;
+                    return;
+                }
+                var validation = await _orderValidation.ValidateOrderRequest(user);
+                var activeSub = SubscriptionUtility.SubscriptionActive(validation.Subscription);
+                switch (validation.State)
+                {
+                    case ValidationState.NoReportsLeftInPeriod:
+                        MainLayoutVisible = false;
+                        CannotSubmitHeaderText = "You've been busy!";
+                        CannotSubmitLabelText = $"Sorry, you have used all of your reports for this month.";
+                        CannotSubmitLayoutVisible = true;
+                        PurchaseOptionsText = $"Additional reports can be purchased at a reduced price of " +
+                            $"${SubscriptionUtility.GetSingleReportInfo(validation).Price} per report.";
+                        PurchaseOptionsVisible = true;
+                        break;
+                    case ValidationState.NoSubscriptionAndTrialValid:
+                        MainLayoutVisible = false;
+                        CannotSubmitHeaderText = "Thanks for trying Fair Squares!";
+                        CannotSubmitLabelText = $"Please claim your free one month subscription trial, or click below to view other options.";
+                        CannotSubmitLayoutVisible = true;
+                        PurchaseOptionsVisible = false;
+                        break;
+                    case ValidationState.NoSubscriptionAndTrialAlreadyUsed:
+                        MainLayoutVisible = false;
+                        CannotSubmitHeaderText = "Thanks for trying Fair Squares!";
+                        CannotSubmitLabelText = $"Click below to view options for getting more reports.";
+                        CannotSubmitLayoutVisible = true;
+                        PurchaseOptionsVisible = false;
+                        break;
+                    default:
+                        MainLayoutVisible = true;
+                        CannotSubmitLayoutVisible = false;
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Failed to set visual state on load.", ex);
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -211,6 +283,80 @@ namespace MobileClient.Routes
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SubmitButtonText)));
             }
         }
+        public bool CannotSubmitLayoutVisible
+        {
+            get
+            {
+                return _cannotSubmitLayoutVisible;
+            }
+            set
+            {
+                _cannotSubmitLayoutVisible = value;
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CannotSubmitLayoutVisible)));
+            }
+        }
+        public string CannotSubmitHeaderText
+        {
+            get
+            {
+                return _cannotSubmitHeaderText;
+            }
+            set
+            {
+                _cannotSubmitHeaderText = value;
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CannotSubmitHeaderText)));
+            }
+        }
+        public string CannotSubmitLabelText
+        {
+            get
+            {
+                return _cannotSubmitLabelText;
+            }
+            set
+            {
+                _cannotSubmitLabelText = value;
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CannotSubmitLabelText)));
+            }
+        }
+        public string PurchaseOptionsText
+        {
+            get
+            {
+                return _purchaseOptionsText;
+            }
+            set
+            {
+                _purchaseOptionsText = value;
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PurchaseOptionsText)));
+            }
+        }
+        public bool PurchaseOptionsVisible
+        {
+            get
+            {
+                return _purchaseOptionsVisible;
+            }
+            set
+            {
+                _purchaseOptionsVisible = value;
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PurchaseOptionsVisible)));
+            }
+        }
+        public bool MainLayoutVisible
+        {
+            get
+            {
+                return _mainLayoutVisible;
+            }
+            set
+            {
+                _mainLayoutVisible = value;
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MainLayoutVisible)));
+            }
+        }
+        public ICommand PurchaseOptionsCommand { get; private set; }
+
         private readonly List<OptionViewModel> Options = new List<OptionViewModel>()
         {
             new OptionViewModel() { RoofOption = Models.RoofOption.PrimaryOnly, Text = "Primary Roof Only" },

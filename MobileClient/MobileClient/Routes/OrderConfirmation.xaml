@@ -9,7 +9,7 @@
              x:Class="MobileClient.Routes.OrderConfirmation">
     <ContentPage.Content>
         <StackLayout Margin="5">
-            <Label Text="Address"
+            <Label Text="Selected Address"
                    HorizontalOptions="CenterAndExpand"
                    FontSize="Medium"
                    FontAttributes="Bold"
@@ -25,9 +25,10 @@
                 FontSize="Medium"
                 HorizontalOptions="CenterAndExpand" />
             <Label HeightRequest="20" />
-            <StackLayout Orientation="Horizontal">
-                <Label Text="Option" 
+            <StackLayout Orientation="Horizontal" IsVisible="{Binding MainLayoutVisible}">
+                <Label Text="Option: " 
                            FontSize="Medium"
+                           FontAttributes="Bold"
                            VerticalOptions="Center"
                            HorizontalOptions="Center" />
                 <Picker ItemsSource="{Binding OptionsSource}" 
@@ -36,9 +37,10 @@
                             VerticalOptions="Center"
                             HorizontalOptions="StartAndExpand" />
             </StackLayout>
-            <StackLayout Orientation="Horizontal">
-                <Label Text="Comments" 
+            <StackLayout Orientation="Horizontal" IsVisible="{Binding MainLayoutVisible}">
+                <Label Text="Comments: " 
                            FontSize="Medium"
+                           FontAttributes="Bold"
                            VerticalOptions="Center"
                            HorizontalOptions="Center"/>
                 <client:BorderlessEntry Text="{Binding Comments}"
@@ -48,9 +50,41 @@
                             HorizontalOptions="StartAndExpand" />
             </StackLayout>
             <Label HeightRequest="30" />
+            <StackLayout IsVisible="{Binding CannotSubmitLayoutVisible}" 
+                         Orientation="Vertical" 
+                         HorizontalOptions="CenterAndExpand" 
+                         VerticalOptions="Start">
+                <Frame BorderColor="Black">
+                    <StackLayout Orientation="Vertical">
+                        <Label Text="{Binding CannotSubmitHeaderText}"
+                               FontSize="Medium"
+                               FontAttributes="Bold"
+                               VerticalOptions="CenterAndExpand"
+                               HorizontalOptions="CenterAndExpand" />
+                        <Label />
+                        <Label Text="{Binding CannotSubmitLabelText}"
+                               FontSize="Small"
+                               VerticalOptions="CenterAndExpand"
+                               HorizontalOptions="CenterAndExpand" />
+                        <Label HeightRequest="10"/>
+                        <Label Text="{Binding PurchaseOptionsText}"
+                               IsVisible="{Binding PurchaseOptionsVisible}"
+                               FontSize="Small"
+                               VerticalOptions="CenterAndExpand"
+                               HorizontalOptions="CenterAndExpand" />
+                        <Button Text="View Purchase Options"
+                               StyleClass="btn-success"
+                               Command="{Binding PurchaseOptionsCommand}"
+                               VerticalOptions="Center"
+                               WidthRequest="250"
+                               HorizontalOptions="Center" />
+                    </StackLayout>
+                </Frame>
+            </StackLayout>
             <Button Text="{Binding SubmitButtonText}"
                     x:Name="SubmitButton"
                     HorizontalOptions="Center"
+                    IsVisible="{Binding MainLayoutVisible}"
                     VerticalOptions="Center"
                     WidthRequest="250"
                     IsEnabled="{Binding SubmitButtonEnabled}"

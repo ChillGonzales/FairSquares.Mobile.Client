@@ -85,11 +85,15 @@ namespace MobileClient.Routes
                 StatusMessageVisible = true;
                 MainLayoutVisible = false;
                 // Have to do this because some dummy decided to store dates in EST
-                var timeInfo = TimeZoneInfo.FindSystemTimeZoneById("America/Detroit");
-                var utc = TimeZoneInfo.ConvertTimeToUtc(order.DateReceived?.DateTime ?? DateTime.Now, timeInfo);
-                var displayTime = TimeZoneInfo.ConvertTimeFromUtc(utc, TimeZoneInfo.Local);
+                DateTime displayTime = DateTime.Now;
+                if (order.DateReceived != null)
+                {
+                    var timeInfo = TimeZoneInfo.FindSystemTimeZoneById("America/Detroit");
+                    var utc = TimeZoneInfo.ConvertTimeToUtc(order.DateReceived.Value.DateTime);
+                    displayTime = TimeZoneInfo.ConvertTimeFromUtc(utc, TimeZoneInfo.Local);
+                }
                 SubmittedDateText = $"Order #{order.OrderId} was submitted on {displayTime.ToString("dddd, MMMM dd yyyy")}" +
-                    $" at {displayTime.ToString("H:mm tt")}";
+                    $" at {displayTime.ToString("h:mm tt")}";
                 switch (order.Status.Status)
                 {
                     case (Status.ActionRequired):
