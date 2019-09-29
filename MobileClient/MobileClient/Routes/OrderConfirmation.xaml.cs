@@ -1,4 +1,5 @@
 ﻿using MobileClient.Authentication;
+using MobileClient.Models;
 using MobileClient.Services;
 using MobileClient.Utilities;
 using MobileClient.Utility;
@@ -18,10 +19,10 @@ namespace MobileClient.Routes
     public partial class OrderConfirmation : ContentPage
     {
         private readonly ICommand _onAppearing;
-        public OrderConfirmation(Placemark pl)
+        public OrderConfirmation(LocationModel loc)
         {
             InitializeComponent();
-            var vm = new OrderConfirmationViewModel(pl,
+            var vm = new OrderConfirmationViewModel(loc,
                                                     App.Container.GetInstance<ICurrentUserService>(),
                                                     new AlertUtility((s1, s2, s3, s4) => DisplayAlert(s1, s2, s3, s4),
                                                         (s1, s2, s3) => DisplayAlert(s1, s2, s3)),

@@ -1,4 +1,5 @@
-﻿using MobileClient.Routes;
+﻿using MobileClient.Models;
+using MobileClient.Routes;
 using MobileClient.Services;
 using System;
 using System.Collections.Generic;
@@ -33,7 +34,7 @@ namespace MobileClient.Utility
                 case PageType.Purchase:
                     return new Purchase(stateArgs[0] as ValidationModel);
                 case PageType.Order:
-                    return new Order();
+                    return new Routes.Order();
                 case PageType.PurchaseOptions:
                     return new PurchaseOptions(stateArgs[0] as ValidationModel);
                 case PageType.SingleReportPurchase:
@@ -41,7 +42,7 @@ namespace MobileClient.Utility
                 case PageType.Feedback:
                     return new Feedback();
                 case PageType.OrderConfirmation:
-                    return new OrderConfirmation(stateArgs[0] as Placemark);
+                    return new OrderConfirmation(stateArgs[0] as LocationModel);
                 default:
                     return new Account();
             }

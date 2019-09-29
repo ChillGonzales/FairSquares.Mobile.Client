@@ -5,11 +5,11 @@ using Android.Content.PM;
 using Android.Gms.Common;
 using Android.OS;
 using Android.Runtime;
-using Android.Support.V4.App;
 using Android.Util;
 using Android.Views;
 using Plugin.CurrentActivity;
 using Plugin.InAppBilling;
+using Plugin.Permissions;
 using System;
 
 namespace MobileClient.Droid
@@ -71,6 +71,12 @@ namespace MobileClient.Droid
             InAppBillingImplementation.HandleActivityResult(requestCode, resultCode, data);
         }
 
+        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
+        {
+            PermissionsImplementation.Current.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+            base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+
         private void CreateNotificationChannel()
         {
             if (Build.VERSION.SdkInt < BuildVersionCodes.O)
@@ -88,12 +94,6 @@ namespace MobileClient.Droid
 
             var notificationManager = (NotificationManager)GetSystemService(NotificationService);
             notificationManager.CreateNotificationChannel(channel);
-        }
-
-        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
-        {
-            Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
-            base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
         }
 
         public bool IsPlayServicesAvailable()

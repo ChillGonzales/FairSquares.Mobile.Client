@@ -14,11 +14,36 @@
                                    HorizontalOptions="CenterAndExpand"
                                    VerticalOptions="CenterAndExpand"
                                    Color="Black" />
-                <Label IsVisible="{Binding StatusMessageVisible}" 
-                       FontSize="Medium"
-                       Text="Your order has been submitted and is in the process of being measured."
-                       VerticalOptions="Center"
-                       HorizontalOptions="CenterAndExpand" />
+                <StackLayout IsVisible="{Binding StatusMessageVisible}" Orientation="Vertical">
+                    <Label FontSize="Medium"
+                           Text="{Binding SubmittedDateText}"
+                           FontAttributes="Bold"
+                           VerticalOptions="Center"
+                           HorizontalOptions="Start" />
+                        
+                    <Label FontSize="Small"
+                           IsVisible="{Binding TimingDisclaimerVisible}"
+                           FontAttributes="Italic"
+                           Text="Pending orders will be completed within 24 hours of the submission date (excluding weekends)."
+                           VerticalOptions="Center"
+                           HorizontalOptions="Start" />
+                    <Label HeightRequest="10"/>
+                    <StackLayout Orientation="Horizontal">
+                        <Label FontAttributes="Bold"
+                               FontSize="Medium"
+                               Text="Current Status: "
+                               HorizontalOptions="Start"
+                               VerticalOptions="Center" />
+                        <Label FontSize="Medium"
+                               Text="{Binding StatusText}"
+                               VerticalOptions="Center"
+                               HorizontalOptions="Start" />
+                    </StackLayout>
+                    <Label FontSize="Medium"
+                           Text="{Binding StatusMessageText}"
+                           VerticalOptions="Center"
+                           HorizontalOptions="Start" />
+                </StackLayout>
                 <StackLayout IsVisible="{Binding MainLayoutVisible}" Orientation="Vertical">
                     <Label Text="{Binding Address}"
                         FontSize="Large"

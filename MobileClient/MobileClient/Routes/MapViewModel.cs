@@ -1,5 +1,9 @@
-﻿using MobileClient.Services;
+﻿using MobileClient.Models;
+using MobileClient.Services;
+using MobileClient.Utilities;
 using MobileClient.Utility;
+using Plugin.Permissions;
+using Plugin.Permissions.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -26,8 +30,9 @@ namespace MobileClient.Routes
         private readonly Action<MapSpan> _setMapSpan;
         private readonly MainThreadNavigator _navigation;
         private readonly IPageFactory _pageFactory;
+        private readonly ILogger<MapViewModel> _logger;
         private string _movePinText;
-        private Placemark _foundLocation;
+        private LocationModel _foundLocation;
         private bool _movePinVisible;
         private Color _movePinColor;
 
@@ -37,7 +42,7 @@ namespace MobileClient.Routes
                             Action<MapSpan> setMapSpan,
                             MainThreadNavigator navigation,
                             IPageFactory pageFactory,
-                            bool hasLocationPermission)
+                            ILogger<MapViewModel> logger)
         {
             _toast = toast;
             _addPin = addPin;
@@ -45,15 +50,14 @@ namespace MobileClient.Routes
             _setMapSpan = setMapSpan;
             _navigation = navigation;
             _pageFactory = pageFactory;
+            _logger = logger;
             _pins = new List<Pin>();
-            _isShowingUser = hasLocationPermission;
             ActionButtonText = "Measure It";
             MovePinText = "Move Pin";
             SearchCommand = new Command(async x => await this.Search(SearchBarText));
             MovePinCommand = new Command(() => ToggleMovePinMode());
             ActionButtonCommand = new Command(() => _navigation.Push(_pageFactory.GetPage(PageType.OrderConfirmation, _foundLocation)));
         }
-
         private void ToggleMovePinMode()
         {
 
@@ -70,8 +74,13 @@ namespace MobileClient.Routes
             }
             var loc = locations.First();
             var pos = new Position(loc.Latitude, loc.Longitude);
-            _foundLocation = (await Geocoding.GetPlacemarksAsync(locations.FirstOrDefault())).FirstOrDefault();
-            var address = $"{_foundLocation.SubThoroughfare} {_foundLocation.Thoroughfare}";
+            var pl = (await Geocoding.GetPlacemarksAsync(locations.FirstOrDefault())).FirstOrDefault();
+            _foundLocation = new LocationModel()
+            {
+                Position = pos,
+                Placemark = pl
+            };
+            var address = $"{pl.SubThoroughfare} {pl.Thoroughfare}";
             var pin = new Pin() { Position = pos, Type = PinType.SearchResult, Address = address, Label = address };
             _setMapSpan(MapSpan.FromCenterAndRadius(new Position(loc.Latitude, loc.Longitude), Distance.FromMeters(20)));
             AddPin(pin);

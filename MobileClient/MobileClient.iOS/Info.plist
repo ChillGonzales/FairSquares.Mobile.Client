@@ -51,7 +51,9 @@
 	<string>Can we use your location when your app is being used?</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Can we use your location at all times?</string>
-	<key>CFBundleVersion</key>
+  <key>NSCalendarsUsageDescription</key>
+  <string>Needs Calendar Permission</string>
+  <key>CFBundleVersion</key>
 	<string>1.58</string>
 	<key>UIBackgroundModes</key>
 	<array>

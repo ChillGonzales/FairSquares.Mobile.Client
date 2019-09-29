@@ -25,7 +25,7 @@ namespace MobileClient.Routes
         private int _selectedOptionIndex;
         private string _comments;
         private string _submitButtonText;
-        private readonly Placemark _placemark;
+        private readonly LocationModel _location;
         private readonly ICurrentUserService _userService;
         private readonly AlertUtility _alertUtility;
         private readonly Action<BaseNavPageType> _baseNavAction;
@@ -42,7 +42,7 @@ namespace MobileClient.Routes
 
         public ICommand OnAppearingBehavior { get; private set; }
 
-        public OrderConfirmationViewModel(Placemark placemark,
+        public OrderConfirmationViewModel(LocationModel location,
                                           ICurrentUserService userService,
                                           AlertUtility alertUtility,
                                           Action<BaseNavPageType> baseNavAction,
@@ -57,7 +57,7 @@ namespace MobileClient.Routes
                                           Action<string> changeSubmitButtonStyle,
                                           ILogger<OrderConfirmationViewModel> logger)
         {
-            _placemark = placemark;
+            _location = location;
             _userService = userService;
             _alertUtility = alertUtility;
             _baseNavAction = baseNavAction;
@@ -80,8 +80,8 @@ namespace MobileClient.Routes
         {
             _changeSubmitButtonStyle(_userService.GetLoggedInAccount() == null ? "btn-primary" : "btn-success");
             SubmitButtonText = _userService.GetLoggedInAccount() == null ? "Log In" : "Submit Order";
-            AddressLine1 = $"{_placemark.SubThoroughfare} {_placemark.Thoroughfare}";
-            AddressLine2 = $"{_placemark.SubLocality + " "}{_placemark.Locality}, {_placemark.AdminArea} {_placemark.PostalCode}";
+            AddressLine1 = $"{_location.Placemark.SubThoroughfare} {_location.Placemark.Thoroughfare}";
+            AddressLine2 = $"{_location.Placemark.SubLocality + " "}{_location.Placemark.Locality}, {_location.Placemark.AdminArea} {_location.Placemark.PostalCode}";
         }
 
         private async Task Submit()
@@ -116,7 +116,9 @@ namespace MobileClient.Routes
                 MemberEmail = email,
                 RoofOption = Options[SelectedOptionIndex].RoofOption,
                 Comments = Comments,
-                PlatformType = _deviceType == Device.Android ? Models.PlatformType.Android : Models.PlatformType.iOS
+                PlatformType = _deviceType == Device.Android ? Models.PlatformType.Android : Models.PlatformType.iOS,
+                Status = new StatusModel() { Status = Status.Pending },
+                AddressPosition = new PositionModel() { Latitude = _location.Position.Latitude, Longitude = _location.Position.Longitude }
             };
             newOrder.OrderId = await _orderService.AddOrder(newOrder);
             try

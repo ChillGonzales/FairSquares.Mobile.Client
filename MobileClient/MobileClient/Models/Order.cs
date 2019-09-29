@@ -21,6 +21,24 @@ namespace MobileClient.Models
         public string ChargeId { get; set; }
         public string CouponCodeId { get; set; }
         public PlatformType? PlatformType { get; set; }
+        public StatusModel Status { get; set; }
+        public PositionModel AddressPosition { get; set; }
+    }
+    public class StatusModel
+    {
+        public Status Status { get; set; }
+        public string Message { get; set; }
+    }
+    public enum Status
+    {
+        Pending = 0,
+        ActionRequired = 1,
+        Completed = 2
+    }
+    public class PositionModel
+    {
+        public double? Latitude { get; set; }
+        public double? Longitude { get; set; }
     }
     public enum PlatformType
     {
