@@ -1,15 +1,58 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Application xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:light="clr-namespace:Xamarin.Forms.Themes;assembly=Xamarin.Forms.Theme.Light"
              x:Class="MobileClient.App">
     <Application.Resources>
-        <ResourceDictionary MergedWith="light:LightThemeResources">
+        <ResourceDictionary>
             <Color x:Key="primary-back-title-color">#527754</Color>
             <Color x:Key="primary-title-color">#FFFFFF</Color>
+            <Color x:Key="blue">#007bff</Color>
+            <Color x:Key="red">#dc3545</Color>
+            <Color x:Key="yellow">#ffc107</Color>
+            <Color x:Key="green">#28a745</Color>
+            <Color x:Key="cyan">#17a2b8</Color>
+            <Color x:Key="gray-600">#868e96</Color>
+            <Color x:Key="white">#fff</Color>
+            <Color x:Key="black">#000</Color>
             <Style ApplyToDerivedTypes="true" TargetType="NavigationPage">
                 <Setter Property="BarBackgroundColor" Value="{StaticResource Key=primary-back-title-color}"/>
                 <Setter Property="BarTextColor" Value="{StaticResource Key=primary-title-color}"/>
+            </Style>
+            <Style TargetType="Button" Class="btn-primary">
+                <Setter Property="BackgroundColor" Value="{StaticResource Key=blue}"/>
+                <Setter Property="TextColor" Value="{StaticResource Key=white}"/>
+                <Setter Property="FontAttributes" Value="Bold" />
+            </Style>
+            <Style TargetType="Button" Class="btn-danger">
+                <Setter Property="BackgroundColor" Value="{StaticResource Key=red}"/>
+                <Setter Property="TextColor" Value="{StaticResource Key=white}"/>
+                <Setter Property="FontAttributes" Value="Bold" />
+            </Style>
+            <Style TargetType="Button" Class="btn-warning">
+                <Setter Property="BackgroundColor" Value="{StaticResource Key=yellow}"/>
+                <Setter Property="TextColor" Value="{StaticResource Key=black}"/>
+                <Setter Property="FontAttributes" Value="Bold" />
+            </Style>
+            <Style TargetType="Button" Class="btn-success">
+                <Setter Property="BackgroundColor" Value="{StaticResource Key=green}"/>
+                <Setter Property="TextColor" Value="{StaticResource Key=white}"/>
+                <Setter Property="FontAttributes" Value="Bold" />
+            </Style>
+            <Style TargetType="Button" Class="btn-info">
+                <Setter Property="BackgroundColor" Value="{StaticResource Key=cyan}"/>
+                <Setter Property="TextColor" Value="{StaticResource Key=white}"/>
+                <Setter Property="FontAttributes" Value="Bold" />
+            </Style>
+            <Style TargetType="Button" Class="btn-secondary">
+                <Setter Property="BackgroundColor" Value="{StaticResource Key=gray-600}"/>
+                <Setter Property="TextColor" Value="{StaticResource Key=white}"/>
+                <Setter Property="FontAttributes" Value="Bold" />
+            </Style>
+            <Style TargetType="Button" Class="btn-outline-secondary">
+                <Setter Property="BackgroundColor" Value="{StaticResource Key=white}"/>
+                <Setter Property="TextColor" Value="{StaticResource Key=gray-600}"/>
+                <Setter Property="FontAttributes" Value="Bold"/>
+                <Setter Property="BorderColor" Value="{StaticResource Key=gray-600}"/>
             </Style>
         </ResourceDictionary>
     </Application.Resources>

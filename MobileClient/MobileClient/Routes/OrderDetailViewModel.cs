@@ -94,10 +94,19 @@ namespace MobileClient.Routes
                 }
                 SubmittedDateText = $"Order #{order.OrderId} was submitted on {displayTime.ToString("dddd, MMMM dd yyyy")}" +
                     $" at {displayTime.ToString("h:mm tt")}";
+                if (order.Status == null)
+                {
+                    order.Status = new StatusModel()
+                    {
+                        Status = Status.Pending
+                    };
+                }
                 switch (order.Status.Status)
                 {
                     case (Status.ActionRequired):
-                        StatusMessageText = order.Status.Message ?? $"Please respond to the message sent to {_userService.GetLoggedInAccount().Email} to continue with this order.";
+                        StatusMessageText = string.IsNullOrWhiteSpace(order.Status.Message) ?
+                            $"Please respond to the message sent to {_userService.GetLoggedInAccount().Email} to continue with this order." :
+                            order.Status.Message;
                         StatusText = "Action Required";
                         TimingDisclaimerVisible = false;
                         break;
