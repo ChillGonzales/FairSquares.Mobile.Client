@@ -1,4 +1,4 @@
-﻿using MobileClient.Authentication;
+using MobileClient.Authentication;
 using MobileClient.Models;
 using MobileClient.Services;
 using MobileClient.Utilities;
@@ -25,13 +25,15 @@ namespace MobileClient.Routes
                                                    App.Container.GetInstance<ICache<SubscriptionModel>>(),
                                                    App.Container.GetInstance<ISubscriptionService>(),
                                                    App.Container.GetInstance<ICurrentUserService>(),
-                                                   new MainThreadNavigator(x => Device.BeginInvokeOnMainThread(x), this.Navigation),
+                                                   App.Container.GetInstance<MainThreadNavigator>(),
                                                    model,
                                                    Device.RuntimePlatform,
                                                    page => (Application.Current.MainPage as BaseTab).NavigateToTab(page),
                                                    new AlertUtility((s1, s2, s3, s4) => DisplayAlert(s1, s2, s3, s4),
                                                    (s1, s2, s3) => DisplayAlert(s1, s2, s3)),
-                                                   uri => Device.OpenUri(uri));
+                                                   uri => Device.OpenUri(uri),
+                                                   registry);
+            registry.RegisterPage(this);
         }
     }
 }

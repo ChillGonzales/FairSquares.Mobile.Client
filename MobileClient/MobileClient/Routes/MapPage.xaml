@@ -37,9 +37,11 @@
                         WidthRequest="150"
                         HeightRequest="50"
                         StyleClass="btn-primary"
+                        IsEnabled="{Binding ActionButtonEnabled}"
                         Command="{Binding ActionButtonCommand}"
                         IsVisible="{Binding ActionButtonVisible}" />
                 <Button Text="{Binding MovePinText}"
+                        x:Name="MovePinButton"
                         VerticalOptions="Center"
                         HorizontalOptions="End"
                         HeightRequest="50"

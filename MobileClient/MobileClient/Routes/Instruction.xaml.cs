@@ -1,4 +1,4 @@
-﻿using MobileClient.Models;
+using MobileClient.Models;
 using MobileClient.Utilities;
 using MobileClient.Utility;
 using System;

@@ -1,4 +1,4 @@
-﻿using MobileClient.Services;
+using MobileClient.Services;
 using MobileClient.Utility;
 using System;
 using System.Collections.Generic;

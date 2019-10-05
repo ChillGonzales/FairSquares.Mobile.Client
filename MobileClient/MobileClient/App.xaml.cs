@@ -27,10 +27,11 @@ namespace MobileClient
     {
         public readonly static Container Container;
         private static string _apiKey = "30865dc7-8e15-4fab-a777-0b795370a9d7";
-        private static string _orderEndpoint = @"https://fairsquares-order-management-api.azurewebsites.net/api/orders";
-        private static string _notifyEndpoint = @"https://fairsquares-order-management-api.azurewebsites.net/api/notification";
-        private static string _subEndpoint = @"https://fairsquares-order-management-api.azurewebsites.net/api/subscriptions";
-        private static string _purchasedReportsEndpoint = @"https://fairsquares-order-management-api.azurewebsites.net/api/purchasedreports";
+        // TODO: Undo the qa stuff
+        private static string _orderEndpoint = @"https://qa-fairsquares-order-management-api.azurewebsites.net/api/orders";
+        private static string _notifyEndpoint = @"https://qa-fairsquares-order-management-api.azurewebsites.net/api/notification";
+        private static string _subEndpoint = @"https://qa-fairsquares-order-management-api.azurewebsites.net/api/subscriptions";
+        private static string _purchasedReportsEndpoint = @"https://qa-fairsquares-order-management-api.azurewebsites.net/api/purchasedreports";
         private static string _propertyEndpoint = @"https://property-measurements.azurewebsites.net/api/properties";
         private static string _blobEndpoint = @"https://fairsquaresapplogging.blob.core.windows.net/roof-images";
         private const string GoogleAuthorizeUrl = "https://accounts.google.com/o/oauth2/v2/auth";
@@ -69,17 +70,17 @@ namespace MobileClient
 
                 // Setup caches and begin process of filling them.
                 var dbBasePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-                var propertyCache = new LocalSqlCache<PropertyModel>(Path.Combine(dbBasePath, "property.db3"), 
+                var propertyCache = new LocalSqlCache<PropertyModel>(Path.Combine(dbBasePath, "property.db3"),
                     new AnalyticsLogger<LocalSqlCache<PropertyModel>>(analyticsSvc, userService));
-                var orderCache = new LocalSqlCache<Models.Order>(Path.Combine(dbBasePath, "order.db3"), 
+                var orderCache = new LocalSqlCache<Models.Order>(Path.Combine(dbBasePath, "order.db3"),
                     new AnalyticsLogger<LocalSqlCache<Models.Order>>(analyticsSvc, userService));
-                var imageCache = new LocalSqlCache<ImageModel>(Path.Combine(dbBasePath, "images.db3"), 
+                var imageCache = new LocalSqlCache<ImageModel>(Path.Combine(dbBasePath, "images.db3"),
                     new AnalyticsLogger<LocalSqlCache<ImageModel>>(analyticsSvc, userService));
-                var subCache = new LocalSqlCache<SubscriptionModel>(Path.Combine(dbBasePath, "subs.db3"), 
+                var subCache = new LocalSqlCache<SubscriptionModel>(Path.Combine(dbBasePath, "subs.db3"),
                     new AnalyticsLogger<LocalSqlCache<SubscriptionModel>>(analyticsSvc, userService));
-                var settingsCache = new LocalSqlCache<SettingsModel>(Path.Combine(dbBasePath, "sets.db3"), 
+                var settingsCache = new LocalSqlCache<SettingsModel>(Path.Combine(dbBasePath, "sets.db3"),
                     new AnalyticsLogger<LocalSqlCache<SettingsModel>>(analyticsSvc, userService));
-                var prCache = new LocalSqlCache<PurchasedReportModel>(Path.Combine(dbBasePath, "purchasedreports.db3"), 
+                var prCache = new LocalSqlCache<PurchasedReportModel>(Path.Combine(dbBasePath, "purchasedreports.db3"),
                     new AnalyticsLogger<LocalSqlCache<PurchasedReportModel>>(analyticsSvc, userService));
 
                 Action ClearCaches = () =>

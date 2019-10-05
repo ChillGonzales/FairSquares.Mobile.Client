@@ -1,4 +1,4 @@
-﻿using MobileClient.Authentication;
+using MobileClient.Authentication;
 using MobileClient.Models;
 using MobileClient.Services;
 using MobileClient.Utilities;

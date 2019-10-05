@@ -41,13 +41,13 @@ namespace MobileClient.Routes
         private readonly IMessagingSubscriber _topicSubscriber;
         private readonly string _deviceType;
         private readonly ICache<Models.Order> _orderCache;
+        private readonly IMessagingCenter _messagingCenter;
         private readonly IToastService _toast;
         private readonly MainThreadNavigator _nav;
         private readonly ILogger<OrderConfirmationViewModel> _logger;
         private readonly Action<string> _changeSubmitButtonStyle;
 
         public ICommand OnAppearingBehavior { get; private set; }
-
         public OrderConfirmationViewModel(LocationModel location,
                                           ICurrentUserService userService,
                                           AlertUtility alertUtility,
@@ -61,6 +61,7 @@ namespace MobileClient.Routes
                                           MainThreadNavigator nav,
                                           ICache<Models.Order> orderCache,
                                           Action<string> changeSubmitButtonStyle,
+                                          IMessagingCenter messagingCenter,
                                           ILogger<OrderConfirmationViewModel> logger)
         {
             _location = location;
@@ -73,6 +74,7 @@ namespace MobileClient.Routes
             _deviceType = deviceType;
             _topicSubscriber = topicSubscriber;
             _orderCache = orderCache;
+            _messagingCenter = messagingCenter;
             _toast = toast;
             _nav = nav;
             _logger = logger;
@@ -95,7 +97,7 @@ namespace MobileClient.Routes
             _changeSubmitButtonStyle(_userService.GetLoggedInAccount() == null ? "btn-primary" : "btn-success");
             SubmitButtonText = _userService.GetLoggedInAccount() == null ? "Log In" : "Submit Order";
             AddressLine1 = $"{_location.Placemark.SubThoroughfare} {_location.Placemark.Thoroughfare}";
-            AddressLine2 = $"{_location.Placemark.SubLocality + " "}{_location.Placemark.Locality}, {_location.Placemark.AdminArea} {_location.Placemark.PostalCode}";
+            AddressLine2 = $"{_location.Placemark.Locality}, {_location.Placemark.AdminArea} {_location.Placemark.PostalCode}";
             await SetVisualStateForValidation();
         }
 
@@ -124,6 +126,8 @@ namespace MobileClient.Routes
                 try
                 {
                     await SetVisualStateForValidation();
+                    App.Current.MainPage = _pageFactory.GetPage(PageType.Map);
+                    _nav.PopToRoot();
                 }
                 catch { }
             }

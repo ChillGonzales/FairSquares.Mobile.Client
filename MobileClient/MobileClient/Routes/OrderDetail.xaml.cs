@@ -1,4 +1,4 @@
-﻿using FairSquares.Measurement.Core.Models;
+using FairSquares.Measurement.Core.Models;
 using MobileClient.Authentication;
 using MobileClient.Models;
 using MobileClient.Services;
