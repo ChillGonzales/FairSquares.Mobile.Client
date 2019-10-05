@@ -199,9 +199,9 @@ namespace MobileClient.Routes
                 PurchaseId = sub.Id,
                 PurchaseToken = sub.PurchaseToken,
                 SubscriptionType = SubscriptionUtility.GetTypeFromProductId(sub.ProductId),
-                StartDateTime = DateTimeOffset.Now,
-                PurchasedDateTime = DateTimeOffset.Now,
-                EndDateTime = DateTimeOffset.Now.AddMonths(1),
+                StartDateTime = DateTimeOffset.UtcNow,
+                PurchasedDateTime = DateTimeOffset.UtcNow,
+                EndDateTime = DateTimeOffset.UtcNow.AddMonths(1),
                 PurchaseSource = Device.RuntimePlatform == Device.Android ? Models.PurchaseSource.GooglePlay : Models.PurchaseSource.AppStore,
                 UserId = _userCache.GetLoggedInAccount().UserId,
                 Email = _userCache.GetLoggedInAccount().Email

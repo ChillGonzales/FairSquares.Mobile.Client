@@ -132,7 +132,7 @@ namespace MobileClient.Routes
             {
                 PurchaseId = purchase.Id,
                 PurchaseToken = purchase.PurchaseToken,
-                PurchasedDateTime = DateTimeOffset.Now,
+                PurchasedDateTime = DateTimeOffset.UtcNow,
                 PurchaseSource = Device.RuntimePlatform == Device.Android ? Models.PurchaseSource.GooglePlay : Models.PurchaseSource.AppStore,
                 UserId = _userCache.GetLoggedInAccount().UserId,
                 Email = _userCache.GetLoggedInAccount().Email

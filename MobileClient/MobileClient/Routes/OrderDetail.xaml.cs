@@ -1,4 +1,5 @@
 ﻿using FairSquares.Measurement.Core.Models;
+using MobileClient.Authentication;
 using MobileClient.Models;
 using MobileClient.Services;
 using MobileClient.Utilities;
@@ -31,6 +32,7 @@ namespace MobileClient.Routes
                                               new MainThreadNavigator(x => Device.BeginInvokeOnMainThread(x), this.Navigation),
                                               App.Container.GetInstance<IPageFactory>(),
                                               (s1, s2, s3) => DisplayAlert(s1, s2, s3),
+                                              App.Container.GetInstance<ICurrentUserService>(),
                                               App.Container.GetInstance<ILogger<OrderDetailViewModel>>());
             _onAppearing = vm.OnAppearingBehavior;
             BindingContext = vm;

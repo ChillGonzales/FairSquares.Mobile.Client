@@ -1,5 +1,6 @@
 ﻿using FairSquares.Measurement.Core.Models;
 using FairSquares.Measurement.Core.Utility;
+using MobileClient.Authentication;
 using MobileClient.Models;
 using MobileClient.Services;
 using MobileClient.Utilities;
@@ -27,6 +28,7 @@ namespace MobileClient.Routes
         private readonly IPropertyService _propertyService;
         private readonly IPageFactory _pageFactory;
         private readonly IImageService _imageService;
+        private readonly ICurrentUserService _userService;
         private readonly IToastService _toastService;
         private readonly MainThreadNavigator _nav;
         private readonly Func<string, string, string, Task> _alertAction;
@@ -45,6 +47,10 @@ namespace MobileClient.Routes
         private string _numberOfRoofs;
         private string _numberOfPitches;
         private List<WasteGroup> _safetyStockSource;
+        private string _submittedDateText;
+        private string _statusText;
+        private string _statusMessageText;
+        private bool _timingDisclaimerVisible;
         private readonly ILogger<OrderDetailViewModel> _logger;
         public readonly ICommand OnAppearingBehavior;
 
@@ -57,6 +63,7 @@ namespace MobileClient.Routes
                                     MainThreadNavigator nav,
                                     IPageFactory pageFactory,
                                     Func<string, string, string, Task> alertAction,
+                                    ICurrentUserService userService,
                                     ILogger<OrderDetailViewModel> logger)
         {
             _order = order;
@@ -65,6 +72,7 @@ namespace MobileClient.Routes
             _propertyService = propService;
             _pageFactory = pageFactory;
             _imageService = imgService;
+            _userService = userService;
             _toastService = toast;
             _nav = nav;
             _alertAction = alertAction;
@@ -76,6 +84,29 @@ namespace MobileClient.Routes
             {
                 StatusMessageVisible = true;
                 MainLayoutVisible = false;
+                // Have to do this because some dummy decided to store dates in EST
+                DateTime displayTime = DateTime.Now;
+                if (order.DateReceived != null)
+                {
+                    var timeInfo = TimeZoneInfo.FindSystemTimeZoneById("America/Detroit");
+                    var utc = TimeZoneInfo.ConvertTimeToUtc(order.DateReceived.Value.DateTime);
+                    displayTime = TimeZoneInfo.ConvertTimeFromUtc(utc, TimeZoneInfo.Local);
+                }
+                SubmittedDateText = $"Order #{order.OrderId} was submitted on {displayTime.ToString("dddd, MMMM dd yyyy")}" +
+                    $" at {displayTime.ToString("h:mm tt")}";
+                switch (order.Status.Status)
+                {
+                    case (Status.ActionRequired):
+                        StatusMessageText = order.Status.Message ?? $"Please respond to the message sent to {_userService.GetLoggedInAccount().Email} to continue with this order.";
+                        StatusText = "Action Required";
+                        TimingDisclaimerVisible = false;
+                        break;
+                    default:
+                        StatusMessageText = "Your order has been received and is being processed.";
+                        StatusText = "Pending";
+                        TimingDisclaimerVisible = true;
+                        break;
+                }
                 return;
             }
             else
@@ -480,6 +511,54 @@ namespace MobileClient.Routes
             {
                 _safetyStockSource = value;
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SafetyStockSource)));
+            }
+        }
+        public string SubmittedDateText
+        {
+            get
+            {
+                return _submittedDateText;
+            }
+            set
+            {
+                _submittedDateText = value;
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SubmittedDateText)));
+            }
+        }
+        public string StatusText
+        {
+            get
+            {
+                return _statusText;
+            }
+            set
+            {
+                _statusText = value;
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(StatusText)));
+            }
+        }
+        public string StatusMessageText
+        {
+            get
+            {
+                return _statusMessageText;
+            }
+            set
+            {
+                _statusMessageText = value;
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(StatusMessageText)));
+            }
+        }
+        public bool TimingDisclaimerVisible
+        {
+            get
+            {
+                return _timingDisclaimerVisible;
+            }
+            set
+            {
+                _timingDisclaimerVisible = value;
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(TimingDisclaimerVisible)));
             }
         }
     }
