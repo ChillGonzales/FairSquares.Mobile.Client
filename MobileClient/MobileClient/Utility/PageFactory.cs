@@ -1,4 +1,4 @@
-﻿using MobileClient.Models;
+using MobileClient.Models;
 using MobileClient.Routes;
 using MobileClient.Services;
 using System;
@@ -58,6 +58,7 @@ namespace MobileClient.Utility
         Instruction,
         Landing,
         ManageSubscription,
+        Map,
         MyOrders,
         OrderDetail,
         Order,

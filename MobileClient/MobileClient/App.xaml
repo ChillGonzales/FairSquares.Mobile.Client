@@ -48,6 +48,12 @@
                 <Setter Property="TextColor" Value="{StaticResource Key=white}"/>
                 <Setter Property="FontAttributes" Value="Bold" />
             </Style>
+            <Style TargetType="Button" Class="btn-outline-secondary">
+                <Setter Property="BackgroundColor" Value="{StaticResource Key=white}"/>
+                <Setter Property="TextColor" Value="{StaticResource Key=gray-600}"/>
+                <Setter Property="FontAttributes" Value="Bold"/>
+                <Setter Property="BorderColor" Value="{StaticResource Key=gray-600}"/>
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
