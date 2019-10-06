@@ -203,7 +203,7 @@ namespace MobileClient.Routes
             newOrder.OrderId = await _orderService.AddOrder(newOrder);
             try
             {
-                _topicSubscriber.Subscribe(new List<string>() { newOrder.OrderId });
+                _topicSubscriber.Subscribe(new List<string>() { $"{App.TopicPrefix}{newOrder.OrderId}" });
             }
             catch { }
             try

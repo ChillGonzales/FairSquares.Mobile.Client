@@ -43,6 +43,7 @@ namespace MobileClient.Routes
         private List<OrderGroup> _ordersSource;
         private OrderViewCell _orderListSelectedItem;
         public ICommand OnAppearingBehavior;
+        private string _navigateToOrderId;
 
         public MyOrdersViewModel(IOrderService orderSvc,
                                  ICache<Models.Order> orderCache,
@@ -53,6 +54,7 @@ namespace MobileClient.Routes
                                  IOrderValidationService validator,
                                  IPageFactory pageFactory,
                                  ICurrentUserService userService,
+                                 LaunchedFromPushModel pushModel,
                                  MainThreadNavigator nav,
                                  IMessagingCenter messagingCenter,
                                  Action<Action> uiInvoke,
@@ -110,6 +112,10 @@ namespace MobileClient.Routes
                 await this.SetViewState();
             });
             OnAppearingBehavior = new Command(async () => await SetViewState());
+            if (pushModel != null && !string.IsNullOrWhiteSpace(pushModel.OrderId))
+            {
+                _navigateToOrderId = pushModel.OrderId;
+            }
         }
 
         private async Task SetViewState()
@@ -151,6 +157,11 @@ namespace MobileClient.Routes
                     var validation = await _validationService.ValidateOrderRequest(user);
                     FreeReportLayoutVisible = validation.State == ValidationState.FreeReportValid;
                     LoginLayoutVisible = false;
+                    if (!string.IsNullOrWhiteSpace(_navigateToOrderId))
+                    {
+                        _nav.Push(_pageFactory.GetPage(PageType.OrderDetail, orders.FirstOrDefault(x => x.OrderId == _navigateToOrderId)));
+                        _navigateToOrderId = null;
+                    }
                 }
                 else
                 {

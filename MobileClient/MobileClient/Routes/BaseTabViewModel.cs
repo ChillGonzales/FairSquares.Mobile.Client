@@ -22,7 +22,7 @@ namespace MobileClient.Routes
         private readonly MainThreadNavigator _nav;
         private bool _dialogShown;
 
-        public BaseTabViewModel(ICache<SettingsModel> settings,
+        public BaseTabViewModel( ICache<SettingsModel> settings,
                                 IPageFactory pageFactory,
                                 ILogger<BaseTabViewModel> logger,
                                 MainThreadNavigator nav)

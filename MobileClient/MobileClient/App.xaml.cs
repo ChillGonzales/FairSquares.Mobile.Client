@@ -28,6 +28,10 @@ namespace MobileClient
         public readonly static Container Container;
         private static string _apiKey = "30865dc7-8e15-4fab-a777-0b795370a9d7";
         // TODO: Undo the qa stuff
+        //private static string _orderEndpoint = @"https://qa-fairsquares-order-management-api.azurewebsites.net/api/orders";
+        //private static string _notifyEndpoint = @"https://qa-fairsquares-order-management-api.azurewebsites.net/api/notification";
+        //private static string _subEndpoint = @"https://qa-fairsquares-order-management-api.azurewebsites.net/api/subscriptions";
+        //private static string _purchasedReportsEndpoint = @"https://qa-fairsquares-order-management-api.azurewebsites.net/api/purchasedreports";
         private static string _orderEndpoint = @"https://qa-fairsquares-order-management-api.azurewebsites.net/api/orders";
         private static string _notifyEndpoint = @"https://qa-fairsquares-order-management-api.azurewebsites.net/api/notification";
         private static string _subEndpoint = @"https://qa-fairsquares-order-management-api.azurewebsites.net/api/subscriptions";
@@ -36,6 +40,8 @@ namespace MobileClient
         private static string _blobEndpoint = @"https://fairsquaresapplogging.blob.core.windows.net/roof-images";
         private const string GoogleAuthorizeUrl = "https://accounts.google.com/o/oauth2/v2/auth";
         private const string GoogleAccessTokenUrl = "https://www.googleapis.com/oauth2/v4/token";
+        public const string TopicPrefix = "v1-";
+        private static LaunchedFromPushModel PushModel;
 
         static App()
         {
@@ -121,7 +127,7 @@ namespace MobileClient
                             {
                                 try
                                 {
-                                    DependencyService.Get<IMessagingSubscriber>().Subscribe(orders.Select(x => x.OrderId).ToList());
+                                    DependencyService.Get<IMessagingSubscriber>().Subscribe(orders.Select(x => $"{App.TopicPrefix}{x.OrderId}").ToList());
                                 }
                                 catch { }
                             });
@@ -228,6 +234,7 @@ namespace MobileClient
                 Container.Register<IMessagingCenter>(() => MessagingCenter.Instance, Lifestyle.Singleton);
                 Container.Register<IPurchasedReportService>(() => prService, Lifestyle.Singleton);
                 Container.Register<IAnalyticsService>(() => analyticsSvc, Lifestyle.Singleton);
+                Container.Register<LaunchedFromPushModel>(() => App.PushModel, Lifestyle.Transient);
 
                 // Finish registering created caches
                 Container.Register<ICache<PropertyModel>>(() => propertyCache, Lifestyle.Singleton);
@@ -245,11 +252,12 @@ namespace MobileClient
             }
         }
 
-        public App()
+        public App(LaunchedFromPushModel model)
         {
             try
             {
                 InitializeComponent();
+                App.PushModel = model;
                 MainPage = new BaseTab();
             }
             catch (Exception ex)

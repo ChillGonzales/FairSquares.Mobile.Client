@@ -27,7 +27,6 @@ namespace MobileClient.iOS
         {
             global::Xamarin.Forms.Forms.Init();
             global::Xamarin.Auth.Presenters.XamarinIOS.AuthenticationConfiguration.Init();
-
             try
             {
                 // Register your app for remote notifications.
@@ -53,7 +52,14 @@ namespace MobileClient.iOS
             }
             catch { }
 
-            LoadApplication(new App());
+            var pm = new Models.LaunchedFromPushModel();
+            if (options != null || options.Any())
+            {
+                options.TryGetValue(NSObject.FromObject("orderId"), out var nsObj);
+                if (nsObj != null)
+                    pm.OrderId = nsObj.ToString();
+            }
+            LoadApplication(new App(pm));
 
             // Firebase component initialize
             Firebase.Core.App.Configure();

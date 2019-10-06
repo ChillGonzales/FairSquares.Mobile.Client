@@ -6,6 +6,6 @@ namespace MobileClient.Models
 {
     public class LaunchedFromPushModel
     {
-        public string Topic { get; set; }
+        public string OrderId { get; set; }
     }
 }
