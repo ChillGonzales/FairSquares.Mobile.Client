@@ -6,6 +6,7 @@ using Android.OS;
 using Android.Runtime;
 using Android.Util;
 using Android.Views;
+using Firebase;
 using Plugin.CurrentActivity;
 using Plugin.InAppBilling;
 using System;
@@ -22,17 +23,16 @@ namespace MobileClient.Droid
         {
             try
             {
-                base.Window.RequestFeature(WindowFeatures.ActionBar);
-                base.SetTheme(Resource.Style.MainTheme);
                 if (Intent.Extras != null)
                 {
                     foreach (var key in Intent.Extras.KeySet())
                     {
                         var value = Intent.Extras.GetString(key);
-                        //if (key == "from")
-                        //    pushModel = new LaunchedFromPushModel() { Topic = value };
+                        Log.Debug("Key: {0} Value: {1}", key, value);
                     }
                 }
+                base.Window.RequestFeature(WindowFeatures.ActionBar);
+                base.SetTheme(Resource.Style.MainTheme);
                 TabLayoutResource = Resource.Layout.Tabbar;
                 ToolbarResource = Resource.Layout.Toolbar;
 
@@ -49,8 +49,7 @@ namespace MobileClient.Droid
                 Fabric.Fabric.With(this, new Crashlytics.Crashlytics());
                 Crashlytics.Crashlytics.HandleManagedExceptions();
                 LoadApplication(new App());
-                var x = typeof(Xamarin.Forms.Themes.LightThemeResources);
-                x = typeof(Xamarin.Forms.Themes.Android.UnderlineEffect);
+                FirebaseApp app = FirebaseApp.InitializeApp(Android.App.Application.Context);
             }
             catch (Exception ex)
             {
