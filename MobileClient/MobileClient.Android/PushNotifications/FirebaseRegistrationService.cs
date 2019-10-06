@@ -11,29 +11,20 @@ using Android.Util;
 using Android.Views;
 using Android.Widget;
 using Firebase.Iid;
-using Firebase.Messaging;
 
 namespace MobileClient.Droid.PushNotifications
 {
-    [Service(Name = "com.FairSquares.MobileClient.FirebaseMessagingService")]
+    [Service]
     [IntentFilter(new[] { "com.google.firebase.INSTANCE_ID_EVENT" })]
-    public class FirebaseRegistrationService : FirebaseMessagingService
+    public class FirebaseRegistrationService : FirebaseInstanceIdService
     {
         const string TAG = "FirebaseRegistrationService";
 
-        public override void OnNewToken(string token)
+        public override void OnTokenRefresh()
         {
-            base.OnNewToken(token);
-            Log.Debug(TAG, $"Token '{token}'");
-        }
-        public override void OnMessageReceived(RemoteMessage message)
-        {
-            base.OnMessageReceived(message);
-            foreach (var i in message.Data)
-            {
-                Log.Debug(TAG, $"Key '{i.Key}' Value '{i.Value}'");
-            }
-            Log.Debug(TAG, message.From);
+            var refreshedToken = FirebaseInstanceId.Instance.Token;
+            Log.Debug(TAG, "Refreshed token: " + refreshedToken);
+            // TODO: Subscribe to topics?
         }
     }
 }
