@@ -32,10 +32,10 @@ namespace MobileClient
         //private static string _notifyEndpoint = @"https://qa-fairsquares-order-management-api.azurewebsites.net/api/notification";
         //private static string _subEndpoint = @"https://qa-fairsquares-order-management-api.azurewebsites.net/api/subscriptions";
         //private static string _purchasedReportsEndpoint = @"https://qa-fairsquares-order-management-api.azurewebsites.net/api/purchasedreports";
-        private static string _orderEndpoint = @"https://qa-fairsquares-order-management-api.azurewebsites.net/api/orders";
-        private static string _notifyEndpoint = @"https://qa-fairsquares-order-management-api.azurewebsites.net/api/notification";
-        private static string _subEndpoint = @"https://qa-fairsquares-order-management-api.azurewebsites.net/api/subscriptions";
-        private static string _purchasedReportsEndpoint = @"https://qa-fairsquares-order-management-api.azurewebsites.net/api/purchasedreports";
+        private static string _orderEndpoint = @"https://fairsquares-order-management-api.azurewebsites.net/api/orders";
+        private static string _notifyEndpoint = @"https://fairsquares-order-management-api.azurewebsites.net/api/notification";
+        private static string _subEndpoint = @"https://fairsquares-order-management-api.azurewebsites.net/api/subscriptions";
+        private static string _purchasedReportsEndpoint = @"https://fairsquares-order-management-api.azurewebsites.net/api/purchasedreports";
         private static string _propertyEndpoint = @"https://property-measurements.azurewebsites.net/api/properties";
         private static string _blobEndpoint = @"https://fairsquaresapplogging.blob.core.windows.net/roof-images";
         private const string GoogleAuthorizeUrl = "https://accounts.google.com/o/oauth2/v2/auth";

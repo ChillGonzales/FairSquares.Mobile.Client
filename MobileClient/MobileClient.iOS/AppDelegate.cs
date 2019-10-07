@@ -106,6 +106,7 @@ namespace MobileClient.iOS
             //Messaging.SharedInstance.AppDidReceiveMessage (userInfo);
 
             // Print full message.
+            // ref: https://forums.xamarin.com/discussion/161408/xamarin-forms-how-to-handle-the-notification-click-in-ios#latest
             Console.WriteLine(userInfo);
 
             completionHandler(UIBackgroundFetchResult.NewData);
