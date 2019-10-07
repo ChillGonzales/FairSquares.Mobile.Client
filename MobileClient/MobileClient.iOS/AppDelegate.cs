@@ -53,12 +53,16 @@ namespace MobileClient.iOS
             catch { }
 
             var pm = new Models.LaunchedFromPushModel();
-            if (options != null || options.Any())
+            try
             {
-                options.TryGetValue(NSObject.FromObject("orderId"), out var nsObj);
-                if (nsObj != null)
-                    pm.OrderId = nsObj.ToString();
+                if (options != null && options.Any())
+                {
+                    options.TryGetValue(NSObject.FromObject("orderId"), out var nsObj);
+                    if (nsObj != null)
+                        pm.OrderId = nsObj.ToString();
+                }
             }
+            catch { }
             LoadApplication(new App(pm));
 
             // Firebase component initialize
