@@ -104,9 +104,10 @@ namespace MobileClient.Routes
                 switch (order.Status.Status)
                 {
                     case (Status.ActionRequired):
-                        StatusMessageText = string.IsNullOrWhiteSpace(order.Status.Message) ?
-                            $"Please respond to the message sent to {_userService.GetLoggedInAccount().Email} to continue with this order." :
-                            order.Status.Message;
+                        //StatusMessageText = string.IsNullOrWhiteSpace(order.Status.Message) ?
+                        //    $"Please respond to the message sent to {_userService.GetLoggedInAccount().Email} to continue with this order." :
+                        //    order.Status.Message;
+                        StatusMessageText = $"Please respond to the message sent to {_userService.GetLoggedInAccount().Email} to continue with this order.";
                         StatusText = "Action Required";
                         TimingDisclaimerVisible = false;
                         break;

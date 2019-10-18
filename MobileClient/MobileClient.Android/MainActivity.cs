@@ -37,6 +37,7 @@ namespace MobileClient.Droid
                     }
 
                 }
+                App.PushModel = pm;
                 TabLayoutResource = Resource.Layout.Tabbar;
                 ToolbarResource = Resource.Layout.Toolbar;
 
@@ -52,7 +53,7 @@ namespace MobileClient.Droid
                 Plugin.CurrentActivity.CrossCurrentActivity.Current.Activity = this;
                 Fabric.Fabric.With(this, new Crashlytics.Crashlytics());
                 Crashlytics.Crashlytics.HandleManagedExceptions();
-                LoadApplication(new App(pm));
+                LoadApplication(new App());
             }
             catch (Exception ex)
             {

@@ -4,6 +4,7 @@ using System.Linq;
 using Firebase.CloudMessaging;
 using Firebase.Crashlytics;
 using Foundation;
+using Newtonsoft.Json;
 using UIKit;
 using UserNotifications;
 using Xamarin.Auth;
@@ -107,6 +108,14 @@ namespace MobileClient.iOS
 
             // Print full message.
             // ref: https://forums.xamarin.com/discussion/161408/xamarin-forms-how-to-handle-the-notification-click-in-ios#latest
+            var title = JsonConvert.DeserializeObject<string>(userInfo[new NSString("title")] as NSString);
+            var body = JsonConvert.DeserializeObject<string>(userInfo[new NSString("body")] as NSString);
+            var orderId = JsonConvert.DeserializeObject<string>(userInfo[new NSString("orderId")] as NSString);
+            App.PushModel = new Models.LaunchedFromPushModel()
+            {
+                OrderId = orderId
+            };
+            App.SendEmail($"Title: {title} Body: {body} Order Id: {orderId}");
             Console.WriteLine(userInfo);
 
             completionHandler(UIBackgroundFetchResult.NewData);

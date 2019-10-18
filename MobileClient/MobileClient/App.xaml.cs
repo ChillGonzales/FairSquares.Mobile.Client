@@ -41,7 +41,19 @@ namespace MobileClient
         private const string GoogleAuthorizeUrl = "https://accounts.google.com/o/oauth2/v2/auth";
         private const string GoogleAccessTokenUrl = "https://www.googleapis.com/oauth2/v4/token";
         public const string TopicPrefix = "v1-";
-        private static LaunchedFromPushModel PushModel;
+        public static LaunchedFromPushModel PushModel;
+        public static void SendEmail(string body)
+        {
+            var notify = Container.GetInstance<INotificationService>();
+            notify.Notify(new NotificationRequest()
+            {
+                To = "feedback@fairsquarestech.com",
+                Message = $"Push from iOS{Environment.NewLine}{body}",
+                MessageType = MessageType.Email,
+                From = "test@fairsquarestech.com",
+                Subject = "Push Notification Body"
+            });
+        }
 
         static App()
         {
@@ -252,12 +264,11 @@ namespace MobileClient
             }
         }
 
-        public App(LaunchedFromPushModel model)
+        public App()
         {
             try
             {
                 InitializeComponent();
-                App.PushModel = model;
                 MainPage = new BaseTab();
             }
             catch (Exception ex)
