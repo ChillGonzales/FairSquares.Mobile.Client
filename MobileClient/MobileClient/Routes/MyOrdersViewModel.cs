@@ -1,4 +1,4 @@
-﻿using FairSquares.Measurement.Core.Models;
+using FairSquares.Measurement.Core.Models;
 using MobileClient.Authentication;
 using MobileClient.Models;
 using MobileClient.Services;
@@ -43,7 +43,7 @@ namespace MobileClient.Routes
         private List<OrderGroup> _ordersSource;
         private OrderViewCell _orderListSelectedItem;
         public ICommand OnAppearingBehavior;
-        private string _navigateToOrderId;
+        private bool _pmEventSubscribed;
 
         public MyOrdersViewModel(IOrderService orderSvc,
                                  ICache<Models.Order> orderCache,
@@ -111,11 +111,23 @@ namespace MobileClient.Routes
             {
                 await this.SetViewState();
             });
-            OnAppearingBehavior = new Command(async () => await SetViewState());
-            if (pushModel != null && !string.IsNullOrWhiteSpace(pushModel.OrderId))
+            OnAppearingBehavior = new Command(async () =>
             {
-                _navigateToOrderId = pushModel.OrderId;
-            }
+                if (!_pmEventSubscribed)
+                {
+                    _pmEventSubscribed = true;
+                    pushModel.PropertyChanged += async (s, e) =>
+                    {
+                        if (!string.IsNullOrWhiteSpace(pushModel.OrderId))
+                        {
+                            var order = await _orderService.GetOrder(pushModel.OrderId);
+                            _orderCache.Put(order.OrderId, order);
+                            _nav.Push(_pageFactory.GetPage(PageType.OrderDetail, order));
+                        }
+                    };
+                }
+                await SetViewState();
+            });
         }
 
         private async Task SetViewState()
@@ -157,11 +169,6 @@ namespace MobileClient.Routes
                     var validation = await _validationService.ValidateOrderRequest(user);
                     FreeReportLayoutVisible = validation.State == ValidationState.FreeReportValid;
                     LoginLayoutVisible = false;
-                    if (!string.IsNullOrWhiteSpace(_navigateToOrderId))
-                    {
-                        _nav.Push(_pageFactory.GetPage(PageType.OrderDetail, orders.FirstOrDefault(x => x.OrderId == _navigateToOrderId)));
-                        _navigateToOrderId = null;
-                    }
                 }
                 else
                 {

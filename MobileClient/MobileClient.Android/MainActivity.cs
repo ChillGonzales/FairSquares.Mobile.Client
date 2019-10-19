@@ -25,7 +25,7 @@ namespace MobileClient.Droid
             {
                 base.Window.RequestFeature(WindowFeatures.ActionBar);
                 base.SetTheme(Resource.Style.MainTheme);
-                var pm = new LaunchedFromPushModel();
+                string orderId = null;
                 if (Intent.Extras != null)
                 {
                     foreach (var key in Intent.Extras.KeySet())
@@ -33,16 +33,13 @@ namespace MobileClient.Droid
                         var value = Intent.Extras.GetString(key);
                         Log.Debug("Hi", $"Key: '{key}' Value: '{value}'");
                         if (key == "orderId")
-                            pm.OrderId = value;
+                            orderId = value;
                     }
 
                 }
-                App.PushModel = pm;
                 TabLayoutResource = Resource.Layout.Tabbar;
                 ToolbarResource = Resource.Layout.Toolbar;
-
                 base.OnCreate(savedInstanceState);
-
                 IsPlayServicesAvailable();
                 CreateNotificationChannel();
                 global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
@@ -54,6 +51,7 @@ namespace MobileClient.Droid
                 Fabric.Fabric.With(this, new Crashlytics.Crashlytics());
                 Crashlytics.Crashlytics.HandleManagedExceptions();
                 LoadApplication(new App());
+                App.PushModel.OrderId = orderId;
             }
             catch (Exception ex)
             {

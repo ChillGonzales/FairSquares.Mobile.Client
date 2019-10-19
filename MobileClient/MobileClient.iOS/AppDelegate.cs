@@ -112,10 +112,7 @@ namespace MobileClient.iOS
             try
             {
                 var orderId = JsonConvert.DeserializeObject<string>(userInfo[new NSString("orderId")] as NSString);
-                App.PushModel = new Models.LaunchedFromPushModel()
-                {
-                    OrderId = orderId
-                };
+                App.PushModel.OrderId = orderId;
             }
             catch (Exception ex) 
             {
