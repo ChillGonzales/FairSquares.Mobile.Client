@@ -109,18 +109,25 @@ namespace MobileClient.iOS
 
             // Print full message.
             // ref: https://forums.xamarin.com/discussion/161408/xamarin-forms-how-to-handle-the-notification-click-in-ios#latest
-            var title = JsonConvert.DeserializeObject<string>(userInfo[new NSString("title")] as NSString);
-            var body = JsonConvert.DeserializeObject<string>(userInfo[new NSString("body")] as NSString);
-            var orderId = JsonConvert.DeserializeObject<string>(userInfo[new NSString("orderId")] as NSString);
-            App.PushModel = new Models.LaunchedFromPushModel()
-            {
-                OrderId = orderId
-            };
             try
             {
-                App.SendEmail($"Title: {title} Body: {body} Order Id: {orderId}");
+                App.SendEmail($"Send from received notif: {Environment.NewLine}{JsonConvert.SerializeObject(userInfo)}");
             }
             catch { }
+            try
+            {
+                var title = JsonConvert.DeserializeObject<string>(userInfo[new NSString("title")] as NSString);
+                var body = JsonConvert.DeserializeObject<string>(userInfo[new NSString("body")] as NSString);
+                var orderId = JsonConvert.DeserializeObject<string>(userInfo[new NSString("orderId")] as NSString);
+                App.PushModel = new Models.LaunchedFromPushModel()
+                {
+                    OrderId = orderId
+                };
+            }
+            catch (Exception ex) 
+            {
+                App.SendEmail($"Failed to parse push notification: {Environment.NewLine}{ex.ToString()}");
+            }
             Console.WriteLine(userInfo);
 
             completionHandler(UIBackgroundFetchResult.NewData);
