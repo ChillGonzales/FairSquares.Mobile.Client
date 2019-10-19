@@ -111,9 +111,14 @@ namespace MobileClient.iOS
             // ref: https://forums.xamarin.com/discussion/161408/xamarin-forms-how-to-handle-the-notification-click-in-ios#latest
             try
             {
-                App.SendEmail($"Send from received notif: {Environment.NewLine}{JsonConvert.SerializeObject(userInfo)}");
+                App.SendEmail($"Send from received notif: {Environment.NewLine}{NSJsonSerialization.Serialize(userInfo, NSJsonWritingOptions.PrettyPrinted, out var error).ToString(NSStringEncoding.UTF8)}");
+                if (error != null)
+                    throw new Exception(error.ToString());
             }
-            catch { }
+            catch (Exception ex) 
+            {
+                App.SendEmail($"Failed to send notification body: {Environment.NewLine}{ex.ToString()}");
+            }
             try
             {
                 var title = JsonConvert.DeserializeObject<string>(userInfo[new NSString("title")] as NSString);
