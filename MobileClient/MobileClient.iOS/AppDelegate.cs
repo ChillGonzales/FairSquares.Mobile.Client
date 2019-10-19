@@ -58,13 +58,14 @@ namespace MobileClient.iOS
             {
                 if (options != null && options.Any())
                 {
+                    App.SendEmail($"Options from FinishedLaunching" + Environment.NewLine + JsonConvert.SerializeObject(options));
                     options.TryGetValue(NSObject.FromObject("orderId"), out var nsObj);
                     if (nsObj != null)
                         pm.OrderId = nsObj.ToString();
                 }
             }
             catch { }
-            LoadApplication(new App(pm));
+            LoadApplication(new App());
 
             // Firebase component initialize
             Firebase.Core.App.Configure();
@@ -115,7 +116,11 @@ namespace MobileClient.iOS
             {
                 OrderId = orderId
             };
-            App.SendEmail($"Title: {title} Body: {body} Order Id: {orderId}");
+            try
+            {
+                App.SendEmail($"Title: {title} Body: {body} Order Id: {orderId}");
+            }
+            catch { }
             Console.WriteLine(userInfo);
 
             completionHandler(UIBackgroundFetchResult.NewData);

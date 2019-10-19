@@ -107,7 +107,7 @@ namespace MobileClient.Routes
                         //StatusMessageText = string.IsNullOrWhiteSpace(order.Status.Message) ?
                         //    $"Please respond to the message sent to {_userService.GetLoggedInAccount().Email} to continue with this order." :
                         //    order.Status.Message;
-                        StatusMessageText = $"Please respond to the message sent to {_userService.GetLoggedInAccount().Email} to continue with this order.";
+                        StatusMessageText = $"Please respond to the message sent to {_userService.GetLoggedInAccount()?.Email ?? "your logged in email"} to continue with this order.";
                         StatusText = "Action Required";
                         TimingDisclaimerVisible = false;
                         break;

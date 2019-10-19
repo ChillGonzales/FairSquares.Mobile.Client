@@ -1,4 +1,4 @@
-﻿using FairSquares.Measurement.Core.Models;
+using FairSquares.Measurement.Core.Models;
 using MobileClient.Authentication;
 using MobileClient.Models;
 using MobileClient.Routes;
@@ -47,7 +47,7 @@ namespace MobileClient
             var notify = Container.GetInstance<INotificationService>();
             notify.Notify(new NotificationRequest()
             {
-                To = "feedback@fairsquarestech.com",
+                To = "colin.monroe@fairsquarestech.com",
                 Message = $"Push from iOS{Environment.NewLine}{body}",
                 MessageType = MessageType.Email,
                 From = "test@fairsquarestech.com",
@@ -246,7 +246,7 @@ namespace MobileClient
                 Container.Register<IMessagingCenter>(() => MessagingCenter.Instance, Lifestyle.Singleton);
                 Container.Register<IPurchasedReportService>(() => prService, Lifestyle.Singleton);
                 Container.Register<IAnalyticsService>(() => analyticsSvc, Lifestyle.Singleton);
-                Container.Register<LaunchedFromPushModel>(() => App.PushModel, Lifestyle.Transient);
+                Container.Register<LaunchedFromPushModel>(() => App.PushModel ?? new LaunchedFromPushModel(), Lifestyle.Singleton);
 
                 // Finish registering created caches
                 Container.Register<ICache<PropertyModel>>(() => propertyCache, Lifestyle.Singleton);
