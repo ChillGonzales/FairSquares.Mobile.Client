@@ -41,7 +41,7 @@ namespace MobileClient
         private const string GoogleAuthorizeUrl = "https://accounts.google.com/o/oauth2/v2/auth";
         private const string GoogleAccessTokenUrl = "https://www.googleapis.com/oauth2/v4/token";
         public const string TopicPrefix = "v1-";
-        public static LaunchedFromPushModel PushModel;
+        public static LaunchedFromPushModel PushModel = new LaunchedFromPushModel();
         public static void SendEmail(string body)
         {
             var notify = Container.GetInstance<INotificationService>();
@@ -139,7 +139,7 @@ namespace MobileClient
                             {
                                 try
                                 {
-                                    DependencyService.Get<IMessagingSubscriber>().Subscribe(orders.Select(x => $"{App.TopicPrefix}{x.OrderId}").ToList());
+                                    DependencyService.Get<IMessagingSubscriber>().Subscribe(orders.Select(x => $"{(Device.RuntimePlatform == Device.Android ? App.TopicPrefix : "")}{x.OrderId}").ToList());
                                 }
                                 catch { }
                             });

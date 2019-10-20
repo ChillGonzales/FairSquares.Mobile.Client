@@ -51,6 +51,8 @@ namespace MobileClient.Routes
         private string _statusText;
         private string _statusMessageText;
         private bool _timingDisclaimerVisible;
+        private List<string> _roofsSource;
+        private int _selectedRoofIndex;
         private readonly ILogger<OrderDetailViewModel> _logger;
         public readonly ICommand OnAppearingBehavior;
 
@@ -104,9 +106,6 @@ namespace MobileClient.Routes
                 switch (order.Status.Status)
                 {
                     case (Status.ActionRequired):
-                        //StatusMessageText = string.IsNullOrWhiteSpace(order.Status.Message) ?
-                        //    $"Please respond to the message sent to {_userService.GetLoggedInAccount().Email} to continue with this order." :
-                        //    order.Status.Message;
                         StatusMessageText = $"Please respond to the message sent to {_userService.GetLoggedInAccount()?.Email ?? "your logged in email"} to continue with this order.";
                         StatusText = "Action Required";
                         TimingDisclaimerVisible = false;
@@ -125,7 +124,7 @@ namespace MobileClient.Routes
             }
             _property = _propertyCache.Get(order.OrderId);
             _image = _property != null ? _imageCache.Get(_property.OrderId) : null;
-
+            SelectedRoofChangedCommand = new Command(() => SetUIMeasurements(_selectedRoofIndex));
             if ((_property == null || _image == null) && _order.Fulfilled)
             {
                 MainLayoutVisible = false;
@@ -136,19 +135,25 @@ namespace MobileClient.Routes
             else
             {
                 MainLayoutVisible = true;
-                SetUIMeasurements();
+                RoofsSource = _property.Roofs.Select(x => x.Name).Distinct().ToList();
+                if (RoofsSource.Count > 1)
+                    RoofsSource = new[] { "All" }.Concat(RoofsSource).ToList();
+                SetUIMeasurements(0);
             }
         }
 
-        private void SetUIMeasurements()
+        private void SetUIMeasurements(int selectedRoofIndex)
         {
             try
             {
+                if (_property == null || _image == null)
+                    return;
                 // Recalculate roof totals for current property
                 CalculateCurrentTotals(_property);
 
                 // Materialize view
-                _recalculated = GetViewModelFromProperty(_property);
+                _recalculated = GetViewModelFromProperty(_property, selectedRoofIndex > 0 ?
+                    _property.Roofs.FirstOrDefault(x => x.RoofId == (selectedRoofIndex - 1).ToString()) : null);
 
                 // Set GUI and event handlers
                 var stream = new StreamImageSource();
@@ -162,14 +167,14 @@ namespace MobileClient.Routes
                 NumberOfPitches = $"Number of Distinct Pitches Measured: {_recalculated.PitchCount}";
                 ImageSource = stream;
                 Address = StringUtility.RemoveEmptyLines(_property.Address);
-                Area = $"{Convert.ToInt64(_property.Roofs.Sum(x => x.TotalArea)).ToString()} sq. ft.";
-                Squares = $"Total Squares: {_property.Roofs.Sum(x => x.TotalSquares).ToString()} squares";
+                Area = $"{Convert.ToInt64(_recalculated.Roofs.Sum(x => x.TotalArea)).ToString()} sq. ft.";
+                Squares = $"Total Squares: {_recalculated.Roofs.Sum(x => x.TotalSquares).ToString()} squares";
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Failed to set UI to new measurements.", ex);
             }
-            RefreshTableView(_property.Roofs.Sum(x => x.TotalArea));
+            RefreshTableView(_recalculated.Roofs.Sum(x => x.TotalArea));
         }
         private async Task LoadPropertyAndImage()
         {
@@ -221,7 +226,10 @@ namespace MobileClient.Routes
                     LoadingAnimVisible = false;
                     LoadingAnimRunning = false;
                     MainLayoutVisible = true;
-                    SetUIMeasurements();
+                    RoofsSource = _property.Roofs.Select(x => x.Name).Distinct().ToList();
+                    if (RoofsSource.Count > 1)
+                        RoofsSource = new[] { "All" }.Concat(RoofsSource).ToList();
+                    SetUIMeasurements(0);
                 }
             }
             catch (Exception ex)
@@ -247,20 +255,26 @@ namespace MobileClient.Routes
                 _logger.LogError("Failed to calculate current totals.", ex);
             }
         }
-        private RecalculatedPropertyModel GetViewModelFromProperty(PropertyModel property)
+        private RecalculatedPropertyModel GetViewModelFromProperty(PropertyModel property, RoofModel roof = null)
         {
             try
             {
-                var sections = _property.Roofs.SelectMany(x => x.Sections).ToList();
+                List<SectionModel> sections = null;
+                if (roof != null)
+                    sections = roof.Sections;
+                else
+                    sections = _property.Roofs.SelectMany(x => x.Sections).ToList();
                 var overallPitch = RoofUtility.GetPredominantPitchFromSections(sections);
                 var count = RoofUtility.GetPitchCount(sections)?.PitchCount ?? 1;
-                return new RecalculatedPropertyModel(property)
+                var recalc = new RecalculatedPropertyModel(property)
                 {
                     RecalculatedSections = property.Roofs.SelectMany(x => x.Sections).Where(x => x.PitchRise == overallPitch).ToList(),
                     CurrentPitch = overallPitch,
                     OriginalPitch = overallPitch,
                     PitchCount = count
                 };
+                recalc.Roofs = recalc.Roofs.Where(x => x.Name == (roof?.Name ?? x.Name)).ToList();
+                return recalc;
             }
             catch (Exception ex)
             {
@@ -571,6 +585,33 @@ namespace MobileClient.Routes
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(TimingDisclaimerVisible)));
             }
         }
+        public List<string> RoofsSource
+        {
+            get
+            {
+                return _roofsSource;
+            }
+            private set
+            {
+                _roofsSource = value;
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RoofsSource)));
+            }
+        }
+        public int SelectedRoofIndex
+        {
+            get
+            {
+                return _selectedRoofIndex;
+            }
+            set
+            {
+                if (value == _selectedRoofIndex)
+                    return;
+                _selectedRoofIndex = value;
+                this.SelectedRoofChangedCommand?.Execute(null);
+            }
+        }
+        public ICommand SelectedRoofChangedCommand { get; private set; }
     }
 
     public class WasteViewModel

@@ -20,7 +20,7 @@
                            FontAttributes="Bold"
                            VerticalOptions="Center"
                            HorizontalOptions="Start" />
-                        
+
                     <Label FontSize="Small"
                            IsVisible="{Binding TimingDisclaimerVisible}"
                            FontAttributes="Italic"
@@ -65,6 +65,17 @@
                         Margin="10"
                         VerticalOptions="Center" 
                         HorizontalOptions="CenterAndExpand" />
+                    <StackLayout Orientation="Horizontal">
+                        <Label Text="Select Roof: "
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
+                        <Picker ItemsSource="{Binding RoofsSource}"
+                                SelectedIndex="{Binding SelectedRoofIndex}"
+                                TextColor="Black"
+                                WidthRequest="250"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Center" />
+                    </StackLayout>
                     <Label HeightRequest="10" />
                     <Grid>
                         <Grid.RowDefinitions>
