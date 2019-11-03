@@ -31,7 +31,6 @@ namespace MobileClient.Routes
         private readonly Action<BaseNavPageType> _navigateFromMenu;
 
         // Local binding vars
-        private int _selectedSubscriptionIndex;
         private string _marketingDescText;
         private bool _marketingDescVisible;
         private string _reportsDescText;
@@ -78,9 +77,11 @@ namespace MobileClient.Routes
 
         private void SetVisualState(ValidationModel validation)
         {
+            var freeTrial = false;
             try
             {
-                PurchaseButtonText = $"Purchase Subscription Plan";
+                freeTrial = new[] { ValidationState.NoSubscriptionAndTrialValid, ValidationState.FreeReportValid }.Contains(validation.State);
+                PurchaseButtonText = freeTrial ? "Start Your Free Trial" : "Purchase Subscription Plan";
                 LegalText = GetLegalJargon(validation);
             }
             catch { }
@@ -92,7 +93,7 @@ namespace MobileClient.Routes
                 PurchaseButtonEnabled = true;
             }
             catch { }
-            if (new[] { ValidationState.NoSubscriptionAndTrialValid, ValidationState.FreeReportValid }.Contains(validation.State))
+            if (freeTrial)
             {
                 MarketingDescVisible = true;
                 MarketingDescText = $"One month free trial!";

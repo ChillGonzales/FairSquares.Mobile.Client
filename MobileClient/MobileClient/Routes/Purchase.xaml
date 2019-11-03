@@ -5,26 +5,13 @@
     <ContentPage.Content>
         <ScrollView>
             <StackLayout Orientation="Vertical" Margin="5">
-                <Label Text="Choose Your Plan. Cancel Anytime."
+                <Label Text="Become a Subscriber. Cancel Anytime."
                    FontSize="Large"
                    FontAttributes="Bold"
                    HorizontalOptions="CenterAndExpand"
                    VerticalOptions="Center" />
                 <Label HeightRequest="25" />
 
-                <!--Subscription Dropdown-->
-                <StackLayout Orientation="Horizontal" VerticalOptions="Center" HorizontalOptions="CenterAndExpand">
-                    <Label Text="Choose Your Plan: "
-                           FontSize="Medium"
-                           VerticalOptions="Center"
-                           HorizontalOptions="End" />
-                    <Picker FontSize="Medium"
-                        ItemsSource="{Binding SubscriptionOptions}"
-                        SelectedIndex="{Binding SelectedSubscriptionIndex}"
-                        VerticalOptions="Center"
-                        HorizontalOptions="Start"
-                        WidthRequest="200" />
-                </StackLayout>
                 <Frame OutlineColor="Black">
                     <StackLayout>
                         <Label Text="{Binding MarketingDescText}"
