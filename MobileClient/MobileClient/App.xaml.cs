@@ -27,11 +27,6 @@ namespace MobileClient
     {
         public readonly static Container Container;
         private static string _apiKey = "30865dc7-8e15-4fab-a777-0b795370a9d7";
-        // TODO: Undo the qa stuff
-        //private static string _orderEndpoint = @"https://qa-fairsquares-order-management-api.azurewebsites.net/api/orders";
-        //private static string _notifyEndpoint = @"https://qa-fairsquares-order-management-api.azurewebsites.net/api/notification";
-        //private static string _subEndpoint = @"https://qa-fairsquares-order-management-api.azurewebsites.net/api/subscriptions";
-        //private static string _purchasedReportsEndpoint = @"https://qa-fairsquares-order-management-api.azurewebsites.net/api/purchasedreports";
         private static string _orderEndpoint = @"https://fairsquares-order-management-api.azurewebsites.net/api/orders";
         private static string _notifyEndpoint = @"https://fairsquares-order-management-api.azurewebsites.net/api/notification";
         private static string _subEndpoint = @"https://fairsquares-order-management-api.azurewebsites.net/api/subscriptions";
@@ -236,7 +231,7 @@ namespace MobileClient
                 Container.Register<OAuth2Authenticator>(() => authenticator, Lifestyle.Singleton);
                 Container.Register<AccountStore>(() => AccountStore.Create(), Lifestyle.Singleton);
                 Container.Register<ICurrentUserService>(() => userService, Lifestyle.Singleton);
-                Container.Register<IPurchasingService>(() => purchaseService);
+                Container.Register<IPurchasingService>(() => purchaseService, Lifestyle.Singleton);
                 Container.Register<ICacheRefresher>(() => refresher, Lifestyle.Singleton);
                 Container.Register<ISubscriptionService>(() => subService, Lifestyle.Singleton);
                 Container.Register<IOrderValidationService, OrderValidationService>();

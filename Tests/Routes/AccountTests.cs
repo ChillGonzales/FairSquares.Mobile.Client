@@ -59,8 +59,8 @@ namespace Tests.Routes
                     _subStyleAction,
                     _logger.Object,
                     _refresher.Object);
-            Assert.AreEqual("Info", _loginStyle);
-            Assert.AreEqual("Success", _subStyle);
+            Assert.AreEqual("btn-primary", _loginStyle);
+            Assert.AreEqual("btn-success", _subStyle);
             Assert.AreEqual(false, account.SubscriptionButtonEnabled);
             Assert.AreEqual("Please log in to continue", account.Email);
             Assert.AreEqual("Log In", account.LogOutText);
@@ -95,8 +95,8 @@ namespace Tests.Routes
                     _subStyleAction,
                     _logger.Object,
                     _refresher.Object);
-            Assert.AreEqual("Success", _subStyle);
-            Assert.AreEqual("Danger", _loginStyle);
+            Assert.AreEqual("btn-success", _subStyle);
+            Assert.AreEqual("btn-danger", _loginStyle);
             Assert.AreEqual("No reports remaining. Click below to view purchase options.", account.SubscriptionLabel);
             Assert.AreEqual(true, account.SubscriptionButtonEnabled);
             Assert.AreEqual("View Options", account.SubscriptionButtonText);
@@ -140,8 +140,8 @@ namespace Tests.Routes
                 _subStyleAction,
                 _logger.Object,
                 _refresher.Object);
-            Assert.AreEqual("Danger", _loginStyle);
-            Assert.AreEqual("Info", _subStyle);
+            Assert.AreEqual("btn-danger", _loginStyle);
+            Assert.AreEqual("btn-primary", _subStyle);
             Assert.AreEqual("Manage", acct.SubscriptionButtonText);
             Assert.AreEqual("Reports remaining: 2", acct.SubscriptionLabel);
             Assert.AreEqual(true, acct.SubscriptionButtonEnabled);

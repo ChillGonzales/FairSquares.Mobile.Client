@@ -65,7 +65,7 @@
                         Margin="10"
                         VerticalOptions="Center" 
                         HorizontalOptions="CenterAndExpand" />
-                    <StackLayout Orientation="Horizontal">
+                    <StackLayout Orientation="Horizontal" IsVisible="{Binding RoofSelectionVisible}">
                         <Label Text="Select Roof: "
                            HorizontalOptions="Center"
                            VerticalOptions="Center"/>
@@ -142,17 +142,6 @@
                         VerticalOptions="Center" 
                         HorizontalOptions="Start" />
                     <StackLayout Orientation="Horizontal">
-                        <Label Text="{Binding NumberOfRoofs}"
-                               VerticalOptions="Center"
-                               HorizontalOptions="Start" />
-                        <ImageButton Source="ic_action_info_outline.png"
-                                     Command="{Binding RoofsInfoCommand}"
-                                     HeightRequest="25"
-                                     WidthRequest="25"
-                                     HorizontalOptions="End"
-                                     VerticalOptions="Center" />
-                    </StackLayout>
-                    <StackLayout Orientation="Horizontal">
                         <Label Text="{Binding NumberOfPitches}"
                                VerticalOptions="Center"
                                HorizontalOptions="Start" />
@@ -166,22 +155,38 @@
                     <Label HeightRequest="15" />
                     <Label Text="Safety Stock Calculations"
                         FontAttributes="Bold"
+                        FontSize="Medium"
                         VerticalOptions="Center" 
                         HorizontalOptions="Start" />
-                    <ListView IsGroupingEnabled="True"
-                        ItemsSource="{Binding SafetyStockSource}"
-                        GroupDisplayBinding="{Binding Title}"
-                        VerticalOptions="End"
-                        HorizontalOptions="Center">
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <TextCell Text="{Binding Text}"
-                                  Detail="{Binding Detail}"
-                                  TextColor= "Black"
-                                  DetailColor="{Binding DetailColor}" />
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
+                    <Frame BorderColor="Black" HeightRequest="180">
+                        <ListView ItemsSource="{Binding SafetyStockSource}"
+                            VerticalOptions="Start"
+                            HorizontalOptions="Center">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <ViewCell>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Label Text="{Binding WasteName}" 
+                                                   Grid.Column="0"
+                                                   FontSize="Medium"
+                                                   FontAttributes="Bold"
+                                                   VerticalOptions="Center"
+                                                   HorizontalOptions="Center"/>
+                                            <Label Text="{Binding WasteAmount}" 
+                                                   Grid.Column="1"
+                                                   FontSize="Medium"
+                                                   VerticalOptions="Center"
+                                                   HorizontalOptions="Start"/>
+                                        </Grid>
+                                    </ViewCell>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </Frame>
                 </StackLayout>
             </StackLayout>
         </ScrollView>

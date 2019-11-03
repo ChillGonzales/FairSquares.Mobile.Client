@@ -8,6 +8,7 @@ using MobileClient.Utility;
 using MobileClient.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -44,15 +45,15 @@ namespace MobileClient.Routes
         private string _predominantPitch;
         private string _area;
         private string _orderId;
-        private string _numberOfRoofs;
         private string _numberOfPitches;
-        private List<WasteGroup> _safetyStockSource;
+        private ObservableCollection<WasteViewModel> _safetyStockSource;
         private string _submittedDateText;
         private string _statusText;
         private string _statusMessageText;
         private bool _timingDisclaimerVisible;
         private List<string> _roofsSource;
         private int _selectedRoofIndex;
+        private bool _roofSelectionVisible;
         private readonly ILogger<OrderDetailViewModel> _logger;
         public readonly ICommand OnAppearingBehavior;
 
@@ -135,9 +136,14 @@ namespace MobileClient.Routes
             else
             {
                 MainLayoutVisible = true;
-                RoofsSource = _property.Roofs.Select(x => x.Name).Distinct().ToList();
-                if (RoofsSource.Count > 1)
+                if (_property.Roofs.Count > 1)
+                {
+                    RoofSelectionVisible = true;
+                    RoofsSource = _property.Roofs.Select(x => x.Name).Distinct().ToList();
                     RoofsSource = new[] { "All" }.Concat(RoofsSource).ToList();
+                }
+                else
+                    RoofSelectionVisible = false;
                 SetUIMeasurements(0);
             }
         }
@@ -163,7 +169,6 @@ namespace MobileClient.Routes
                 };
                 OrderId = $"Order ID: {_order.OrderId}";
                 PredominantPitch = $"{_recalculated.CurrentPitch}:12";
-                NumberOfRoofs = $"Number of Roofs Measured: {_recalculated.Roofs.Count()}";
                 NumberOfPitches = $"Number of Distinct Pitches Measured: {_recalculated.PitchCount}";
                 ImageSource = stream;
                 Address = StringUtility.RemoveEmptyLines(_property.Address);
@@ -226,9 +231,16 @@ namespace MobileClient.Routes
                     LoadingAnimVisible = false;
                     LoadingAnimRunning = false;
                     MainLayoutVisible = true;
-                    RoofsSource = _property.Roofs.Select(x => x.Name).Distinct().ToList();
-                    if (RoofsSource.Count > 1)
+                    if (_property.Roofs.Count > 1)
+                    {
+                        RoofSelectionVisible = true;
+                        RoofsSource = _property.Roofs.Select(x => x.Name).Distinct().ToList();
                         RoofsSource = new[] { "All" }.Concat(RoofsSource).ToList();
+                    }
+                    else
+                    {
+                        RoofSelectionVisible = false;
+                    }
                     SetUIMeasurements(0);
                 }
             }
@@ -327,20 +339,12 @@ namespace MobileClient.Routes
         {
             try
             {
-                SafetyStockSource = null;
-                var groups = new List<WasteGroup>();
-                var pcts = new[] { .05, .10, .15, .20 };
-                foreach (var pct in pcts)
+                var pcts = new[] { 0.05, 0.1, 0.15, 0.2 };
+                SafetyStockSource = new ObservableCollection<WasteViewModel>(pcts.Select(x => new WasteViewModel()
                 {
-                    var group = new WasteGroup() { Title = pct.ToString("P0") + " Waste" };
-                    group.Add(new WasteViewModel()
-                    {
-                        Text = Math.Ceiling((totalArea * (1 + pct)) / 100).ToString() + " Squares",
-                        TextColor = Color.Green
-                    });
-                    groups.Add(group);
-                }
-                SafetyStockSource = groups;
+                    WasteName = $"{x.ToString("P0")} Waste",
+                    WasteAmount = $"{Math.Ceiling((totalArea * (1 + x)) / 100).ToString()} Squares"
+                }).ToList());
             }
             catch (Exception ex)
             {
@@ -496,20 +500,6 @@ namespace MobileClient.Routes
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(OrderId)));
             }
         }
-        public string NumberOfRoofs
-        {
-            get
-            {
-                return _numberOfRoofs;
-            }
-            set
-            {
-                _numberOfRoofs = value;
-                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(NumberOfRoofs)));
-            }
-        }
-        public ICommand RoofsInfoCommand => new Command(async () => await _alertAction("Roof Count Information",
-                "This is the number of roofs Fair Squares measured for this order.", "Close"));
         public string NumberOfPitches
         {
             get
@@ -523,9 +513,9 @@ namespace MobileClient.Routes
             }
         }
         public ICommand PitchesInfoCommand => new Command(async () => await _alertAction("Pitch Count Information",
-                "This is the number of distinct pitches Fair Squares used to measure this order. \n\n" +
+                "This is the number of distinct pitches Fair Squares used to measure this roof(s). \n\n" +
                 "NOTE: Only the pitch with the largest square footage (the predominant pitch) can be adjusted.", "Close"));
-        public List<WasteGroup> SafetyStockSource
+        public ObservableCollection<WasteViewModel> SafetyStockSource
         {
             get
             {
@@ -611,18 +601,24 @@ namespace MobileClient.Routes
                 this.SelectedRoofChangedCommand?.Execute(null);
             }
         }
+        public bool RoofSelectionVisible
+        {
+            get
+            {
+                return _roofSelectionVisible;
+            }
+            set
+            {
+                _roofSelectionVisible = value;
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RoofSelectionVisible)));
+            }
+        }
         public ICommand SelectedRoofChangedCommand { get; private set; }
     }
 
     public class WasteViewModel
     {
-        public string Text { get; set; }
-        public Color TextColor { get; set; }
-        public string Detail { get; set; }
-        public Color DetailColor { get; set; }
-    }
-    public class WasteGroup : List<WasteViewModel>
-    {
-        public string Title { get; set; }
+        public string WasteName { get; set; }
+        public string WasteAmount { get; set; }
     }
 }

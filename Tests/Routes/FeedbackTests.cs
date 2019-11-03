@@ -68,18 +68,5 @@ namespace Tests.Routes
                 _nav.VerifyAll();
             }
         }
-
-        [Test]
-        public void WhenNoUserLoggedIn_StillSendsFeedback()
-        {
-            _userCache = new Mock<ICurrentUserService>();
-            _userCache.Setup(x => x.GetLoggedInAccount()).Returns(null as AccountModel);
-            var vm = new FeedbackViewModel(_notifier.Object, _userCache.Object, _alert, _pageFactory.Object, _logger.Object, _mnNav);
-            vm.FeedbackEntry = "hi";
-            vm.SubmitCommand.Execute(null);
-            _notifier.VerifyAll();
-            _userCache.VerifyAll();
-            _nav.VerifyAll();
-        }
     }
 }

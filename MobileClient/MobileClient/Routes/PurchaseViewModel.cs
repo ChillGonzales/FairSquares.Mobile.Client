@@ -29,11 +29,6 @@ namespace MobileClient.Routes
         private readonly AlertUtility _alertUtility;
         private readonly MainThreadNavigator _nav;
         private readonly Action<BaseNavPageType> _navigateFromMenu;
-        private List<SubscriptionType> _subscriptionSource = new List<SubscriptionType>()
-        {
-            SubscriptionType.Basic,
-            SubscriptionType.Premium
-        };
 
         // Local binding vars
         private int _selectedSubscriptionIndex;
@@ -78,26 +73,15 @@ namespace MobileClient.Routes
             _navigateFromMenu = navigateFromMenu;
             LegalLinkCommand = new Command(() => _openUri(new Uri(Configuration.PrivacyPolicyUrl)));
             PurchaseButtonCommand = new Command(() => PurchaseButtonClicked());
-            SetVisualState(SubscriptionType.Basic, _validationModel);
+            SetVisualState(validationModel);
         }
 
-        private void HandlePickedSubChange(int newIndex)
-        {
-            var selected = SubscriptionType.Basic;
-            try
-            {
-                selected = _subscriptionSource[newIndex];
-            }
-            catch { }
-            SetVisualState(selected, _validationModel);
-        }
-
-        private void SetVisualState(SubscriptionType selected, ValidationModel validation)
+        private void SetVisualState(ValidationModel validation)
         {
             try
             {
-                PurchaseButtonText = $"Purchase {selected.ToString()} Plan";
-                LegalText = GetLegalJargon(selected, validation);
+                PurchaseButtonText = $"Purchase Subscription Plan";
+                LegalText = GetLegalJargon(validation);
             }
             catch { }
             try
@@ -108,38 +92,19 @@ namespace MobileClient.Routes
                 PurchaseButtonEnabled = true;
             }
             catch { }
-            switch (selected)
+            if (new[] { ValidationState.NoSubscriptionAndTrialValid, ValidationState.FreeReportValid }.Contains(validation.State))
             {
-                case SubscriptionType.Premium:
-                    MarketingDescVisible = true;
-                    MarketingDescText = $"A 25% Cost Savings!";
-                    ReportsDescText = $"{SubscriptionUtility.PremiumOrderCount} reports per month";
-                    CostDescText = $"${SubscriptionUtility.PremiumPrice} per month";
-                    AvgCostText = $"Unlocks access to purchase additional reports at a reduced price of ${SubscriptionUtility.IndvReportPremiumPrice} per report.";
-                    break;
-                case SubscriptionType.Enterprise:
-                    MarketingDescVisible = true;
-                    MarketingDescText = $"Over 50% in Cost Savings!";
-                    ReportsDescText = $"{SubscriptionUtility.EnterpriseOrderCount} reports per month";
-                    CostDescText = $"${SubscriptionUtility.EnterprisePrice} per month";
-                    AvgCostText = $"Unlocks access to purchase additional reports at a reduced price of ${SubscriptionUtility.IndvReportEnterprisePrice} per report.";
-                    break;
-                default:
-                    if (new[] { ValidationState.NoSubscriptionAndTrialValid, ValidationState.FreeReportValid }.Contains(validation.State))
-                    {
-                        MarketingDescVisible = true;
-                        MarketingDescText = $"One month free trial!";
-                        CostDescText = $"${SubscriptionUtility.BasicPrice} per month after trial period ends";
-                    }
-                    else
-                    {
-                        MarketingDescVisible = false;
-                        CostDescText = $"${SubscriptionUtility.BasicPrice} per month";
-                    }
-                    ReportsDescText = $"{SubscriptionUtility.BasicOrderCount} reports per month";
-                    AvgCostText = $"Unlocks access to purchase additional reports at a reduced price of ${SubscriptionUtility.IndvReportBasicPrice} per report.";
-                    break;
+                MarketingDescVisible = true;
+                MarketingDescText = $"One month free trial!";
+                CostDescText = $"${SubscriptionUtility.BasicPrice} per month after trial period ends";
             }
+            else
+            {
+                MarketingDescVisible = false;
+                CostDescText = $"${SubscriptionUtility.BasicPrice} per month";
+            }
+            ReportsDescText = $"{SubscriptionUtility.BasicOrderCount} reports per month";
+            AvgCostText = $"Unlocks access to purchase additional reports at a reduced price of ${SubscriptionUtility.IndvReportBasicPrice} per report.";
         }
 
         private async void PurchaseButtonClicked()
@@ -150,12 +115,6 @@ namespace MobileClient.Routes
             try
             {
                 SubscriptionType selected = SubscriptionType.Basic;
-                try
-                {
-                    selected = _subscriptionSource[_selectedSubscriptionIndex];
-                }
-                catch { }
-
                 var subCode = SubscriptionUtility.GetInfoFromSubType(selected).SubscriptionCode;
                 try
                 {
@@ -214,26 +173,14 @@ namespace MobileClient.Routes
             _subService.AddSubscription(model);
         }
 
-        private string GetLegalJargon(SubscriptionType selected, ValidationModel validation)
+        private string GetLegalJargon(ValidationModel validation)
         {
             string costDesc = "";
-            string periodText = (new[] { ValidationState.FreeReportValid, ValidationState.NoSubscriptionAndTrialValid }.Contains(validation.State)
-                                && selected == SubscriptionType.Basic)
+            string periodText = new[] { ValidationState.FreeReportValid, ValidationState.NoSubscriptionAndTrialValid }.Contains(validation.State)
                                 ? "at the end of the trial on"
                                 : "upon";
             string platformText = _runtimePlatform == Device.Android ? "Play Store" : "iTunes";
-            switch (selected)
-            {
-                case SubscriptionType.Premium:
-                    costDesc = $"${SubscriptionUtility.PremiumPrice.ToString()} monthly";
-                    break;
-                case SubscriptionType.Enterprise:
-                    costDesc = $"${SubscriptionUtility.EnterprisePrice.ToString()} monthly";
-                    break;
-                default:
-                    costDesc = $"${SubscriptionUtility.BasicPrice.ToString()} monthly";
-                    break;
-            }
+            costDesc = $"${SubscriptionUtility.BasicPrice.ToString()} monthly";
             return $@"A {costDesc} purchase will be applied to your {platformText} account {periodText} confirmation. " +
                     $@"Subscriptions will automatically renew unless canceled within 24-hours before the end of the current period. " +
                     $@"You can cancel anytime with your {platformText} account settings. " +
@@ -243,22 +190,6 @@ namespace MobileClient.Routes
 
         // Bound handlers
         public event PropertyChangedEventHandler PropertyChanged;
-        public List<string> SubscriptionOptions => _subscriptionSource.Select(x => x.ToString() + " Subscription").ToList();
-        public int SelectedSubscriptionIndex
-        {
-            get
-            {
-                return _selectedSubscriptionIndex;
-            }
-            set
-            {
-                if (_selectedSubscriptionIndex == value)
-                    return;
-                _selectedSubscriptionIndex = value;
-                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SelectedSubscriptionIndex)));
-                HandlePickedSubChange(value);
-            }
-        }
         public string MarketingDescText
         {
             get
