@@ -80,8 +80,15 @@ namespace MobileClient.Routes
                 else
                     _nav.Push(_pageFactory.GetPage(PageType.PurchaseOptions, val));
             });
+            OptionsInfoCommand = new Command(async () => await alertUtility.Display("Roof Option Selection",
+                $"Selecting a roof option allows Fair Squares to determine what roofs you would like measured at the submitted address.{Environment.NewLine}" +
+                $"{Environment.NewLine}Primary Only- Fair Squares will measure the primary structure, including attached garage.{Environment.NewLine}" +
+                $"Detached Garage- Fair Squares will also measure the detached garage on the property.{Environment.NewLine}" + 
+                $"Shed/Barn- Fair Squares will also measure a shed or barn on the property.{Environment.NewLine}" +
+                $"{Environment.NewLine}NOTE: Fair Squares only supports measuring one primary structure per report (with a detached garage or shed/barn if needed).",
+                "Ok"));
             ErrorMessageRowHeight = 0;
-            SelectedOptionIndex = 0;
+            SelectedOptionIndex = -1;
             SelectedStateIndex = -1;
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
             SetVisualStateForValidation();
@@ -101,6 +108,12 @@ namespace MobileClient.Routes
                 }
                 var validation = await _orderValidator.ValidateOrderRequest(user);
                 var activeSub = SubscriptionUtility.SubscriptionActive(validation.Subscription);
+                if (validation.RemainingOrders > 0)
+                {
+                    MainLayoutVisible = true;
+                    CannotSubmitLayoutVisible = false;
+                    return;
+                }
                 switch (validation.State)
                 {
                     case ValidationState.NoReportsLeftInPeriod:
@@ -149,6 +162,7 @@ namespace MobileClient.Routes
                 if (string.IsNullOrWhiteSpace(AddressLine1) ||
                     string.IsNullOrWhiteSpace(City) ||
                     SelectedStateIndex < 0 ||
+                    SelectedOptionIndex < 0 ||
                     string.IsNullOrWhiteSpace(Zip))
                 {
                     ErrorMessageRowHeight = GridLength.Star;
@@ -217,7 +231,7 @@ namespace MobileClient.Routes
             City = "";
             ErrorMessageRowHeight = 0;
             SelectedStateIndex = -1;
-            SelectedOptionIndex = 0;
+            SelectedOptionIndex = -1;
             Zip = "";
             SubmitButtonEnabled = true;
             Comments = "";
@@ -425,6 +439,7 @@ namespace MobileClient.Routes
             }
         }
         public ICommand PurchaseOptionsCommand { get; private set; }
+        public ICommand OptionsInfoCommand { get; private set; }
 
         private readonly List<OptionViewModel> Options = new List<OptionViewModel>()
         {
