@@ -24,7 +24,7 @@
                     <Label FontSize="Small"
                            IsVisible="{Binding TimingDisclaimerVisible}"
                            FontAttributes="Italic"
-                           Text="Pending orders will be completed within 24 hours of the submission date (excluding weekends)."
+                           Text="Pending orders will be completed by the end of the next business day."
                            VerticalOptions="Center"
                            HorizontalOptions="Start" />
                     <Label HeightRequest="10"/>
