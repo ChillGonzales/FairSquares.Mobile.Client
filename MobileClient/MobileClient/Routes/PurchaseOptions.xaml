@@ -4,16 +4,11 @@
              xmlns:d="http://xamarin.com/schemas/2014/forms/design"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
+             Title="Purchasing Options"
              x:Class="MobileClient.Routes.PurchaseOptions">
     <ContentPage.Content>
         <ScrollView Margin="5">
             <StackLayout Orientation="Vertical">
-                <Label Text="Choose the right option for you."
-                    FontSize="Large"
-                    FontAttributes="Bold"
-                    VerticalOptions="Start" 
-                    HorizontalOptions="CenterAndExpand" />
-                <Label HeightRequest="25" />
                 <StackLayout Orientation="Vertical">
                     <Label Text="Additional Report"
                            FontSize="Medium"
