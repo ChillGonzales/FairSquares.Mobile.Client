@@ -172,6 +172,7 @@ namespace MobileClient
                                     try
                                     {
                                         purchases = (await purchaseService.GetPurchases(ItemType.Subscription)).ToList();
+                                        App.SendEmail(JsonConvert.SerializeObject(purchases));
                                     }
                                     catch (Exception ex)
                                     {
@@ -181,6 +182,7 @@ namespace MobileClient
                                     if (mostRecent != null)
                                     {
                                         newSub = SubscriptionUtility.GetModelFromIAP(mostRecent, user, recentSub);
+                                        App.SendEmail($"Resolved subscription after business logic: '{JsonConvert.SerializeObject(newSub)}'");
                                         if (newSub != null)
                                         {
                                             allSubs.Add(newSub);
