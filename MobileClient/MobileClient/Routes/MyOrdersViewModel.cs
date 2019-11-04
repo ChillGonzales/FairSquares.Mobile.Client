@@ -1,4 +1,4 @@
-﻿using FairSquares.Measurement.Core.Models;
+using FairSquares.Measurement.Core.Models;
 using MobileClient.Authentication;
 using MobileClient.Models;
 using MobileClient.Services;
@@ -43,6 +43,7 @@ namespace MobileClient.Routes
         private List<OrderGroup> _ordersSource;
         private OrderViewCell _orderListSelectedItem;
         public ICommand OnAppearingBehavior;
+        private bool _pmEventSubscribed;
 
         public MyOrdersViewModel(IOrderService orderSvc,
                                  ICache<Models.Order> orderCache,
@@ -53,6 +54,7 @@ namespace MobileClient.Routes
                                  IOrderValidationService validator,
                                  IPageFactory pageFactory,
                                  ICurrentUserService userService,
+                                 LaunchedFromPushModel pushModel,
                                  MainThreadNavigator nav,
                                  IMessagingCenter messagingCenter,
                                  Action<Action> uiInvoke,
@@ -109,7 +111,23 @@ namespace MobileClient.Routes
             {
                 await this.SetViewState();
             });
-            OnAppearingBehavior = new Command(async () => await SetViewState());
+            OnAppearingBehavior = new Command(async () =>
+            {
+                if (!_pmEventSubscribed)
+                {
+                    _pmEventSubscribed = true;
+                    pushModel.PropertyChanged += async (s, e) =>
+                    {
+                        if (!string.IsNullOrWhiteSpace(pushModel.OrderId))
+                        {
+                            var order = await _orderService.GetOrder(pushModel.OrderId);
+                            _orderCache.Put(order.OrderId, order);
+                            _nav.Push(_pageFactory.GetPage(PageType.OrderDetail, order));
+                        }
+                    };
+                }
+                await SetViewState();
+            });
         }
 
         private async Task SetViewState()

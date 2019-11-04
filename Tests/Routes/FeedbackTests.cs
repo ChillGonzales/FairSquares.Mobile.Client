@@ -20,6 +20,7 @@ namespace Tests.Routes
         private Mock<INotificationService> _notifier;
         private Mock<ICurrentUserService> _userCache;
         private Mock<INavigation> _nav;
+        private Mock<IPageFactory> _pageFactory;
         private Mock<ILogger<FeedbackViewModel>> _logger;
         private AlertUtility _alert;
         private MainThreadNavigator _mnNav;
@@ -32,6 +33,7 @@ namespace Tests.Routes
             _nav = new Mock<INavigation>();
             _alert = new AlertUtility((s1, s2, s3, s4) => Task.FromResult(false), (s1, s2, s3) => Task.Delay(0));
             _logger = new Mock<MobileClient.Utilities.ILogger<FeedbackViewModel>>();
+            _pageFactory = new Mock<IPageFactory>();
             _notifier.Setup(x => x.Notify(It.Is<NotificationRequest>(y => y.From == "feedback@fairsquarestech.com" &&
                                                                           y.To == "colin.monroe@fairsquarestech.com" &&
                                                                           y.MessageType == MessageType.Email)));
@@ -50,7 +52,7 @@ namespace Tests.Routes
         [TestCase("hi")]
         public void WhenFeedbackEntered_RespondAppropriately(string feedback)
         {
-            var vm = new FeedbackViewModel(_notifier.Object, _userCache.Object, _alert, _logger.Object, _mnNav);
+            var vm = new FeedbackViewModel(_notifier.Object, _userCache.Object, _alert, _pageFactory.Object, _logger.Object, _mnNav);
             vm.FeedbackEntry = feedback;
             vm.SubmitCommand.Execute(null);
             if (string.IsNullOrWhiteSpace(feedback))
@@ -65,19 +67,6 @@ namespace Tests.Routes
                 _userCache.VerifyAll();
                 _nav.VerifyAll();
             }
-        }
-
-        [Test]
-        public void WhenNoUserLoggedIn_StillSendsFeedback()
-        {
-            _userCache = new Mock<ICurrentUserService>();
-            _userCache.Setup(x => x.GetLoggedInAccount()).Returns(null as AccountModel);
-            var vm = new FeedbackViewModel(_notifier.Object, _userCache.Object, _alert, _logger.Object, _mnNav);
-            vm.FeedbackEntry = "hi";
-            vm.SubmitCommand.Execute(null);
-            _notifier.VerifyAll();
-            _userCache.VerifyAll();
-            _nav.VerifyAll();
         }
     }
 }

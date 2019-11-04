@@ -136,13 +136,13 @@ namespace MobileClient.Routes
                 if (user == null)
                 {
                     Email = "Please log in to continue";
-                    _changeLoginStyleClass("Info");
+                    _changeLoginStyleClass("btn-primary");
                     LogOutText = "Log In";
                 }
                 else
                 {
                     Email = user.Email;
-                    _changeLoginStyleClass("Danger");
+                    _changeLoginStyleClass("btn-danger");
                     LogOutText = "Sign Out";
                 }
             }
@@ -159,7 +159,7 @@ namespace MobileClient.Routes
                 if (user == null)
                 {
                     SubscriptionLabel = $"Please log in to view purchasing options.";
-                    _changeSubStyleClass("Success");
+                    _changeSubStyleClass("btn-success");
                     SubscriptionButtonText = "View Options";
                     SubscriptionButtonEnabled = false;
                     return;
@@ -168,7 +168,7 @@ namespace MobileClient.Routes
                     await (_cacheRefresher.RefreshTask ?? Task.CompletedTask);
                 var validity = await _orderValidator.ValidateOrderRequest(user);
                 var activeSub = SubscriptionUtility.SubscriptionActive(validity.Subscription);
-                _changeSubStyleClass(activeSub ? "Info" : "Success");
+                _changeSubStyleClass(activeSub ? "btn-primary" : "btn-success");
                 SubscriptionButtonText = activeSub ? "Manage" : "View Options";
                 SubscriptionButtonEnabled = true;
                 if (validity.RemainingOrders > 0)

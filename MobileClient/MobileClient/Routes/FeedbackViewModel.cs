@@ -15,6 +15,7 @@ namespace MobileClient.Routes
     public class FeedbackViewModel : INotifyPropertyChanged
     {
         private readonly INotificationService _notifier;
+        private readonly IPageFactory _pageFactory;
         private readonly ICurrentUserService _userCache;
         private readonly MainThreadNavigator _nav;
         private readonly ILogger<FeedbackViewModel> _logger;
@@ -24,10 +25,12 @@ namespace MobileClient.Routes
         public FeedbackViewModel(INotificationService notifier,
                                  ICurrentUserService userCache,
                                  AlertUtility alertUtility,
+                                 IPageFactory pageFactory,
                                  ILogger<FeedbackViewModel> logger,
                                  MainThreadNavigator nav)
         {
             _notifier = notifier;
+            _pageFactory = pageFactory;
             _userCache = userCache;
             _nav = nav;
             _logger = logger;
@@ -42,9 +45,19 @@ namespace MobileClient.Routes
             {
                 return;
             }
+            var user = _userCache.GetLoggedInAccount();
+            if (user == null)
+            {
+                var response = await _alertUtility.Display("Not Logged In", "Because you are not logged in, Fair Squares staff will not be able to respond to your feedback. " +
+                    "Are you sure you want to continue?", "Continue", "Log In");
+                if (!response)
+                {
+                    _nav.Push(_pageFactory.GetPage(PageType.Landing));
+                    return;
+                }
+            }
             try
             {
-                var user = _userCache.GetLoggedInAccount();
                 _notifier.Notify(new Models.NotificationRequest()
                 {
                     From = "feedback@fairsquarestech.com",

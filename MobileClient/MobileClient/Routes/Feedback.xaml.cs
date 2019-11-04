@@ -23,6 +23,7 @@ namespace MobileClient.Routes
                                                    App.Container.GetInstance<ICurrentUserService>(),
                                                    new AlertUtility((s1, s2, s3, s4) => DisplayAlert(s1, s2, s3, s4),
                                                     (s1, s2, s3) => DisplayAlert(s1, s2, s3)),
+                                                   App.Container.GetInstance<IPageFactory>(),
                                                    App.Container.GetInstance<ILogger<FeedbackViewModel>>(),
                                                    new MainThreadNavigator(x => Device.BeginInvokeOnMainThread(x), this.Navigation));
         }

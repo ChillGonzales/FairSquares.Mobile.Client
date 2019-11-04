@@ -50,5 +50,20 @@ namespace MobileClient.Services
                 return JsonConvert.DeserializeObject<IEnumerable<Order>>(await result.Content.ReadAsStringAsync());
             }
         }
+
+        public async Task<Order> GetOrder(string orderId)
+        {
+            if (string.IsNullOrWhiteSpace(orderId))
+                return null;
+            var result = await _http.GetAsync($"{_baseEndpoint}/{orderId}?accessKey={_apiKey}");
+            if (!result.IsSuccessStatusCode)
+            {
+                throw new Exception("HTTP request to get order failed with error code: " + result.StatusCode);
+            }
+            else
+            {
+                return JsonConvert.DeserializeObject<Order>(await result.Content.ReadAsStringAsync());
+            }
+        }
     }
 }

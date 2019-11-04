@@ -35,7 +35,7 @@
                 HorizontalOptions="CenterAndExpand">
                     <Label.FormattedText>
                         <FormattedString>
-                            <Span Text= "- Go to the " FontSize="Medium" />
+                            <Span Text= "&#x2022; Go to the " FontSize="Medium" />
                             <Span Text = "Measure It" FontAttributes="Bold" FontSize="Medium"/>
                             <Span Text = " page to submit an address for measuring." FontSize="Medium" />
                         </FormattedString>
@@ -48,7 +48,7 @@
                 HorizontalOptions="CenterAndExpand">
                     <Label.FormattedText>
                         <FormattedString>
-                            <Span Text= "- View your completed and pending orders on the " FontSize="Medium"/>
+                            <Span Text= "&#x2022; View your completed and pending orders on the " FontSize="Medium"/>
                             <Span Text = "My Orders" FontAttributes="Bold" FontSize="Medium"/>
                             <Span Text = " page." FontSize="Medium"/>
                         </FormattedString>
@@ -62,7 +62,7 @@
                 HorizontalOptions="CenterAndExpand" >
                     <Label.FormattedText>
                         <FormattedString>
-                            <Span Text= "- Fair Squares is optimized for " FontSize="Medium"/>
+                            <Span Text= "&#x2022; Fair Squares is optimized for " FontSize="Medium"/>
                             <Span Text = "residential" FontAttributes="Bold" FontSize="Medium"/>
                             <Span Text = " properties. " FontSize="Medium"/>
                             <Span Text = "We do not recommend using Fair Squares for non-residential properties." FontAttributes="Bold" FontSize="Medium"/>
@@ -77,7 +77,7 @@
                 HorizontalOptions="CenterAndExpand" >
                     <Label.FormattedText>
                         <FormattedString>
-                            <Span Text="- " FontSize="Medium" />
+                            <Span Text="&#x2022; " FontSize="Medium" />
                             <Span Text = "You're the boss! " FontAttributes="Bold" FontSize="Medium"/>
                             <Span Text= "Fair Squares gives you the ability to " FontSize="Medium" />
                             <Span Text ="change the predominant pitch " FontSize="Medium" FontAttributes="Bold" />
@@ -109,7 +109,7 @@
                     <Label Text="Don't show this message again." HorizontalOptions="StartAndExpand" VerticalOptions="Center" />
                 </StackLayout>
                 <Button x:Name="SubmitButton"
-                StyleClass="Success"
+                StyleClass="btn-success"
                 Command="{Binding DismissCommand}"
                 Text="Got It, Thanks"
                 WidthRequest="250"

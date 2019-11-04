@@ -1,4 +1,4 @@
-﻿using FairSquares.Measurement.Core.Models;
+using FairSquares.Measurement.Core.Models;
 using MobileClient.Authentication;
 using MobileClient.Models;
 using MobileClient.Routes;
@@ -35,6 +35,20 @@ namespace MobileClient
         private static string _blobEndpoint = @"https://fairsquaresapplogging.blob.core.windows.net/roof-images";
         private const string GoogleAuthorizeUrl = "https://accounts.google.com/o/oauth2/v2/auth";
         private const string GoogleAccessTokenUrl = "https://www.googleapis.com/oauth2/v4/token";
+        public const string TopicPrefix = "v1-";
+        public static LaunchedFromPushModel PushModel = new LaunchedFromPushModel();
+        public static void SendEmail(string body)
+        {
+            var notify = Container.GetInstance<INotificationService>();
+            notify.Notify(new NotificationRequest()
+            {
+                To = "colin.monroe@fairsquarestech.com",
+                Message = $"Push from iOS{Environment.NewLine}{body}",
+                MessageType = MessageType.Email,
+                From = "test@fairsquarestech.com",
+                Subject = "Push Notification Body"
+            });
+        }
 
         static App()
         {
@@ -69,17 +83,17 @@ namespace MobileClient
 
                 // Setup caches and begin process of filling them.
                 var dbBasePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-                var propertyCache = new LocalSqlCache<PropertyModel>(Path.Combine(dbBasePath, "property.db3"), 
+                var propertyCache = new LocalSqlCache<PropertyModel>(Path.Combine(dbBasePath, "property.db3"),
                     new AnalyticsLogger<LocalSqlCache<PropertyModel>>(analyticsSvc, userService));
-                var orderCache = new LocalSqlCache<Models.Order>(Path.Combine(dbBasePath, "order.db3"), 
+                var orderCache = new LocalSqlCache<Models.Order>(Path.Combine(dbBasePath, "order.db3"),
                     new AnalyticsLogger<LocalSqlCache<Models.Order>>(analyticsSvc, userService));
-                var imageCache = new LocalSqlCache<ImageModel>(Path.Combine(dbBasePath, "images.db3"), 
+                var imageCache = new LocalSqlCache<ImageModel>(Path.Combine(dbBasePath, "images.db3"),
                     new AnalyticsLogger<LocalSqlCache<ImageModel>>(analyticsSvc, userService));
-                var subCache = new LocalSqlCache<SubscriptionModel>(Path.Combine(dbBasePath, "subs.db3"), 
+                var subCache = new LocalSqlCache<SubscriptionModel>(Path.Combine(dbBasePath, "subs.db3"),
                     new AnalyticsLogger<LocalSqlCache<SubscriptionModel>>(analyticsSvc, userService));
-                var settingsCache = new LocalSqlCache<SettingsModel>(Path.Combine(dbBasePath, "sets.db3"), 
+                var settingsCache = new LocalSqlCache<SettingsModel>(Path.Combine(dbBasePath, "sets.db3"),
                     new AnalyticsLogger<LocalSqlCache<SettingsModel>>(analyticsSvc, userService));
-                var prCache = new LocalSqlCache<PurchasedReportModel>(Path.Combine(dbBasePath, "purchasedreports.db3"), 
+                var prCache = new LocalSqlCache<PurchasedReportModel>(Path.Combine(dbBasePath, "purchasedreports.db3"),
                     new AnalyticsLogger<LocalSqlCache<PurchasedReportModel>>(analyticsSvc, userService));
 
                 Action ClearCaches = () =>
@@ -120,7 +134,7 @@ namespace MobileClient
                             {
                                 try
                                 {
-                                    DependencyService.Get<IMessagingSubscriber>().Subscribe(orders.Select(x => x.OrderId).ToList());
+                                    DependencyService.Get<IMessagingSubscriber>().Subscribe(orders.Select(x => $"{(Device.RuntimePlatform == Device.Android ? App.TopicPrefix : "")}{x.OrderId}").ToList());
                                 }
                                 catch { }
                             });
@@ -217,7 +231,7 @@ namespace MobileClient
                 Container.Register<OAuth2Authenticator>(() => authenticator, Lifestyle.Singleton);
                 Container.Register<AccountStore>(() => AccountStore.Create(), Lifestyle.Singleton);
                 Container.Register<ICurrentUserService>(() => userService, Lifestyle.Singleton);
-                Container.Register<IPurchasingService>(() => purchaseService);
+                Container.Register<IPurchasingService>(() => purchaseService, Lifestyle.Singleton);
                 Container.Register<ICacheRefresher>(() => refresher, Lifestyle.Singleton);
                 Container.Register<ISubscriptionService>(() => subService, Lifestyle.Singleton);
                 Container.Register<IOrderValidationService, OrderValidationService>();
@@ -227,6 +241,7 @@ namespace MobileClient
                 Container.Register<IMessagingCenter>(() => MessagingCenter.Instance, Lifestyle.Singleton);
                 Container.Register<IPurchasedReportService>(() => prService, Lifestyle.Singleton);
                 Container.Register<IAnalyticsService>(() => analyticsSvc, Lifestyle.Singleton);
+                Container.Register<LaunchedFromPushModel>(() => App.PushModel ?? new LaunchedFromPushModel(), Lifestyle.Singleton);
 
                 // Finish registering created caches
                 Container.Register<ICache<PropertyModel>>(() => propertyCache, Lifestyle.Singleton);

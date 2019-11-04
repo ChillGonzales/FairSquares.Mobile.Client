@@ -18,17 +18,18 @@ namespace MobileClient.Routes
         private readonly IPageFactory _pageFactory;
         private string _singleReportPrice;
         private string _subscriptionPrice;
-        private bool _isFreeTrialVisible;
+        private string _subscriptionHeaderText;
 
         public PurchaseOptionsViewModel(ValidationModel validation, MainThreadNavigator nav, IPageFactory pageFactory)
         {
             _validation = validation;
             _nav = nav;
             _pageFactory = pageFactory;
-            IsFreeTrialVisible = new[] { ValidationState.NoSubscriptionAndTrialValid, ValidationState.FreeReportValid }.Contains(validation.State);
-            SingleReportPrice = $"Price is ${SubscriptionUtility.IndvReportNoSubPrice} per report.";
-            SubscriptionPrice = $"Plans start at {SubscriptionUtility.BasicOrderCount} reports/month for ${SubscriptionUtility.BasicPrice}" +
-                $"{(IsFreeTrialVisible ? " after 30-day FREE trial ends." : ".")}";
+            var freeTrial = new[] { ValidationState.NoSubscriptionAndTrialValid, ValidationState.FreeReportValid }.Contains(validation.State);
+            SubscriptionHeaderText = freeTrial ? "FREE 30 DAY TRIAL AVAILABLE!" : "Become a Subscriber";
+            SingleReportPrice = $"An additional report gives you access to submit an additional order. Price is ${SubscriptionUtility.IndvReportNoSubPrice} per report.";
+            var ending = freeTrial ? " after 30-day free trial ends." : ".";
+            SubscriptionPrice = $"A subscription plan gives you access to 3 reports every month for $24.99 a month{ending}";
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -58,16 +59,16 @@ namespace MobileClient.Routes
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SubscriptionPrice)));
             }
         }
-        public bool IsFreeTrialVisible
+        public string SubscriptionHeaderText
         {
             get
             {
-                return _isFreeTrialVisible;
+                return _subscriptionHeaderText;
             }
             set
             {
-                _isFreeTrialVisible = value;
-                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsFreeTrialVisible)));
+                _subscriptionHeaderText = value;
+                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SubscriptionHeaderText)));
             }
         }
     }

@@ -6,6 +6,7 @@ using Android.OS;
 using Android.Runtime;
 using Android.Util;
 using Android.Views;
+using MobileClient.Models;
 using Plugin.CurrentActivity;
 using Plugin.InAppBilling;
 using System;
@@ -16,7 +17,7 @@ namespace MobileClient.Droid
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
         internal static readonly string CHANNEL_ID = "push_notification_channel";
-        internal static readonly int NOTIFICATION_ID = 100;
+        internal static readonly int NOTIFICATION_ID = 1000;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -24,20 +25,21 @@ namespace MobileClient.Droid
             {
                 base.Window.RequestFeature(WindowFeatures.ActionBar);
                 base.SetTheme(Resource.Style.MainTheme);
+                string orderId = null;
                 if (Intent.Extras != null)
                 {
                     foreach (var key in Intent.Extras.KeySet())
                     {
                         var value = Intent.Extras.GetString(key);
-                        //if (key == "from")
-                        //    pushModel = new LaunchedFromPushModel() { Topic = value };
+                        Log.Debug("Hi", $"Key: '{key}' Value: '{value}'");
+                        if (key == "orderId")
+                            orderId = value;
                     }
+
                 }
                 TabLayoutResource = Resource.Layout.Tabbar;
                 ToolbarResource = Resource.Layout.Toolbar;
-
                 base.OnCreate(savedInstanceState);
-
                 IsPlayServicesAvailable();
                 CreateNotificationChannel();
                 global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
@@ -49,8 +51,7 @@ namespace MobileClient.Droid
                 Fabric.Fabric.With(this, new Crashlytics.Crashlytics());
                 Crashlytics.Crashlytics.HandleManagedExceptions();
                 LoadApplication(new App());
-                var x = typeof(Xamarin.Forms.Themes.LightThemeResources);
-                x = typeof(Xamarin.Forms.Themes.Android.UnderlineEffect);
+                App.PushModel.OrderId = orderId;
             }
             catch (Exception ex)
             {

@@ -25,7 +25,7 @@
                 <Button x:Name="GoogleLogin"
                     Text="Login with Google"
                     WidthRequest="250"
-                    StyleClass="Info"
+                    StyleClass="btn-primary"
                     Command="{Binding GoogleLoginCommand}"
                     HorizontalOptions="CenterAndExpand"
                     VerticalOptions="CenterAndExpand" />

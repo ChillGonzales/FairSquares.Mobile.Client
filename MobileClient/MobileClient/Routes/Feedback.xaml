@@ -25,9 +25,15 @@
                 Command="{Binding SubmitCommand}"
                 Text="Submit"
                 WidthRequest="250"
-                StyleClass="Info"
+                StyleClass="btn-primary"
                 VerticalOptions="Center"
                 HorizontalOptions="CenterAndExpand" />
+            <Label HeightRequest="10"/>
+            <Label FontAttributes="Italic"
+                   FontSize="Small"
+                   Text="You can also submit feedback via email at any time by sending an email to info@fairsquarestech.com"
+                   VerticalOptions="Center"
+                   HorizontalOptions="CenterAndExpand" />
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>
