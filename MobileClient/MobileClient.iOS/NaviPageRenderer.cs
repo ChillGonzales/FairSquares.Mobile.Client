@@ -18,7 +18,11 @@ namespace MobileClient.iOS
         {
             base.OnElementChanged(e);
 
-            OverrideUserInterfaceStyle = UIUserInterfaceStyle.Light;
+            try
+            {
+                OverrideUserInterfaceStyle = UIUserInterfaceStyle.Light;
+            }
+            catch { }
         }
     }
 }

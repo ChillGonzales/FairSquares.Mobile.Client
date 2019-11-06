@@ -96,6 +96,7 @@ namespace MobileClient
                 var prCache = new LocalSqlCache<PurchasedReportModel>(Path.Combine(dbBasePath, "purchasedreports.db3"),
                     new AnalyticsLogger<LocalSqlCache<PurchasedReportModel>>(analyticsSvc, userService));
 
+                var startUpLogger = new AnalyticsLogger<App>(analyticsSvc, userService);
                 Action ClearCaches = () =>
                 {
                     try
@@ -120,7 +121,7 @@ namespace MobileClient
                         }
                         catch (Exception ex)
                         {
-                            Debug.WriteLine($"Failed to get purchased reports. {ex.ToString()}");
+                            startUpLogger.LogError("Failed to get purchased reports on refresh.", ex);
                         }
                     });
                     var orderTask = Task.Run(async () =>
@@ -160,48 +161,55 @@ namespace MobileClient
                             });
                             var subscriptionTask = Task.Run(async () =>
                             {
-                                // TODO: Refactor this so it can be tested.
-                                var allSubs = subService.GetSubscriptions(userId).OrderBy(x => x.StartDateTime).ToList();
-                                var recentSub = allSubs.LastOrDefault();
-                                var purchases = new List<InAppBillingPurchase>();
-                                SubscriptionModel newSub = null;
-
-                                // Check app store purchases to see if they auto-renewed
-                                if (recentSub != null && !SubscriptionUtility.SubscriptionActive(recentSub))
+                                try
                                 {
-                                    try
+                                    // TODO: Refactor this so it can be tested.
+                                    var allSubs = subService.GetSubscriptions(userId).OrderBy(x => x.StartDateTime).ToList();
+                                    var recentSub = allSubs.LastOrDefault();
+                                    var purchases = new List<InAppBillingPurchase>();
+                                    SubscriptionModel newSub = null;
+
+                                    // Check app store purchases to see if they auto-renewed
+                                    if (recentSub != null && !SubscriptionUtility.SubscriptionActive(recentSub))
                                     {
-                                        purchases = (await purchaseService.GetPurchases(ItemType.Subscription)).ToList();
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        purchaseEmailLogger.LogError($"Error occurred while getting purchases.", ex);
-                                    }
-                                    var mostRecent = purchases.OrderBy(x => x.TransactionDateUtc)?.LastOrDefault();
-                                    if (mostRecent != null)
-                                    {
-                                        newSub = SubscriptionUtility.GetModelFromIAP(mostRecent, user, recentSub);
-                                        if (newSub != null)
+                                        try
                                         {
-                                            allSubs.Add(newSub);
-                                            subService.AddSubscription(newSub);
+                                            purchases = (await purchaseService.GetPurchases(ItemType.Subscription)).ToList();
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            purchaseEmailLogger.LogError($"Error occurred while getting purchases.", ex);
+                                        }
+                                        var mostRecent = purchases.OrderBy(x => x.TransactionDateUtc)?.LastOrDefault();
+                                        if (mostRecent != null)
+                                        {
+                                            newSub = SubscriptionUtility.GetModelFromIAP(mostRecent, user, recentSub);
+                                            if (newSub != null)
+                                            {
+                                                allSubs.Add(newSub);
+                                                subService.AddSubscription(newSub);
+                                            }
                                         }
                                     }
+                                    if (!allSubs.Any())
+                                    {
+                                        subCache.Clear();
+                                    }
+                                    else
+                                    {
+                                        subCache.Put(allSubs.ToDictionary(x => x.PurchaseId, x => x));
+                                    }
                                 }
-                                if (!allSubs.Any())
+                                catch (Exception ex)
                                 {
-                                    subCache.Clear();
-                                }
-                                else
-                                {
-                                    subCache.Put(allSubs.ToDictionary(x => x.PurchaseId, x => x));
+                                    startUpLogger.LogError("Failed to get subscriptions on refresh.", ex);
                                 }
                             });
                             await Task.WhenAll(new[] { propTask, imgTask, subTask, subscriptionTask });
                         }
                         catch (Exception ex)
                         {
-                            Debug.WriteLine($"Failed to fill caches.\n{ex.ToString()}");
+                            startUpLogger.LogError($"Failed to fill caches.\n{ex.ToString()}", ex);
                         }
                     });
                     return Task.WhenAll(new[] { prTask, orderTask });
