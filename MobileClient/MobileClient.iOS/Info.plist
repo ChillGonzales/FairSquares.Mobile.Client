@@ -54,7 +54,7 @@
 	<key>NSCalendarsUsageDescription</key>
 	<string>Needs Calendar Permission</string>
 	<key>CFBundleVersion</key>
-	<string>1.60</string>
+	<string>1.75</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
@@ -64,6 +64,6 @@
 	<key>XSLaunchImageAssets</key>
 	<string>Assets.xcassets/LaunchImages.launchimage</string>
 	<key>CFBundleShortVersionString</key>
-	<string>60</string>
+	<string>75</string>
 </dict>
 </plist>

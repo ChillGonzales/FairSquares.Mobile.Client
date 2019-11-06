@@ -31,6 +31,7 @@ namespace MobileClient.Routes
                                            App.Container.GetInstance<IOrderValidationService>(),
                                            App.Container.GetInstance<IPageFactory>(),
                                            App.Container.GetInstance<ICurrentUserService>(),
+                                           App.Container.GetInstance<LaunchedFromPushModel>(),
                                            new MainThreadNavigator(x => Device.BeginInvokeOnMainThread(x), this.Navigation),
                                            App.Container.GetInstance<IMessagingCenter>(),
                                            x => Device.BeginInvokeOnMainThread(x),

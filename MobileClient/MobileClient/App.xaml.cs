@@ -1,4 +1,4 @@
-﻿using FairSquares.Measurement.Core.Models;
+using FairSquares.Measurement.Core.Models;
 using MobileClient.Authentication;
 using MobileClient.Models;
 using MobileClient.Routes;
@@ -36,6 +36,20 @@ namespace MobileClient
         private static string _blobEndpoint = @"https://fairsquaresapplogging.blob.core.windows.net/roof-images";
         private const string GoogleAuthorizeUrl = "https://accounts.google.com/o/oauth2/v2/auth";
         private const string GoogleAccessTokenUrl = "https://www.googleapis.com/oauth2/v4/token";
+        public const string TopicPrefix = "v1-";
+        public static LaunchedFromPushModel PushModel = new LaunchedFromPushModel();
+        public static void SendEmail(string body)
+        {
+            var notify = Container.GetInstance<INotificationService>();
+            notify.Notify(new NotificationRequest()
+            {
+                To = "colin.monroe@fairsquarestech.com",
+                Message = $"Push from iOS{Environment.NewLine}{body}",
+                MessageType = MessageType.Email,
+                From = "test@fairsquarestech.com",
+                Subject = "Push Notification Body"
+            });
+        }
 
         static App()
         {
@@ -83,6 +97,7 @@ namespace MobileClient
                 var prCache = new LocalSqlCache<PurchasedReportModel>(Path.Combine(dbBasePath, "purchasedreports.db3"),
                     new AnalyticsLogger<LocalSqlCache<PurchasedReportModel>>(analyticsSvc, userService));
 
+                var startUpLogger = new AnalyticsLogger<App>(analyticsSvc, userService);
                 Action ClearCaches = () =>
                 {
                     try
@@ -107,7 +122,7 @@ namespace MobileClient
                         }
                         catch (Exception ex)
                         {
-                            Debug.WriteLine($"Failed to get purchased reports. {ex.ToString()}");
+                            startUpLogger.LogError("Failed to get purchased reports on refresh.", ex);
                         }
                     });
                     var orderTask = Task.Run(async () =>
@@ -121,7 +136,7 @@ namespace MobileClient
                             {
                                 try
                                 {
-                                    DependencyService.Get<IMessagingSubscriber>().Subscribe(orders.Select(x => x.OrderId).ToList());
+                                    DependencyService.Get<IMessagingSubscriber>().Subscribe(orders.Select(x => $"{(Device.RuntimePlatform == Device.Android ? App.TopicPrefix : "")}{x.OrderId}").ToList());
                                 }
                                 catch { }
                             });
@@ -147,48 +162,55 @@ namespace MobileClient
                             });
                             var subscriptionTask = Task.Run(async () =>
                             {
-                                // TODO: Refactor this so it can be tested.
-                                var allSubs = subService.GetSubscriptions(userId).OrderBy(x => x.StartDateTime).ToList();
-                                var recentSub = allSubs.LastOrDefault();
-                                var purchases = new List<InAppBillingPurchase>();
-                                SubscriptionModel newSub = null;
-
-                                // Check app store purchases to see if they auto-renewed
-                                if (recentSub != null && !SubscriptionUtility.SubscriptionActive(recentSub))
+                                try
                                 {
-                                    try
+                                    // TODO: Refactor this so it can be tested.
+                                    var allSubs = subService.GetSubscriptions(userId).OrderBy(x => x.StartDateTime).ToList();
+                                    var recentSub = allSubs.LastOrDefault();
+                                    var purchases = new List<InAppBillingPurchase>();
+                                    SubscriptionModel newSub = null;
+
+                                    // Check app store purchases to see if they auto-renewed
+                                    if (recentSub != null && !SubscriptionUtility.SubscriptionActive(recentSub))
                                     {
-                                        purchases = (await purchaseService.GetPurchases(ItemType.Subscription)).ToList();
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        purchaseEmailLogger.LogError($"Error occurred while getting purchases.", ex);
-                                    }
-                                    var mostRecent = purchases.OrderBy(x => x.TransactionDateUtc)?.LastOrDefault();
-                                    if (mostRecent != null)
-                                    {
-                                        newSub = SubscriptionUtility.GetModelFromIAP(mostRecent, user, recentSub);
-                                        if (newSub != null)
+                                        try
                                         {
-                                            allSubs.Add(newSub);
-                                            subService.AddSubscription(newSub);
+                                            purchases = (await purchaseService.GetPurchases(ItemType.Subscription)).ToList();
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            purchaseEmailLogger.LogError($"Error occurred while getting purchases.", ex);
+                                        }
+                                        var mostRecent = purchases.OrderBy(x => x.TransactionDateUtc)?.LastOrDefault();
+                                        if (mostRecent != null)
+                                        {
+                                            newSub = SubscriptionUtility.GetModelFromIAP(mostRecent, user, recentSub);
+                                            if (newSub != null)
+                                            {
+                                                allSubs.Add(newSub);
+                                                subService.AddSubscription(newSub);
+                                            }
                                         }
                                     }
+                                    if (!allSubs.Any())
+                                    {
+                                        subCache.Clear();
+                                    }
+                                    else
+                                    {
+                                        subCache.Put(allSubs.ToDictionary(x => x.PurchaseId, x => x));
+                                    }
                                 }
-                                if (!allSubs.Any())
+                                catch (Exception ex)
                                 {
-                                    subCache.Clear();
-                                }
-                                else
-                                {
-                                    subCache.Put(allSubs.ToDictionary(x => x.PurchaseId, x => x));
+                                    startUpLogger.LogError("Failed to get subscriptions on refresh.", ex);
                                 }
                             });
                             await Task.WhenAll(new[] { propTask, imgTask, subTask, subscriptionTask });
                         }
                         catch (Exception ex)
                         {
-                            Debug.WriteLine($"Failed to fill caches.\n{ex.ToString()}");
+                            startUpLogger.LogError($"Failed to fill caches.\n{ex.ToString()}", ex);
                         }
                     });
                     return Task.WhenAll(new[] { prTask, orderTask });
@@ -218,7 +240,7 @@ namespace MobileClient
                 Container.Register<OAuth2Authenticator>(() => authenticator, Lifestyle.Singleton);
                 Container.Register<AccountStore>(() => AccountStore.Create(), Lifestyle.Singleton);
                 Container.Register<ICurrentUserService>(() => userService, Lifestyle.Singleton);
-                Container.Register<IPurchasingService>(() => purchaseService);
+                Container.Register<IPurchasingService>(() => purchaseService, Lifestyle.Singleton);
                 Container.Register<ICacheRefresher>(() => refresher, Lifestyle.Singleton);
                 Container.Register<ISubscriptionService>(() => subService, Lifestyle.Singleton);
                 Container.Register<IOrderValidationService, OrderValidationService>();
@@ -228,6 +250,7 @@ namespace MobileClient
                 Container.Register<IMessagingCenter>(() => MessagingCenter.Instance, Lifestyle.Singleton);
                 Container.Register<IPurchasedReportService>(() => prService, Lifestyle.Singleton);
                 Container.Register<IAnalyticsService>(() => analyticsSvc, Lifestyle.Singleton);
+                Container.Register<LaunchedFromPushModel>(() => App.PushModel ?? new LaunchedFromPushModel(), Lifestyle.Singleton);
 
                 // Finish registering created caches
                 Container.Register<ICache<PropertyModel>>(() => propertyCache, Lifestyle.Singleton);

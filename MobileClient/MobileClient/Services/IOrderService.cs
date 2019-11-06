@@ -10,5 +10,6 @@ namespace MobileClient.Services
     {
         Task<string> AddOrder(Order order);
         Task<IEnumerable<Order>> GetMemberOrders(string memberId);
+        Task<Order> GetOrder(string orderId);
     }
 }

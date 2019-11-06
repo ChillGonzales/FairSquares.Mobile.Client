@@ -4,6 +4,7 @@ using System.Linq;
 using Firebase.CloudMessaging;
 using Firebase.Crashlytics;
 using Foundation;
+using Newtonsoft.Json;
 using UIKit;
 using UserNotifications;
 using Xamarin.Auth;
@@ -54,6 +55,18 @@ namespace MobileClient.iOS
             }
             catch { }
 
+            var pm = new Models.LaunchedFromPushModel();
+            try
+            {
+                if (options != null && options.Any())
+                {
+                    App.SendEmail($"Options from FinishedLaunching" + Environment.NewLine + JsonConvert.SerializeObject(options));
+                    options.TryGetValue(NSObject.FromObject("orderId"), out var nsObj);
+                    if (nsObj != null)
+                        pm.OrderId = nsObj.ToString();
+                }
+            }
+            catch { }
             LoadApplication(new App());
 
             // Firebase component initialize
@@ -97,6 +110,16 @@ namespace MobileClient.iOS
             //Messaging.SharedInstance.AppDidReceiveMessage (userInfo);
 
             // Print full message.
+            // ref: https://forums.xamarin.com/discussion/161408/xamarin-forms-how-to-handle-the-notification-click-in-ios#latest
+            try
+            {
+                var orderId = JsonConvert.DeserializeObject<string>(userInfo[new NSString("orderId")] as NSString);
+                App.PushModel.OrderId = orderId;
+            }
+            catch (Exception ex) 
+            {
+                App.SendEmail($"Failed to parse push notification: {Environment.NewLine}{ex.ToString()}");
+            }
             Console.WriteLine(userInfo);
 
             completionHandler(UIBackgroundFetchResult.NewData);

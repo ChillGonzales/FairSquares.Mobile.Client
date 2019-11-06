@@ -1,24 +1,24 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:d="http://xamarin.com/schemas/2014/forms/design"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
+             Title="Purchasing Options"
              x:Class="MobileClient.Routes.PurchaseOptions">
     <ContentPage.Content>
         <ScrollView Margin="5">
             <StackLayout Orientation="Vertical">
-                <Label Text="Choose the right option for you."
-                    FontSize="Large"
-                    FontAttributes="Bold"
-                    VerticalOptions="Start" 
-                    HorizontalOptions="CenterAndExpand" />
-                <Label HeightRequest="25" />
                 <StackLayout Orientation="Vertical">
+                    <Label Text="Additional Report"
+                           FontSize="Medium"
+                           FontAttributes="Bold"
+                           VerticalOptions="Start"
+                           HorizontalOptions="CenterAndExpand" />
                     <Frame BorderColor="Black"
                            VerticalOptions="End">
                         <StackLayout>
-                            <Label Text="Single reports offer you flexibility without a commitment."
+                            <Label Text="Purchasing additional reports offers you flexibility without a commitment."
                                 FontAttributes="Bold"
                                 FontSize="Medium"
                                 VerticalOptions="Start" 
@@ -35,8 +35,7 @@
                         </StackLayout>
                     </Frame>
                     <Label HeightRequest="20" />
-                    <Label Text="FREE 30 DAY TRIAL AVAILABLE!"
-                           IsVisible="{Binding IsFreeTrialVisible}"
+                    <Label Text="{Binding SubscriptionHeaderText}"
                            FontSize="Medium"
                            FontAttributes="Bold"
                            VerticalOptions="Start"
