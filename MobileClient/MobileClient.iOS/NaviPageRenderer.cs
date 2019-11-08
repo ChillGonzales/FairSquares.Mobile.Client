@@ -20,7 +20,10 @@ namespace MobileClient.iOS
 
             try
             {
-                OverrideUserInterfaceStyle = UIUserInterfaceStyle.Light;
+                if (UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
+                {
+                    OverrideUserInterfaceStyle = UIUserInterfaceStyle.Light;
+                }
             }
             catch { }
         }
